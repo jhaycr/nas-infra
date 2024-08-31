@@ -1,0 +1,73 @@
+---
+
+# -----
+# arillso.system.users
+# -----
+users_list:
+  - username: user0
+    uid: 1000
+    shell: /bin/bash
+  - username: alice
+    uid: 9999
+    shell: /bin/bash
+
+# -----
+# grog.package
+# -----
+package_list: []
+  # - name: bash-completion
+  # - name: curl
+
+luks_keyfile_path: /etc/luks.key
+luks_disks_validate_serial: true
+
+# -----
+# IronicBadger.snapraid
+# -----
+snapraid_install: true
+snapraid_runner: true
+
+snapraid_data_disks:
+  - path: /mnt/data1
+    content: true
+  - path: /mnt/data2
+    content: true
+
+snapraid_parity_disks:
+  - path: /mnt/parity1
+    content: false
+
+snapraid_content_files:
+  - /var/snapraid.content
+
+snapraid_config_excludes:
+  - "*.unrecoverable"
+  - /lost+found/
+  - "*.!sync"
+  - "*.bak"
+  - /tmp/
+  - backup/
+  - downloads/
+  - temp/
+  - "aquota.group"
+  - "aquota.user"
+  - "snapraid.conf*"
+  - "*.nfo"
+
+snapraid_sync_schedule:
+  minute: 0
+  hour: 0
+
+snapraid_scrub_schedule:
+  minute: 5
+  hour: 3
+  weekday: 0
+
+# -----
+# tigattack.mergerfs
+# -----
+mergerfs_mounts:
+  - path: /mnt/storage
+    branches:
+      - /mnt/data*
+    options: defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,category.create=mfs,dropcacheonclose=true,minfreespace=250G,fsname=mergerfs

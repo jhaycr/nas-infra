@@ -1,0 +1,34 @@
+---
+
+- hosts: neo
+
+  roles:
+    - role: arillso.system.users
+      become: yes
+    - role: grog.package
+    - role: geerlingguy.pip
+    - role: geerlingguy.docker
+    - role: jhaycr.luks_disks
+    - role: IronicBadger.snapraid
+      become: yes
+    - role: tigattack.mergerfs
+    - role: geerlingguy.nfs
+    - role: IronicBadger.proxmox_nag_removal
+
+  tasks:
+    - name: create downloads directory
+      ansible.builtin.file:
+        path: "/home/user0/downloads"
+        owner: user0
+        group: user0
+        state: directory
+
+    - name: create symbolic link to downloads
+      ansible.builtin.file:
+        src: "/home/user0/downloads"
+        dest: "/mnt/storage/downloads"
+        owner: user0
+        group: user0
+        state: link
+
+    

@@ -1,0 +1,14 @@
+---
+- hosts: all
+
+  vars:
+    ansible_ssh_user: ansible
+    ssh_permit_root_login: 'yes'
+    ssh_client_password_login: true # ssh
+    ssh_server_password_login: true # sshd
+    ssh_max_auth_retries: 6
+    sshd_authenticationmethods: any
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: devsec.hardening.ssh_hardening

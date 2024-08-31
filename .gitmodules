@@ -1,0 +1,6 @@
+[submodule "roles/jhaycr.deployment_user"]
+	path = roles/jhaycr.deployment_user
+	url = git@github.com:jhaycr/ansible-role-deployment-user.git
+[submodule "roles/jhaycr.luks_disks"]
+	path = roles/jhaycr.luks_disks
+	url = git@github.com:jhaycr/ansible-role-luks-disks.git
