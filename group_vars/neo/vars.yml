@@ -14,9 +14,9 @@ users_list:
 # -----
 # grog.package
 # -----
-package_list: []
-  # - name: bash-completion
-  # - name: curl
+package_list:
+  - name: git
+  - name: curl
 
 # -----
 # jhaycr.luks_disks
