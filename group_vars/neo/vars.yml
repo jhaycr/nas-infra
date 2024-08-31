@@ -18,6 +18,9 @@ package_list: []
   # - name: bash-completion
   # - name: curl
 
+# -----
+# jhaycr.luks_disks
+# -----
 luks_keyfile_path: /etc/luks.key
 luks_disks_validate_serial: true
 
