@@ -1,0 +1,16 @@
+---
+collections:
+  - name: arillso.system
+    version: 0.0.34
+  - name: devsec.hardening
+    version: 9.0.1
+
+roles:
+  - name: geerlingguy.docker
+  - name: geerlingguy.nfs
+  - name: geerlingguy.pip
+  - name: grog.package
+  - name: IronicBadger.proxmox_nag_removal
+  - name: IronicBadger.snapraid
+  - name: joenyland.plexmediaserver
+  - name: tigattack.mergerfs

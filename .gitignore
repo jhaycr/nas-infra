@@ -1,0 +1,6 @@
+.vscode
+
+# galaxy-installed collections/roles
+ansible_collections
+roles/*
+!roles/jhaycr.*/

@@ -1,0 +1,21 @@
+---
+- hosts: all
+
+  vars:
+    deployment_user_state: present
+    deployment_user_name: ansible
+    deployment_user_sudo: true
+    deployment_user_sudo_passwordless: true
+    deployment_user_public_key_files:
+      - ~/.ssh/ansible.pub
+    ansible_ssh_user: root
+
+  tasks:
+
+    - name: Create 'ansible' user if root/admin login succeeded
+      ansible.builtin.import_role:
+        name: jhaycr.deployment_user
+
+    - ansible.builtin.import_role:
+        name: devsec.hardening.ssh_hardening
+
