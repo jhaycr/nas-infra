@@ -6,6 +6,7 @@
     - role: arillso.system.users
       become: yes
     - role: grog.package
+      become: yes
     - role: geerlingguy.pip
     - role: geerlingguy.docker
     - role: jhaycr.luks_disks
@@ -13,22 +14,33 @@
       become: yes
     - role: tigattack.mergerfs
     - role: geerlingguy.nfs
+    - role: IronicBadger.docker_compose_generator
+      tags: compose
+      become: yes
     - role: IronicBadger.proxmox_nag_removal
 
   tasks:
     - name: create downloads directory
       ansible.builtin.file:
-        path: "/home/user0/downloads"
-        owner: user0
-        group: user0
+        path: "/home/{{ main_username }}/downloads"
+        owner: "{{ main_username }}"
+        group: "{{ main_username }}"
         state: directory
 
     - name: create symbolic link to downloads
       ansible.builtin.file:
-        src: "/home/user0/downloads"
+        src: "/home/{{ main_username }}/downloads"
         dest: "/mnt/storage/downloads"
-        owner: user0
-        group: user0
+        owner: "{{ main_username }}"
+        group: "{{ main_username }}"
         state: link
 
-    
+    - name: deploy Docker Compose stack
+      become_user: "{{ main_username }}"
+      tags: compose
+      community.docker.docker_compose_v2:
+        project_src: "{{docker_compose_generator_output_path}}"
+        files:
+        - docker-compose.yml
+        remove_orphans: true
+      

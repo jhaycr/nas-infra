@@ -12,5 +12,6 @@ roles:
   - name: grog.package
   - name: IronicBadger.proxmox_nag_removal
   - name: IronicBadger.snapraid
+  - name: IronicBadger.docker_compose_generator
   - name: joenyland.plexmediaserver
   - name: tigattack.mergerfs
