@@ -1,10 +1,14 @@
 ---
 
+main_username: user0
+ntp_timezone: America/Los_Angeles
+
 # -----
 # arillso.system.users
 # -----
+
 users_list:
-  - username: user0
+  - username: "{{ main_username }}"
     uid: 1000
     shell: /bin/bash
   - username: alice
@@ -74,3 +78,29 @@ mergerfs_mounts:
     branches:
       - /mnt/data*
     options: defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,category.create=mfs,dropcacheonclose=true,minfreespace=250G,fsname=mergerfs
+
+# -----
+# IronicBadger.docker_compose_generator
+# -----
+global_env_vars:
+  - "PUID=1000"
+  - "PGID=1000"
+  - "TZ={{ ntp_timezone }}"
+
+appdata_path: "/opt/appdata"
+docker_compose_generator_output_path: "/home/{{ main_username }}/docker/monitoring"
+containers:
+  ###
+  - service_name: influxdb
+    active: true
+    image: influxdb:2.7-alpine
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+    ports:
+      - '8086:8086'
+    volumes:
+      - "{{ appdata_path }}/influxdb_data:/var/lib/influxdb"

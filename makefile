@@ -25,3 +25,6 @@ vault-unlock:
 
 neo:
 	ansible-playbook -v site.yml --limit neo
+
+neo-compose:
+	ansible-playbook -v site.yml --limit neo --tags compose
