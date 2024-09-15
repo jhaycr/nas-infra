@@ -3,4 +3,6 @@
 # galaxy-installed collections/roles
 ansible_collections
 roles/*
-!roles/jhaycr.*/
+
+# my roles
+!roles/jhaycr*.*/
