@@ -1,0 +1,11 @@
+---
+
+main_username: josh
+
+# -----
+# grog.package
+# -----
+package_list:
+  - name: git
+  - name: curl
+  - name: iperf
