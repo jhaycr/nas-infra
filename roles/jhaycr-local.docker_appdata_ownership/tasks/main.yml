@@ -1,0 +1,7 @@
+---
+- name: Update ownership of container appdata volumes
+  ansible.builtin.file:
+    path: "{{ docker_home_appdata_path }}/{{ item }}"
+    owner: 1000
+    group: 1000
+  with_items: "{{ docker_appdata_folders_to_own }}"

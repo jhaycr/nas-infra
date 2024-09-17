@@ -246,6 +246,21 @@ services:
       bind:
         create_host_path: true
   
+  maintainerr:
+    image: ghcr.io/jorenn92/maintainerr:latest # or jorenn92/maintainerr:latest
+    container_name: maintainerr
+    user: 1000:1000
+    volumes:
+      - {{ docker_home_appdata_path }}/maintainerr:/opt/data
+    environment:
+      PGID: "1000"
+      PUID: "1000"
+      TZ: America/Los_Angeles
+#     DEBUG=true # uncomment to enable debug logs
+    ports:
+      - 6246:6246
+    restart: unless-stopped
+    
   mylar3:
     container_name: mylar3
     environment:
@@ -363,6 +378,19 @@ services:
       bind:
         create_host_path: true
   
+  overseerr:
+    image: linuxserver/overseerr:1.33.2
+    container_name: overseerr
+    restart: unless-stopped
+    environment:
+      PGID: "1000"
+      PUID: "1000"
+      TZ: America/Los_Angeles
+    volumes:
+      - {{ docker_home_appdata_path }}/overseerr:/config
+    ports:
+      - 5055:5055/tcp # Web UI
+
   portainer:
     command:
     - -H
@@ -600,22 +628,10 @@ services:
       protocol: tcp
     restart: unless-stopped
     volumes:
-    - type: bind
-      source: {{ docker_home_appdata_path }}/uptimekuma
-      target: /app/data
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
+    - {{ docker_home_appdata_path }}/uptimekuma:/app/data
+    - {{ docker_storage_path }}:/storage
+    - /etc/localtime:/etc/localtime:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
 networks:
   default:
     name: compose_default

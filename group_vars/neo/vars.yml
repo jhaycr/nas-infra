@@ -5,10 +5,11 @@ ntp_timezone: America/Los_Angeles
 
 docker_compose_templates_path: '../templates/docker/neo'
 
-
+docker_storage_path: '/mnt/storage'
 docker_home_compose_path: '/opt/docker'
 docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
-docker_storage_path: '/mnt/storage'
+docker_appdata_folders_to_own:
+- maintainerr
 
 # -----
 # arillso.system.users
