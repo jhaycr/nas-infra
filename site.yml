@@ -14,7 +14,7 @@
       become: yes
     - role: tigattack.mergerfs
     - role: geerlingguy.nfs
-    - role: IronicBadger.docker_compose_generator
+    - role: jhaycr-local.docker_compose
       tags: compose
       become: yes
     - role: IronicBadger.proxmox_nag_removal
@@ -35,12 +35,16 @@
         group: "{{ main_username }}"
         state: link
 
-    - name: deploy Docker Compose stack
-      become_user: "{{ main_username }}"
+    - name: start docker stack
+      become: yes
       tags: compose
       community.docker.docker_compose_v2:
-        project_src: "{{docker_compose_generator_output_path}}"
+        project_src: "{{ docker_home_compose_path }}"
+        state: present
+        env_files:
+        - .env
         files:
         - docker-compose.yml
+        - docker-compose.override.yml
         remove_orphans: true
       
