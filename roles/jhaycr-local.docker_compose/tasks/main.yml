@@ -1,0 +1,19 @@
+---
+- command: whoami
+  register: result
+- debug:
+    var: result.stdout
+    
+- name: ensure destination for compose file exists
+  file:
+    path: "{{ docker_home_appdata_path }}"
+    state: directory
+
+- name: Copy docker compose configuration template
+  template:
+    src: "{{ docker_compose_templates_path }}/{{ item }}.j2"
+    dest: "{{ docker_home_compose_path }}/{{ item }}"
+  loop:
+    - .env
+    - docker-compose.yml
+    - docker-compose.override.yml

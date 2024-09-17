@@ -27,4 +27,4 @@ neo:
 	ansible-playbook -v site.yml --limit neo
 
 neo-compose:
-	ansible-playbook -v site.yml --limit neo --tags compose
+	ansible-playbook -vv site.yml --limit neo --tags compose
