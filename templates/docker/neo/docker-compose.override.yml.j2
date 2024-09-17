@@ -115,12 +115,6 @@ services:
     - {{ docker_storage_path }}/downloads:/downloads
     - {{ docker_storage_path }}/media/TV:/storage/tv
 
-  uptimekuma:
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # If you use Docker Socket Proxy, comment this line out
-
-
-
 
 # Traefik 2 - Reverse Proxy
   traefik:
@@ -276,3 +270,21 @@ services:
       - traefik.http.middlewares.ombi.headers.frameDeny=true
       - traefik.http.services.ombi.loadbalancer.server.port=3579
 
+  overseerr:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.overseerr.rule=Host(`requests.{{ domain }}`)
+      - traefik.http.routers.overseerr.entrypoints=https
+      - traefik.http.routers.overseerr.tls=true
+      - traefik.http.routers.overseerr.middlewares=chain-oauth@file
+      - traefik.http.middlewares.overseerr.headers.SSLRedirect=true
+      - traefik.http.middlewares.overseerr.headers.STSSeconds=315360000
+      - traefik.http.middlewares.overseerr.headers.browserXSSFilter=true
+      - traefik.http.middlewares.overseerr.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.overseerr.headers.forceSTSHeader=true
+      - traefik.http.middlewares.overseerr.headers.SSLHost=
+      - traefik.http.middlewares.overseerr.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.overseerr.headers.STSPreload=true
+      - traefik.http.middlewares.overseerr.headers.frameDeny=true
+      - traefik.http.services.overseerr.loadbalancer.server.port=3579
