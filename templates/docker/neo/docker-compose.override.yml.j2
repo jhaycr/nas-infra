@@ -156,7 +156,7 @@ services:
       # - --providers.file.filename=/path/to/file # Load dynamic configuration from a file
       - --providers.file.watch=true # Only works on top level files in the rules folder
       # - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
-      - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
+      - --certificatesResolvers.dns-cloudflare.acme.email={{ cloudflare_email }}
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
@@ -180,15 +180,15 @@ services:
       #   protocol: tcp
       #   mode: host
     environment:
-      - CF_API_EMAIL=$CLOUDFLARE_EMAIL
+      - CF_API_EMAIL={{ cloudflare_email }}
       - CF_API_KEY={{ cloudflare_api_key }}
       - DOMAINNAME_CLOUD_SERVER # Passing the domain name to the traefik container to be able to use the variable in rules. 
     volumes:
-      - $DOCKERCONFDIR/traefik/rules/cloudserver:/rules # file provider directory
+      - {{ docker_home_appdata_path }}/traefik/rules/cloudserver:/rules # file provider directory
       - /var/run/docker.sock:/var/run/docker.sock:ro # If you use Docker Socket Proxy, comment this line out
-      - $DOCKERCONFDIR/traefik/acme/acme.json:/acme.json # cert location - you must create this empty file and change permissions to 600
-      - $DOCKERCONFDIR/traefik/logs/cloudserver/traefik.log:/traefik.log # for fail2ban - make sure to create an empty file before starting the container
-      - $DOCKERCONFDIR/traefik/.htpasswd:/.htpasswd
+      - {{ docker_home_appdata_path }}/traefik/acme/acme.json:/acme.json # cert location - you must create this empty file and change permissions to 600
+      - {{ docker_home_appdata_path }}/traefik/logs/cloudserver/traefik.log:/traefik.log # for fail2ban - make sure to create an empty file before starting the container
+      - {{ docker_home_appdata_path }}/traefik/.htpasswd:/.htpasswd
     labels:
       - "traefik.enable=true"
       # HTTP-to-HTTPS Redirect
@@ -283,7 +283,7 @@ services:
       - traefik.http.middlewares.overseerr.headers.browserXSSFilter=true
       - traefik.http.middlewares.overseerr.headers.contentTypeNosniff=true
       - traefik.http.middlewares.overseerr.headers.forceSTSHeader=true
-      - traefik.http.middlewares.overseerr.headers.SSLHost=
+      - traefik.http.middlewares.overseombierr.headers.SSLHost=
       - traefik.http.middlewares.overseerr.headers.STSIncludeSubdomains=true
       - traefik.http.middlewares.overseerr.headers.STSPreload=true
       - traefik.http.middlewares.overseerr.headers.frameDeny=true
