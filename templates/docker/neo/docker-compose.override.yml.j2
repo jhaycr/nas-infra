@@ -52,70 +52,7 @@ x-common-keys-media: &common-keys-media
   restart: "no"
 
 services:
-
-  deluge:
-    image: linuxserver/deluge:5b398f77-ls22
-    volumes:
-    - {{ docker_storage_path }}/media/Anime:/anime
-    - {{ docker_storage_path }}/downloads:/download
     
-  komga:
-    <<: *common-keys-core # See EXTENSION FIELDS at the top
-    image: gotson/komga
-    container_name: komga
-    volumes:
-      - {{ docker_home_appdata_path }}/komga:/config
-      - {{ docker_storage_path }}/comics:/data
-      - {{ docker_storage_path }}/storage/Books:/books
-    ports:
-      - 25600:25600
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - KOMGA_OAUTH2_ACCOUNT_CREATION=true
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - traefik.http.routers.komga.rule=Host(`comics.{{ domain }}`)
-      - traefik.http.routers.komga.entrypoints=https
-      - traefik.http.routers.komga.tls=true
-      - traefik.http.routers.komga.middlewares=chain-oauth@file
-      - traefik.http.middlewares.komga.headers.SSLRedirect=true
-      - traefik.http.middlewares.komga.headers.STSSeconds=315360000
-      - traefik.http.middlewares.komga.headers.browserXSSFilter=true
-      - traefik.http.middlewares.komga.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.komga.headers.forceSTSHeader=true
-      - traefik.http.middlewares.komga.headers.SSLHost=
-      - traefik.http.middlewares.komga.headers.STSIncludeSubdomains=true
-      - traefik.http.middlewares.komga.headers.STSPreload=true
-      - traefik.http.middlewares.komga.headers.frameDeny=true
-      - traefik.http.services.komga.loadbalancer.server.port=25600
-
-  mylar3:
-    volumes:
-    - {{ docker_storage_path }}/downloads:/downloads
-  
-  radarr:
-    volumes:
-    - {{ docker_storage_path }}/downloads:/downloads
-    - {{ docker_storage_path }}/media/Movies:/storage/movies
-
-  sabnzbd:
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-    - {{ docker_storage_path }}/downloads:/downloads
-    restart: unless-stopped
-
-  sonarr:
-    volumes:
-    - {{ docker_storage_path }}/downloads:/downloads
-    - {{ docker_storage_path }}/media/TV:/storage/tv
-
-
 # Traefik 2 - Reverse Proxy
   traefik:
     <<: *common-keys-core # See EXTENSION FIELDS at the top
@@ -249,6 +186,28 @@ services:
       ## HTTP Services
       - "traefik.http.routers.oauth-rtr.service=oauth-svc"
       - "traefik.http.services.oauth-svc.loadbalancer.server.port=4181"
+
+  ############################
+  ## TRAEFIK-ENABLED SERVICES
+  ############################
+  komga:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.komga.rule=Host(`comics.{{ domain }}`)
+      - traefik.http.routers.komga.entrypoints=https
+      - traefik.http.routers.komga.tls=true
+      - traefik.http.routers.komga.middlewares=chain-oauth@file
+      - traefik.http.middlewares.komga.headers.SSLRedirect=true
+      - traefik.http.middlewares.komga.headers.STSSeconds=315360000
+      - traefik.http.middlewares.komga.headers.browserXSSFilter=true
+      - traefik.http.middlewares.komga.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.komga.headers.forceSTSHeader=true
+      - traefik.http.middlewares.komga.headers.SSLHost=
+      - traefik.http.middlewares.komga.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.komga.headers.STSPreload=true
+      - traefik.http.middlewares.komga.headers.frameDeny=true
+      - traefik.http.services.komga.loadbalancer.server.port=25600
 
   ombi:
     <<: *common-keys-core # See EXTENSION FIELDS at the top
