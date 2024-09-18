@@ -1,345 +1,159 @@
 name: compose
-services:
+version: '3'
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-file: "10"
+    max-size: 200k
+
+x-common-keys: &common-keys
+  restart: unless-stopped
+  logging: *default-logging
+
+x-common-env: &common-env
+  PGID: "1000"
+  PUID: "1000"
+  TZ: America/Los_Angeles
+
+x-common-volumes:
+  - &localtime /etc/localtime:/etc/localtime:ro
+  - &storage {{ docker_storage_path }}:/storage
+
+services:
   audiobookshelf:
+    <<: *common-keys
     container_name: audiobookshelf
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
     image: ghcr.io/advplyr/audiobookshelf:latest
-    restart: unless-stopped
+    environment:
+      <<: *common-env
     ports:
-      - 13378:80
+      - "13378:80"
     volumes:
+      - *localtime
+      - *storage
       - {{ docker_storage_path }}/media/audio/audiobooks:/audiobooks
       - {{ docker_storage_path }}/media/audio/podcasts:/podcasts
-      - {{ docker_home_appdata_path }}/audiobookshelf:/config:/config
+      - {{ docker_home_appdata_path }}/audiobookshelf:/config
       - {{ docker_storage_path }}/media/audio/:/metadata1
 
   bazarr:
+    <<: *common-keys
     container_name: bazarr
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/bazarr:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 6767
-      published: "6767"
-      protocol: tcp
-    restart: unless-stopped
+      - "6767:6767"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/bazarr
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/bazarr:/config
 
   calibreweb:
+    <<: *common-keys
     container_name: calibreweb
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/calibre-web:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 8083
-      published: "8083"
-      protocol: tcp
-    restart: unless-stopped
+      - "8083:8083"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/calibreweb
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/calibreweb:/config
 
   deluge:
+    <<: *common-keys
     container_name: deluge
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/deluge:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 6881
-      published: "6881"
-      protocol: tcp
-    - mode: ingress
-      target: 6881
-      published: "6881"
-      protocol: udp
-    - mode: ingress
-      target: 8112
-      published: "8112"
-      protocol: tcp
-    - mode: ingress
-      target: 51413
-      published: "51413"
-      protocol: tcp
-    - mode: ingress
-      target: 51413
-      published: "51413"
-      protocol: udp
-    - mode: ingress
-      target: 58846
-      published: "58846"
-      protocol: tcp
-    - mode: ingress
-      target: 58946
-      published: "58946"
-      protocol: tcp
-    restart: unless-stopped
+      - "6881:6881"
+      - "6881:6881/udp"
+      - "8112:8112"
+      - "51413:51413"
+      - "51413:51413/udp"
+      - "58846:58846"
+      - "58946:58946"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/deluge
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/deluge:/config
 
   filebot:
+    <<: *common-keys
     container_name: filebot
-    environment:
-      GROUP_ID: "1000"
-      TZ: America/Los_Angeles
-      USER_ID: "1000"
-    hostname: DockSTARTer
     image: jlesage/filebot:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 5800
-      published: "5800"
-      protocol: tcp
-    restart: unless-stopped
+      - "5800:5800"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/filebot
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
-    - type: bind
-      source: /mnt/filebot/output
-      target: /output
-      bind:
-        create_host_path: true
-    - type: bind
-      source: /mnt/filebot/watch
-      target: /watch
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/filebot:/config
+      - /mnt/filebot/output:/output
+      - /mnt/filebot/watch:/watch
 
   freshrss:
+    <<: *common-keys
     container_name: freshrss
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/freshrss:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 80
-      published: "8012"
-      protocol: tcp
-    restart: unless-stopped
+      - "8012:80"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/freshrss
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
-  
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/freshrss:/config
+
   maintainerr:
-    image: ghcr.io/jorenn92/maintainerr:latest # or jorenn92/maintainerr:latest
+    <<: *common-keys
     container_name: maintainerr
+    image: ghcr.io/jorenn92/maintainerr:latest
+    environment:
+      <<: *common-env
+    ports:
+      - "6246:6246"
     user: 1000:1000
     volumes:
       - {{ docker_home_appdata_path }}/maintainerr:/opt/data
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-#     DEBUG=true # uncomment to enable debug logs
-    ports:
-      - 6246:6246
-    restart: unless-stopped
-    
+
   mylar3:
+    <<: *common-keys
     container_name: mylar3
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/mylar3:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 8090
-      published: "8090"
-      protocol: tcp
-    restart: unless-stopped
+      - "8090:8090"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/mylar3
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/mylar3:/config
+
   ombi:
+    <<: *common-keys
     container_name: ombi
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/ombi:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
-    ports:
-    - mode: ingress
-      target: 3579
-      published: "3579"
-      protocol: tcp
-    restart: unless-stopped
-    volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/ombi
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
-  ouroboros:
-    container_name: ouroboros
     environment:
+      <<: *common-env
+    ports:
+      - "3579:3579"
+    volumes:
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/ombi:/config
+
+  ouroboros:
+    <<: *common-keys
+    container_name: ouroboros
+    image: pyouroboros/ouroboros:latest
+    environment:
+      <<: *common-env
       CLEANUP: "true"
       CRON: 0 4 * * *
       IGNORE: ""
@@ -349,289 +163,116 @@ services:
       REPO_PASS: ""
       REPO_USER: ""
       SELF_UPDATE: "true"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
-    image: pyouroboros/ouroboros:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
-    restart: unless-stopped
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
-  
+      - *localtime
+      - *storage
+      - /var/run/docker.sock:/var/run/docker.sock
+
   overseerr:
-    image: linuxserver/overseerr:1.33.2
+    <<: *common-keys
     container_name: overseerr
-    restart: unless-stopped
+    image: linuxserver/overseerr:1.33.2
     environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
+      <<: *common-env
+    ports:
+      - "5055:5055"
     volumes:
       - {{ docker_home_appdata_path }}/overseerr:/config
-    ports:
-      - 5055:5055/tcp # Web UI
 
   portainer:
-    command:
-    - -H
-    - unix:///var/run/docker.sock
+    <<: *common-keys
     container_name: portainer
-    environment:
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: portainer/portainer-ce:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    command:
+      - -H
+      - unix:///var/run/docker.sock
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 9000
-      published: "9000"
-      protocol: tcp
-    restart: unless-stopped
+      - "9000:9000"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/portainer
-      target: /data
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - /var/run/docker.sock:/var/run/docker.sock
+      - {{ docker_home_appdata_path }}/portainer:/data
+
   prowlarr:
+    <<: *common-keys
     container_name: prowlarr
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/prowlarr:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 9696
-      published: "9696"
-      protocol: tcp
-    restart: unless-stopped
+      - "9696:9696"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/prowlarr
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/prowlarr:/config
+
   radarr:
+    <<: *common-keys
     container_name: radarr
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/radarr:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
-    ports:
-    - mode: ingress
-      target: 7878
-      published: "7878"
-      protocol: tcp
-    restart: unless-stopped
-    volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/radarr
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
-  sabnzbd:
-    container_name: sabnzbd
     environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
-    image: lscr.io/linuxserver/sabnzbd:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 8080
-      published: "8080"
-      protocol: tcp
-    restart: unless-stopped
+      - "7878:7878"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/sabnzbd
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/radarr:/config
+
+  sabnzbd:
+    <<: *common-keys
+    container_name: sabnzbd
+    image: lscr.io/linuxserver/sabnzbd:latest
+    environment:
+      <<: *common-env
+    ports:
+      - "8080:8080"
+    volumes:
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/sabnzbd:/config
 
   sonarr:
+    <<: *common-keys
     container_name: sonarr
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: lscr.io/linuxserver/sonarr:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 8989
-      published: "8989"
-      protocol: tcp
-    restart: unless-stopped
+      - "8989:8989"
     volumes:
-    - type: bind
-      source: /etc/localtime
-      target: /etc/localtime
-      read_only: true
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_home_appdata_path }}/sonarr
-      target: /config
-      bind:
-        create_host_path: true
-    - type: bind
-      source: {{ docker_storage_path }}
-      target: /storage
-      bind:
-        create_host_path: true
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/sonarr:/config
 
   tautulli:
-    image: lscr.io/linuxserver/tautulli:latest
+    <<: *common-keys
     container_name: tautulli
+    image: lscr.io/linuxserver/tautulli:latest
     environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    volumes:
-    - type: bind
-      source: {{ docker_home_appdata_path }}/tautulli
-      target: /config
-      bind:
-        create_host_path: true
+      <<: *common-env
     ports:
-      - 8181:8181
-    restart: unless-stopped
-  
+      - "8181:8181"
+    volumes:
+      - {{ docker_home_appdata_path }}/tautulli:/config
+
   uptimekuma:
+    <<: *common-keys
     container_name: uptimekuma
-    environment:
-      PGID: "1000"
-      PUID: "1000"
-      TZ: America/Los_Angeles
-    hostname: DockSTARTer
     image: louislam/uptime-kuma:latest
-    logging:
-      driver: json-file
-      options:
-        max-file: "10"
-        max-size: 200k
-    networks:
-      default: null
+    environment:
+      <<: *common-env
     ports:
-    - mode: ingress
-      target: 3001
-      published: "3001"
-      protocol: tcp
-    restart: unless-stopped
+      - "3001:3001"
     volumes:
-    - {{ docker_home_appdata_path }}/uptimekuma:/app/data
-    - {{ docker_storage_path }}:/storage
-    - /etc/localtime:/etc/localtime:ro
-    - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ docker_home_appdata_path }}/uptimekuma:/app/data
+      - *localtime
+      - *storage
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
 networks:
   default:
     name: compose_default
