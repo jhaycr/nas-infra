@@ -255,6 +255,26 @@ services:
       - *storage
       - {{ docker_home_appdata_path }}/sabnzbd:/config
       - {{ docker_storage_path }}/downloads:/downloads
+  
+  # https://github.com/AnalogJ/scrutiny
+  scrutiny:
+    container_name: scrutiny
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    cap_add:
+      - SYS_RAWIO
+    ports:
+      - "8082:8080" # webapp
+      - "8086:8086" # influxDB admin
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ./appdata/scrutiny:/opt/scrutiny/config
+      - ./appdata/scrutiny-influxdb:/opt/scrutiny/influxdb
+    devices:
+      - "/dev/sda"
+      - "/dev/sdb"
+      - "/dev/sdc"
+      - "/dev/sdd"
+      - "/dev/sde"
 
   sonarr:
     <<: *common-keys
