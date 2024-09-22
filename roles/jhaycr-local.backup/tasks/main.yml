@@ -1,0 +1,31 @@
+---
+- name: create local backup dirs
+  ansible.builtin.file:
+    path: "{{ backup_path_local }}"
+    owner: "{{ main_username }}"
+    group: "{{ main_username }}"
+    state: directory
+
+- name: set up autorestic
+  ansible.builtin.import_role:
+    name: fuzzymistborn.autorestic
+
+- ansible.builtin.cron:
+    name: restic prune
+    job: "/usr/local/bin/autorestic forget -a -- prune"
+    user: "root"
+    minute: 0
+    hour: 1
+    weekday: 1
+
+- ansible.builtin.cron:
+    name: restic check and backup
+    job: "/usr/local/bin/autorestic check && /usr/local/bin/autorestic backup -l docker -c /home/{{ main_username }}/.autorestic.yml"
+    user: "root"
+    minute: 10
+    hour: 16
+
+- name: restore from backup (if forced)
+  ansible.builtin.command:
+    cmd: /usr/local/bin/autorestic restore -f -l docker --from local --to /opt/docker/appdata-restore
+  when: backup_restore_force == true

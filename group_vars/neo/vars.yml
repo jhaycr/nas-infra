@@ -10,6 +10,45 @@ docker_home_compose_path: '/opt/docker'
 docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
 docker_appdata_folders_to_own:
 - maintainerr
+ 
+backup_path_local: "{{ docker_storage_path }}/backups"
+
+# -----
+# fuzzymistborn.autorestic
+# -----
+autorestic_download_latest_ver: false
+autorestic_pinned_ver: 1.8.3
+restic_download_latest_ver: false
+restic_pinned_ver: 0.17.1
+
+autorestic_config_user: "{{ main_username}}"
+autorestic_user_directory: /home/"{{ main_username}}"
+autorestic_run_check: false
+autorestic_config_yaml:
+  version: 2
+  locations:
+    docker:
+      from: "{{ docker_home_appdata_path}}"
+      to:
+        - local
+      options:
+        forget:
+          keep-daily: 1
+          keep-weekly: 4
+          keep-monthly: 2
+        backup:
+          exclude:
+            - '**/cache'
+            - '**/Cache'
+            - '**/log'
+            - '**/Log'
+            - '*.log'
+  backends:
+    local:
+      type: local
+      path: "{{ backup_path_local }}"
+      key: "{{ secret_restic_repo_password }}"
+
 
 # -----
 # arillso.system.users
