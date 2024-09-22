@@ -113,6 +113,18 @@ services:
       - *storage
       - {{ docker_home_appdata_path }}/freshrss:/config
 
+  homepage:
+    <<: *common-keys
+    container_name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    environment:
+      <<: *common-env
+    ports:
+      - 3000:3000
+    volumes:
+      - {{ docker_home_appdata_path }}/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
+
   komga:
     <<: *common-keys
     container_name: komga
