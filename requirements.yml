@@ -6,6 +6,7 @@ collections:
     version: 9.0.1
 
 roles:
+  - name: fuzzymistborn.autorestic
   - name: geerlingguy.docker
   - name: geerlingguy.nfs
   - name: geerlingguy.pip

@@ -14,6 +14,9 @@
       become: yes
     - role: tigattack.mergerfs
     - role: geerlingguy.nfs
+    - role: jhaycr-local.backup
+      become: yes
+      tags: compose
     - role: jhaycr-local.docker_compose
       tags: compose
       become: yes
