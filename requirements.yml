@@ -7,11 +7,20 @@ collections:
 
 roles:
   - name: fuzzymistborn.autorestic
+    version: v0.2.3
   - name: geerlingguy.docker
+    version: 7.3.0
   - name: geerlingguy.nfs
+    version: 2.0.0
   - name: geerlingguy.pip
+    version: 3.0.3
   - name: grog.package
+    version: v1.4.0
   - name: IronicBadger.proxmox_nag_removal
+    version: 1.0.2
   - name: IronicBadger.snapraid
+    version: 1.0.0
   - name: joenyland.plexmediaserver
+    version: main
   - name: tigattack.mergerfs
+    version: 1.3.1
