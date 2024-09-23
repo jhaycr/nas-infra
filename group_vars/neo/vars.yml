@@ -109,14 +109,9 @@ snapraid_config_excludes:
   - "snapraid.conf*"
   - "*.nfo"
 
-snapraid_sync_schedule:
-  minute: 0
-  hour: 0
+snapraid_runner_cron_jobs:
+  - { job: '{{ snapraid_runner_command }}', name: 'snapraid_runner', weekday: '*', hour: '01' }
 
-snapraid_scrub_schedule:
-  minute: 5
-  hour: 3
-  weekday: 0
 
 # -----
 # tigattack.mergerfs
