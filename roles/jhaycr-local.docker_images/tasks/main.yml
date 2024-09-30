@@ -1,0 +1,9 @@
+---
+
+- file:
+    path: "{{ docker_images_path }}"
+    state: directory
+  become: yes
+
+- include_tasks: build-image.yml
+  with_items: "{{ docker_images_names }}"

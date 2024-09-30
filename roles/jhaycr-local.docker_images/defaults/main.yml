@@ -1,0 +1,7 @@
+---
+
+docker_images_create_with_root: yes
+docker_images_path: "{{ docker_home_images_build_path }}"
+
+docker_images_names:
+- "telegraf"
