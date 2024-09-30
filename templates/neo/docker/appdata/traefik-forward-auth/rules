@@ -1,0 +1,12 @@
+rule.ombi.action = auth
+rule.ombi.rule = Host(`ombi.{{ domain }}`)
+rule.ombi.whitelist = {{ secret_traefik_rule_ombi_whitelist }}
+rule.komga.action = auth
+rule.komga.rule = Host(`comics.{{ domain }}`)
+rule.komga.whitelist = {{ secret_traefik_rule_komga_whitelist }}
+rule.requests.action = auth
+rule.requests.rule = Host(`requests.{{ domain }}`)
+rule.requests.whitelist = {{ secret_traefik_rule_requests_whitelist }}
+rule.freshrss.action = auth
+rule.freshrss.rule = Host(`rss.{{ domain }}`)
+rule.freshrss.whitelist = {{ secret_traefik_rule_rss_whitelist }}
