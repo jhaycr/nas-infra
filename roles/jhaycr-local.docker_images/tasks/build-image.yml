@@ -1,0 +1,17 @@
+---
+
+- file:
+    path: "{{ docker_images_path }}/{{ item }}"
+    state: directory
+    owner: "{{ main_username }}"
+    group: "{{ main_username }}"
+  become: yes
+
+- template:
+    src: "{{ item }}/Dockerfile"
+    dest: "{{ docker_images_path }}/{{ item }}/Dockerfile"
+  become: yes
+
+- community.docker.docker_image_build:
+    name: "{{ item }}:latest-jhaycr"
+    path: "{{ docker_images_path }}/{{ item }}"
