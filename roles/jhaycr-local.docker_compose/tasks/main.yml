@@ -17,3 +17,16 @@
     - .env
     - docker-compose.yml
     - docker-compose.override.yml
+
+- name: Copy templates for docker apps recursively
+  include_tasks: "template_recursively.yml"
+  loop: "{{ group_names }}"
+  loop_control:
+    loop_var: group_name
+
+- name: Update ownership of container appdata volumes
+  ansible.builtin.file:
+    path: "{{ docker_home_appdata_path }}/{{ item }}"
+    owner: 1000
+    group: 1000
+  with_items: "{{ docker_appdata_folders_to_own }}"
