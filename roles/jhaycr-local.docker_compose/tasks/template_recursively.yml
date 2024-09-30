@@ -1,0 +1,9 @@
+---
+# https://stackoverflow.com/questions/41667864/can-the-templates-module-handle-multiple-templates-directories
+- name: Template all the templates and place them in the corresponding path
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ docker_home_appdata_path }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+    force: yes
+  with_filetree: "./templates/{{ group_name }}/docker/appdata"
+  when: item.state == 'file'
