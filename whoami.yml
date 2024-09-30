@@ -1,0 +1,36 @@
+---
+
+- hosts: all
+
+  tasks:
+
+    - name: whoami
+      shell: whoami
+      register: c
+    - debug: var=c.stdout
+
+    - name: whoami (remote_user)
+      shell: whoami
+      remote_user: {{ main_user }}
+      become: no
+      register: b
+    - debug: var=b.stdout
+
+    - name: whoami (become)
+      shell: whoami
+      become: yes
+      register: d
+    - debug: var=d.stdout
+
+    - name: whoami (become_user)
+      shell: whoami
+      become_user: {{ main_user }}
+      register: e
+    - debug: var=e.stdout
+
+    - name: whoami (become_user + become)
+      shell: whoami
+      become_user: {{ main_user }}
+      become: yes
+      register: f
+    - debug: var=f.stdout
