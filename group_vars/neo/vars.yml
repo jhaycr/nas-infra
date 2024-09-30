@@ -29,13 +29,6 @@ autorestic_config_yaml:
       type: local
       path: "{{ backup_path_local }}"
       key: "{{ secret_restic_repo_password }}"
-    b2-neo-docker:
-      type: b2
-      path: 'emergent-thermodynamics:backup/neo/docker'
-      env:
-        B2_ACCOUNT_ID: "{{ secret_restic_repo_b2_account_id}}"
-        B2_ACCOUNT_KEY: "{{ secret_restic_repo_b2_account_key }}"
-
 
 # -----
 # arillso.system.users
