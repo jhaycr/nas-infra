@@ -2,6 +2,44 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/latest/configs/services
 
+- Books:
+    - AudioBookshelf:
+        icon: audiobookshelf.png
+        description: Audiobook & Podcast Manager
+        widget:
+            type: audiobookshelf
+            url: http://192.168.1.3:13378
+            key: {{ secret_arr_api_key_audiobookshelf }}
+
+    - Calibre:
+        icon: calibre.png
+        href: http://192.168.1.3:8083
+        description: eBook Manager
+        widget:
+            type: calibreweb
+            url: http://192.168.1.3:8083
+            username: {{ secret_arr_user_calibreweb }}
+            password: {{ secret_arr_pass_calibreweb }}
+
+    - Mylar:
+        icon: mylar.png
+        href: http://192.168.1.3:8090
+        description: Comics Manager
+        widget:
+            type: mylar
+            url: http://192.168.1.3:8090
+            key: {{ secret_arr_api_key_mylar3 }}
+
+    - RSS:
+        icon: freshrss.png
+        href: http://192.168.1.3:8012
+        description: RSS Manager
+        widget:
+            type: freshrss
+            url: http://192.168.1.3:8012
+            username: {{ secret_arr_user_freshrss }}
+            password: {{ secret_arr_pass_freshrss }}
+
 - Media:
     - Plex:
         icon: plex.png
@@ -42,14 +80,6 @@
             url: http://192.168.1.3:3579
             key: {{ secret_arr_api_key_ombi }}
 
-    - AudioBookshelf:
-        icon: audiobookshelf.png
-        description: Audiobook & Podcast Manager
-        widget:
-            type: audiobookshelf
-            url: http://192.168.1.3:13378
-            key: {{ secret_arr_api_key_audiobookshelf }}
-
 - Usenet:
     - Sonarr:
         icon: sonarr.png
@@ -88,15 +118,6 @@
             type: bazarr
             url: http://192.168.1.3:6767
             key: {{ secret_arr_api_key_bazarr }}
-
-    - Mylar:
-        icon: mylar.png
-        href: http://192.168.1.3:8090
-        description: Comics Manager
-        widget:
-            type: mylar
-            url: http://192.168.1.3:8090
-            key: {{ secret_arr_api_key_mylar3 }}
 
 - Download:
     - Sabnzbd:
