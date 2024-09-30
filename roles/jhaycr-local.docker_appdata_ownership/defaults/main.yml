@@ -1,3 +1,0 @@
----
-docker_home_appdata_path: "/opt/docker/appdata"
-docker_appdata_folders_to_own: []
