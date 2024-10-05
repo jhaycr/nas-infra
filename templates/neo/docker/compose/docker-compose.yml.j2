@@ -163,6 +163,30 @@ services:
       - *storage
       - {{ docker_home_appdata_path }}/freshrss:/config
 
+  glances:
+    <<: *common-keys
+    container_name: glances
+    image: nicolargo/glances:latest-full
+    restart: always
+    pid: "host"
+    privileged: true
+    network_mode: "host"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock:ro"
+      - "./glances.conf:/glances/conf/glances.conf"
+    environment:
+      - TZ=${TZ}
+      - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
+    # Uncomment for GPU compatibility (Nvidia) inside the container
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
   homepage:
     <<: *common-keys
     container_name: homepage
@@ -360,6 +384,7 @@ services:
       SPEEDTEST_SCHEDULE: "0 * * * *"
       SPEEDTEST_SERVERS: {{ secret_speedtest_tracker_speedtest_servers }}
       PRUNE_RESULTS_OLDER_THAN: 14 #optional
+      DISPLAY_TIMEZONE: America/Los_Angeles
     volumes:
       - {{ docker_home_appdata_path }}/speedtest-tracker:/config
     ports:
