@@ -152,7 +152,7 @@
 
 - Health:
     - Backrest:
-        icon: backrest.png
+        icon: restic.png
         href: http://192.168.1.3:9898
         description: Backups (restic)
 
@@ -174,14 +174,15 @@
             key: adminapikeyadminapikeyadminapikey
 
     - Speedtest:
-        icon: speedtest.png
+        icon: speedtest-tracker.png
+        href: http://192.168.1.3:8084
         widget:
-        type: speedtest
-        url: http://speedtest.host.or.ip
-        bitratePrecision: 3 # optional, default is 0
+            type: speedtest
+            url: http://192.168.1.3:8084
+            bitratePrecision: 3 # optional, default is 0
 
     - Uptime:
-        icon: uptime.png
+        icon: uptime-kuma.png
         href: http://192.168.1.3:3001
         description: Monitoring
         widget:
