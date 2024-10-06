@@ -28,3 +28,9 @@ neo:
 
 neo-compose:
 	ansible-playbook -vv site.yml --limit neo --tags compose
+
+morpheus:
+	ansible-playbook -v site.yml --limit morpheus
+
+trinity:
+	ansible-playbook -v site.yml --limit trinity
