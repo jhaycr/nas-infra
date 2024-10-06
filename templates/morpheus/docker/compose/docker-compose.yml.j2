@@ -1,0 +1,106 @@
+name: compose
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-file: "10"
+    max-size: 200k
+
+x-common-keys: &common-keys
+  restart: unless-stopped
+  logging: *default-logging
+
+x-common-env: &common-env
+  PGID: "1000"
+  PUID: "1000"
+  TZ: America/Los_Angeles
+
+x-common-volumes:
+  - &localtime /etc/localtime:/etc/localtime:ro
+
+########################### NETWORKS
+networks:
+  default:
+    driver: bridge
+
+  dockervlan:
+    name: dockervlan
+    driver: macvlan
+    driver_opts:
+      parent: vmbr0 # using ifconfig
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.225/32"
+          gateway: "192.168.1.1"
+
+########################### SERVICES
+services:
+  # AdGuard Home - DNS AdBlocking
+  adguardhome:
+    <<: *common-keys
+    container_name: adguardhome
+    image: adguard/adguardhome
+    networks:
+      dockervlan:
+        ipv4_address: 192.168.1.225 # IP address inside the defined range
+    ports:
+      - 53:53/udp
+      - 67:67/udp 
+      - 68:68/tcp 
+      - 68:68/udp 
+      - 80:80/tcp 
+      - 443:443/tcp 
+      - 853:853/tcp 
+      - 3000:3000/tcp 
+    volumes:
+      - {{ docker_home_appdata_path }}/appdata/adguardhome/conf:/opt/adguardhome/conf
+      - {{ docker_home_appdata_path }}/appdata/adguardhome/work:/opt/adguardhome/work
+
+  dozzle:
+    <<: *common-keys
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    ports:
+      - "8081:8080"
+    environment:
+      <<: *common-env
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running"
+      # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
+      # DOCKER_HOST: tcp://socket-proxy:2375 # enable when using socket proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # disable when using socket proxy
+
+  glances:
+    <<: *common-keys
+    container_name: glances
+    image: nicolargo/glances:latest-full
+    restart: always
+    pid: "host"
+    privileged: true
+    network_mode: "host"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock:ro"
+      - {{ docker_home_appdata_path }}/glances:/glances/conf
+    environment:
+      - TZ=${TZ}
+      - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
+
+  portainer:
+    <<: *common-keys
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    command:
+      - -H
+      - unix:///var/run/docker.sock
+    environment:
+      <<: *common-env
+    ports:
+      - "9000:9000"
+    volumes:
+      - *localtime
+      - /var/run/docker.sock:/var/run/docker.sock
+      - {{ docker_home_appdata_path }}/portainer:/data

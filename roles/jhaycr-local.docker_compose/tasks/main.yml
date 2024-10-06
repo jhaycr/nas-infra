@@ -30,3 +30,15 @@
     owner: 1000
     group: 1000
   with_items: "{{ docker_appdata_folders_to_own }}"
+
+- name: Start docker stack
+  become: yes
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_home_compose_path }}"
+    state: present
+    env_files:
+    - .env
+    files:
+    - docker-compose.yml
+    - docker-compose.override.yml
+    remove_orphans: true
