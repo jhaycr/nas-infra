@@ -37,20 +37,10 @@
         owner: "{{ main_username }}"
         group: "{{ main_username }}"
         state: link
-
-    - name: start docker stack
-      become: yes
-      tags: compose
-      community.docker.docker_compose_v2:
-        project_src: "{{ docker_home_compose_path }}"
-        state: present
-        env_files:
-        - .env
-        files:
-        - docker-compose.yml
-        - docker-compose.override.yml
-        remove_orphans: true
       
 - hosts: morpheus
   roles:
     - role: IronicBadger.proxmox_nag_removal
+    - role: geerlingguy.docker
+    - role: jhaycr-local.docker_compose
+      tags: compose
