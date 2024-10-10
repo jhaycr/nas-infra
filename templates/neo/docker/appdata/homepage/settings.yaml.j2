@@ -1,14 +1,52 @@
 ---
-# For configuration options and examples, please see:
-# https://gethomepage.dev/latest/configs/settings
-
-providers:
-  openweathermap: openweathermapapikey
-  weatherapi: weatherapiapikey
-
+title: My Homepage
+headerStyle: clean
+background:
+  image: https://wallpapercave.com/wp/wp4565843.jpg
+  blur: md
+  saturate: 50
+  brightness: 50
+  opacity: 70
+theme: dark
+color: slate
+useEqualHeights: true
 quicklaunch:
   searchDescriptions: true
   hideInternetSearch: true
   showSearchSuggestions: true
   hideVisitURL: true
-  provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
+hideVersion: false
+layout:
+  Quick:
+    header: false
+    style: column
+  Access:
+    header: false
+    style: column
+  Calendar:
+    header: false
+    style: column
+  Services:
+    header: true
+    style: row
+    columns: 4
+  Media:
+    header: true
+    style: row
+    columns: 4
+  Usenet:
+    header: true
+    style: row
+    columns: 4
+  Download:
+    header: true
+    style: row
+    columns: 4
+  Infrastructure:
+    header: true
+    style: row
+    columns: 4
+  Monitoring:
+    header: true
+    style: row
+    columns: 4

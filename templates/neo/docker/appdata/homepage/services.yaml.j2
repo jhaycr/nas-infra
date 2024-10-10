@@ -5,7 +5,7 @@
 # Icons list:
 # https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/
 
-- Books:
+- Services:
     - AudioBookshelf:
         icon: audiobookshelf.png
         description: Audiobook & Podcast Manager
@@ -13,16 +13,6 @@
             type: audiobookshelf
             url: http://192.168.1.3:13378
             key: {{ secret_arr_api_key_audiobookshelf }}
-
-    - Calibre:
-        icon: calibre.png
-        href: http://192.168.1.3:8083
-        description: eBook Manager
-        widget:
-            type: calibreweb
-            url: http://192.168.1.3:8083
-            username: {{ secret_arr_user_calibreweb }}
-            password: {{ secret_arr_pass_calibreweb }}
 
     - Mylar:
         icon: mylar.png
@@ -44,15 +34,6 @@
             password: {{ secret_arr_pass_freshrss }}
 
 - Media:
-    - Plex:
-        icon: plex.png
-        href: http://192.168.1.3:32400
-        description: Media Streaming
-        widget:
-            type: plex
-            url: http://192.168.1.3:32400
-            key: {{ secret_arr_api_key_plex }} # see https://www.plexopedia.com/plex-media-server/general/plex-token/
-
     - Tautulli:
         icon: tautulli.png
         href: http://192.168.1.3:8181
@@ -65,15 +46,7 @@
             showEpisodeNumber: true # optional, defaults to false
             expandOneStreamToTwoRows: false # optional, defaults to true
 
-    - Overseerr:
-        icon: overseerr.png
-        href: http://192.168.1.3:5055
-        description: Media Requests
-        widget:
-            type: overseerr
-            url: http://192.168.1.3:5055
-            key: {{ secret_arr_api_key_overseerr }}
-
+- Usenet:
     - Ombi:
         icon: ombi.png
         href: http://192.168.1.3:3579
@@ -83,7 +56,15 @@
             url: http://192.168.1.3:3579
             key: {{ secret_arr_api_key_ombi }}
 
-- Usenet:
+    - Overseerr:
+        icon: overseerr.png
+        href: http://192.168.1.3:5055
+        description: Media Requests
+        widget:
+            type: overseerr
+            url: http://192.168.1.3:5055
+            key: {{ secret_arr_api_key_overseerr }}
+
     - Sonarr:
         icon: sonarr.png
         href: http://192.168.1.3:8989
@@ -92,7 +73,7 @@
             type: sonarr
             url: http://192.168.1.3:8989
             key: {{ secret_arr_api_key_sonarr }}
-            enableQueue: true # optional, defaults to false
+            enableQueue: false # optional, defaults to false
 
     - Radarr:
         icon: radarr.png
@@ -102,7 +83,7 @@
             type: radarr
             url: http://192.168.1.3:7878
             key: {{ secret_arr_api_key_radarr }}
-            enableQueue: true # optional, defaults to false
+            enableQueue: false # optional, defaults to false
 
     - Prowlarr:
         icon: prowlarr.png
@@ -121,6 +102,11 @@
             type: bazarr
             url: http://192.168.1.3:6767
             key: {{ secret_arr_api_key_bazarr }}
+
+    - Maintainerr:
+        href: http://192.168.1.3:6246
+        description: Media Cleanup
+    
 
 - Download:
     - Sabnzbd:
@@ -141,24 +127,29 @@
             url: http://192.168.1.3:8112
             password: {{ secret_arr_api_key_deluge }} # webui password
 
+    - MeTube:
+        icon: metube.png
+        href: http://192.168.1.3:8087
+        description: YouTube Downloader
 
-- Docker:
-    - Portainer (Neo):
+
+- Infrastructure:
+    - Portainer:
         icon: portainer.png
         href: http://192.168.1.3:9000
         description: Docker Container Management
+
+    - Backrest:
+        icon: restic.png
+        href: http://192.168.1.3:9898
+        description: Backups (restic)
 
     - Dozzle (Neo):
         icon: dozzle.png
         href: http://192.168.1.3:8081
         description: Neo Docker Logs
 
-- Health:
-    - Backrest:
-        icon: restic.png
-        href: http://192.168.1.3:9898
-        description: Backups (restic)
-
+- Monitoring:
     - Speedtest:
         icon: speedtest-tracker.png
         href: http://192.168.1.3:8084
@@ -192,17 +183,3 @@
             type: scrutiny
             url: http://192.168.1.3:8082
 
-- TBD:
-    - Authentik:
-        icon: authentik.png
-        widget:
-            type: authentik
-            url: http://authentik.host.or.ip:22070
-            key: api_token
-
-    - Immich:
-        icon: immich.png
-        widget:
-            type: immich
-            url: http://immich.host.or.ip
-            key: adminapikeyadminapikeyadminapikey

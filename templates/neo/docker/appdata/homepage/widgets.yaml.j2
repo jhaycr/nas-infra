@@ -2,9 +2,13 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/latest/configs/service-widgets
 
-- search:
-    provider: duckduckgo
-    target: _blank
+- openmeteo:
+    label: {{ secret_openmeteo_city }}
+    lattitude: {{ secret_openmeteo_lat }}
+    longitude: {{ secret_openmeteo_long }}
+    timezone: TZ
+    units: imperial
+    cache: 5
 
 - glances:
     url: http://192.168.1.3:61208
@@ -33,3 +37,9 @@
     diskUnits: bytes # optional, bytes (default) or bbytes. Only applies to disk
     expanded: true # show the expanded view
     label: Morpheus # optional
+
+- search:
+    provider: duckduckgo
+    target: _blank
+    focus: true
+    showSearchSuggestions: true
