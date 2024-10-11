@@ -132,6 +132,7 @@ services:
       DOZZLE_FILTER: "status=running"
       # DOZZLE_FILTER: "label=log_me" # limits logs displayed to containers with this label
       # DOCKER_HOST: tcp://socket-proxy:2375 # enable when using socket proxy
+      DOZZLE_REMOTE_AGENT: 192.168.1.2:7007
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # disable when using socket proxy
       
