@@ -299,9 +299,7 @@ services:
     <<: *common-keys
     container_name: portainer
     image: portainer/portainer-ce:latest
-    command:
-      - -H
-      - unix:///var/run/docker.sock
+    command: -H tcp://192.168.1.2:9001 --tlsskipverify
     environment:
       <<: *common-env
     ports:

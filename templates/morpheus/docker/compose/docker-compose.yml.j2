@@ -83,18 +83,14 @@ services:
       - TZ=${TZ}
       - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
 
-  portainer:
-    <<: *common-keys
-    container_name: portainer
-    image: portainer/portainer-ce:latest
-    command:
-      - -H
-      - unix:///var/run/docker.sock
-    environment:
-      <<: *common-env
+  portainer-agent:
+    container_name: portainer-agent
+    # Use the portainer/agent Docker image
+    image: portainer/agent
     ports:
-      - "9000:9000"
+      - "9001:9001" 
     volumes:
-      - *localtime
+      # Mount the host's Docker socket into the container
       - /var/run/docker.sock:/var/run/docker.sock
-      - {{ docker_home_appdata_path }}/portainer:/data
+      # Mount the host's Docker volumes into the container
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
