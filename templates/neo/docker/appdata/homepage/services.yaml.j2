@@ -10,6 +10,8 @@
         icon: audiobookshelf.png
         href: http://192.168.1.3:13378
         description: Audiobook & Podcast Manager
+        server: neo-docker
+        container: audiobookshelf
         widget:
             type: audiobookshelf
             url: http://192.168.1.3:13378
@@ -19,11 +21,15 @@
         icon: komga.svg
         href: http://192.168.1.3:25600
         description: Comics Viewer
+        server: neo-docker
+        container: komga
 
     - FreshRSS:
         icon: freshrss.png
         href: http://192.168.1.3:8012
         description: RSS Manager
+        server: neo-docker
+        container: freshrss
         widget:
             type: freshrss
             url: http://192.168.1.3:8012
@@ -35,6 +41,8 @@
         icon: tautulli.png
         href: http://192.168.1.3:8181
         description: Media Streaming Stats
+        server: neo-docker
+        container: tautulli
         widget:
             type: tautulli
             url: http://192.168.1.3:8181
@@ -49,6 +57,8 @@
         icon: mylar.png
         href: http://192.168.1.3:8090
         description: Comics Manager
+        server: neo-docker
+        container: mylar3
         widget:
             type: mylar
             url: http://192.168.1.3:8090
@@ -58,6 +68,8 @@
         icon: ombi.png
         href: http://192.168.1.3:3579
         description: Media Requests
+        server: neo-docker
+        container: ombi
         widget:
             type: ombi
             url: http://192.168.1.3:3579
@@ -67,6 +79,8 @@
         icon: overseerr.png
         href: http://192.168.1.3:5055
         description: Media Requests
+        server: neo-docker
+        container: overseerr
         widget:
             type: overseerr
             url: http://192.168.1.3:5055
@@ -76,6 +90,8 @@
         icon: sonarr.png
         href: http://192.168.1.3:8989
         description: TV Manager
+        server: neo-docker
+        container: sonarr
         widget:
             type: sonarr
             url: http://192.168.1.3:8989
@@ -86,6 +102,8 @@
         icon: radarr.png
         href: http://192.168.1.3:7878
         description: Movies Manager
+        server: neo-docker
+        container: radarr
         widget:
             type: radarr
             url: http://192.168.1.3:7878
@@ -96,6 +114,8 @@
         icon: prowlarr.png
         href: http://192.168.1.3:9696
         description: Indexer Manager
+        server: neo-docker
+        container: prowlarr
         widget:
             type: prowlarr
             url: http://192.168.1.3:9696
@@ -105,6 +125,8 @@
         icon: bazarr.png
         href: http://192.168.1.3:6767
         description: Subtitle Manager
+        server: neo-docker
+        container: bazarr
         widget:
             type: bazarr
             url: http://192.168.1.3:6767
@@ -114,11 +136,15 @@
         icon: filebot.svg
         href: http://192.168.1.3:5800
         description: Automated Media Changes
+        server: neo-docker
+        container: filebot
 
     - Maintainerr:
         abbr: MR
         href: http://192.168.1.3:6246
         description: Media Cleanup
+        server: neo-docker
+        container: maintainerr
     
 
 - Download:
@@ -126,6 +152,8 @@
         icon: sabnzbd.png
         href: http://192.168.1.3:8080
         description: NZB Downloader
+        server: neo-docker
+        container: sabnzbd
         widget:
             type: sabnzbd
             url: http://192.168.1.3:8080
@@ -135,6 +163,8 @@
         icon: deluge.png
         href: http://192.168.1.3:8112
         description: Torrent Downloader
+        server: neo-docker
+        container: deluge
         widget:
             type: deluge
             url: http://192.168.1.3:8112
@@ -144,6 +174,21 @@
         icon: metube.png
         href: http://192.168.1.3:8087
         description: YouTube Downloader
+        server: neo-docker
+        container: metube
+
+    - Pyload:
+        href: http://192.168.1.3:8000
+        description: Downloader
+        server: neo-docker
+        container: pyload-ng
+
+    - JDownloader2:
+        icon: jdownloader.png
+        href: http://192.168.1.3:5801
+        description: Downloader
+        server: neo-docker
+        container: jdownloader
 
 - Network & IoT:
     - UniFi:
@@ -165,10 +210,14 @@
             url: http://192.168.1.225
             username: {{ secret_adguard_home_user }}
             password: {{ secret_adguard_home_pass }}
+        server: morpheus-docker
+        container: adguardhome
 
     - Speedtest:
         icon: speedtest-tracker.png
         href: http://192.168.1.3:8084
+        server: neo-docker
+        container: speedtest-tracker
         widget:
             type: speedtest
             url: http://192.168.1.3:8084
@@ -189,16 +238,22 @@
         icon: portainer.png
         href: http://192.168.1.3:9000
         description: Docker Container Management
+        server: neo-docker
+        container: portainer
 
     - Dozzle:
         icon: dozzle.png
         href: http://192.168.1.3:8081
         description: Docker Logs
+        server: neo-docker
+        container: dozzle
 
     - Backrest:
         icon: restic.png
         href: http://192.168.1.3:9898
         description: Backups (restic)
+        server: neo-docker
+        container: backrest
 
 - Monitoring:
 
@@ -206,6 +261,8 @@
         icon: uptime-kuma.png
         href: http://192.168.1.3:3001
         description: Uptime Monitoring
+        server: neo-docker
+        container: uptimekuma
         widget:
             type: uptimekuma
             url: http://192.168.1.3:3001
@@ -215,6 +272,8 @@
         icon: netdata.png
         href: http://192.168.1.3:19999
         description: General Monitoring
+        server: neo-docker
+        container: netdata
         widget:
             type: netdata
             url: http://192.168.1.3:19999
@@ -223,6 +282,8 @@
         icon: scrutiny.png
         href: http://192.168.1.3:8082
         description: Disk Monitoring
+        server: neo-docker
+        container: scrutiny
         widget:
             type: scrutiny
             url: http://192.168.1.3:8082
