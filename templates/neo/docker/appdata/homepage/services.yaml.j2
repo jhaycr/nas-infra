@@ -8,22 +8,19 @@
 - Services:
     - AudioBookshelf:
         icon: audiobookshelf.png
+        href: http://192.168.1.3:13378
         description: Audiobook & Podcast Manager
         widget:
             type: audiobookshelf
             url: http://192.168.1.3:13378
             key: {{ secret_arr_api_key_audiobookshelf }}
 
-    - Mylar:
-        icon: mylar.png
-        href: http://192.168.1.3:8090
-        description: Comics Manager
-        widget:
-            type: mylar
-            url: http://192.168.1.3:8090
-            key: {{ secret_arr_api_key_mylar3 }}
+    - Komga:
+        icon: komga.svg
+        href: http://192.168.1.3:25600
+        description: Comics Viewer
 
-    - RSS:
+    - FreshRSS:
         icon: freshrss.png
         href: http://192.168.1.3:8012
         description: RSS Manager
@@ -47,6 +44,16 @@
             expandOneStreamToTwoRows: false # optional, defaults to true
 
 - Usenet:
+
+    - Mylar:
+        icon: mylar.png
+        href: http://192.168.1.3:8090
+        description: Comics Manager
+        widget:
+            type: mylar
+            url: http://192.168.1.3:8090
+            key: {{ secret_arr_api_key_mylar3 }}
+
     - Ombi:
         icon: ombi.png
         href: http://192.168.1.3:3579
@@ -103,7 +110,13 @@
             url: http://192.168.1.3:6767
             key: {{ secret_arr_api_key_bazarr }}
 
+    - FileBot:
+        icon: filebot.svg
+        href: http://192.168.1.3:5800
+        description: Automated Media Changes
+
     - Maintainerr:
+        abbr: MR
         href: http://192.168.1.3:6246
         description: Media Cleanup
     
@@ -132,24 +145,27 @@
         href: http://192.168.1.3:8087
         description: YouTube Downloader
 
+- Network & IoT:
+    - UniFi:
+        icon: unifi.svg
+        href: https://192.168.1.38:8443
+        description: Network Controller
+        widget:
+            type: unifi
+            url: https://192.168.1.38:8443
+            username: {{ secret_unifi_user }}
+            password: {{ secret_unifi_pass }}
 
-- Infrastructure:
-    - Portainer:
-        icon: portainer.png
-        href: http://192.168.1.3:9000
-        description: Docker Container Management
+    - Adguard Home:
+        icon: adguard-home.svg
+        href: http://192.168.1.225
+        description: DNS & Adblocker
+        widget:
+            type: adguard
+            url: http://192.168.1.225
+            username: {{ secret_adguard_home_user }}
+            password: {{ secret_adguard_home_pass }}
 
-    - Backrest:
-        icon: restic.png
-        href: http://192.168.1.3:9898
-        description: Backups (restic)
-
-    - Dozzle (Neo):
-        icon: dozzle.png
-        href: http://192.168.1.3:8081
-        description: Neo Docker Logs
-
-- Monitoring:
     - Speedtest:
         icon: speedtest-tracker.png
         href: http://192.168.1.3:8084
@@ -157,6 +173,34 @@
             type: speedtest
             url: http://192.168.1.3:8084
             bitratePrecision: 3 # optional, default is 0
+
+- Infrastructure:
+    - Proxmox (Neo):
+        icon: proxmox.png
+        href: https://192.168.1.3:8006
+        description: PVE Neo
+
+    - Proxmox (Morpheus):
+        icon: proxmox.png
+        href: https://192.168.1.2:8006
+        description: PVE Morpheus
+
+    - Portainer:
+        icon: portainer.png
+        href: http://192.168.1.3:9000
+        description: Docker Container Management
+
+    - Dozzle:
+        icon: dozzle.png
+        href: http://192.168.1.3:8081
+        description: Docker Logs
+
+    - Backrest:
+        icon: restic.png
+        href: http://192.168.1.3:9898
+        description: Backups (restic)
+
+- Monitoring:
 
     - Uptime:
         icon: uptime-kuma.png
