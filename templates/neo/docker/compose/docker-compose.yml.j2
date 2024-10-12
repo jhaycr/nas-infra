@@ -235,6 +235,15 @@ services:
     volumes:
       - {{ docker_home_appdata_path }}/maintainerr:/opt/data
 
+  metube:
+    <<: *common-keys
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    ports:
+      - "8087:8081"
+    volumes:
+      - {{ docker_storage_path }}/downloads:/downloads
+
   mylar3:
     <<: *common-keys
     container_name: mylar3
