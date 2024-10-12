@@ -258,19 +258,6 @@ services:
       - {{ docker_home_appdata_path }}/mylar3:/config
       - {{ docker_storage_path }}/downloads:/downloads
 
-  ombi:
-    <<: *common-keys
-    container_name: ombi
-    image: lscr.io/linuxserver/ombi:latest
-    environment:
-      <<: *common-env
-    ports:
-      - "3579:3579"
-    volumes:
-      - *localtime
-      - *storage
-      - {{ docker_home_appdata_path }}/ombi:/config
-
   ouroboros:
     <<: *common-keys
     container_name: ouroboros
