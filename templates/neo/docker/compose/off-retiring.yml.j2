@@ -1,0 +1,35 @@
+
+services:
+
+  ombi:
+    <<: *common-keys
+    container_name: ombi
+    image: lscr.io/linuxserver/ombi:latest
+    environment:
+      <<: *common-env
+    ports:
+      - "3579:3579"
+    volumes:
+      - *localtime
+      - *storage
+      - {{ docker_home_appdata_path }}/ombi:/config
+
+  ombi:
+    <<: *common-keys-core # See EXTENSION FIELDS at the top
+    labels:
+      - "traefik.enable=true"
+      - traefik.http.routers.ombi.rule=Host(`ombi.{{ domain }}`)
+      #- traefik.http.routers.ombi.rule=PathPrefix(`/ombi`)
+      - traefik.http.routers.ombi.entrypoints=https
+      - traefik.http.routers.ombi.tls=true
+      - traefik.http.routers.ombi.middlewares=chain-oauth@file
+      - traefik.http.middlewares.ombi.headers.SSLRedirect=true
+      - traefik.http.middlewares.ombi.headers.STSSeconds=315360000
+      - traefik.http.middlewares.ombi.headers.browserXSSFilter=true
+      - traefik.http.middlewares.ombi.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.ombi.headers.forceSTSHeader=true
+      - traefik.http.middlewares.ombi.headers.SSLHost=
+      - traefik.http.middlewares.ombi.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.ombi.headers.STSPreload=true
+      - traefik.http.middlewares.ombi.headers.frameDeny=true
+      - traefik.http.services.ombi.loadbalancer.server.port=3579
