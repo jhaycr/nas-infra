@@ -200,6 +200,14 @@ services:
       - {{ docker_home_appdata_path }}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
 
+  jdownloader:
+    image: jlesage/jdownloader-2
+    ports:
+      - "5801:5800"
+    volumes:
+      - {{ docker_home_appdata_path }}/jdownloader:/config:rw
+      - {{ docker_storage_path }}/downloads:/output:rw"
+
   komga:
     <<: *common-keys
     container_name: komga
@@ -311,6 +319,20 @@ services:
       - *localtime
       - *storage
       - {{ docker_home_appdata_path }}/prowlarr:/config
+
+  pyload-ng:
+    <<: *common-keys
+    image: lscr.io/linuxserver/pyload-ng:latest
+    container_name: pyload-ng
+    environment:
+      <<: *common-env
+    volumes:
+      - {{ docker_home_appdata_path }}/pyload-ng:/config
+      - {{ docker_storage_path }}/downloads:/downloads
+    ports:
+      - 8000:8000
+      - 9666:9666 #optional
+    restart: unless-stopped
 
   radarr:
     <<: *common-keys
@@ -429,6 +451,17 @@ services:
       - *localtime
       - *storage
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8085:8080
+    environment:
+      WATCHTOWER_MONITOR_ONLY: 'true'
+    command: --interval 30
 
   netdata:
     image: netdata/netdata
