@@ -258,6 +258,25 @@ services:
       - {{ docker_home_appdata_path }}/mylar3:/config
       - {{ docker_storage_path }}/downloads:/downloads
 
+  navidrome:
+    <<: *common-keys
+    container_name: navidrome
+    image: deluan/navidrome:latest
+    user: 1000:1000 # should be owner of volumes
+    ports:
+      - "4533:4533"
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      # Optional: put your config options customization here. Examples:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info  
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    volumes:
+      - {{ docker_home_appdata_path }}/navidrome:/data
+      - {{ docker_storage_path }}/media/audio/Music:/music:ro"
+
   ouroboros:
     <<: *common-keys
     container_name: ouroboros
