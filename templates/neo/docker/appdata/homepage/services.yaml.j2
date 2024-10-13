@@ -169,13 +169,6 @@
             url: http://192.168.1.3:8112
             password: {{ secret_arr_api_key_deluge }} # webui password
 
-    - MeTube:
-        icon: metube.png
-        href: http://192.168.1.3:8087
-        description: YouTube Downloader
-        server: neo-docker
-        container: metube
-
     - Pyload:
         href: http://192.168.1.3:8000
         description: Downloader
@@ -188,6 +181,20 @@
         description: Downloader
         server: neo-docker
         container: jdownloader
+
+    - MeTube:
+        icon: metube.png
+        href: http://192.168.1.3:8087
+        description: YouTube Downloader
+        server: neo-docker
+        container: metube
+
+    - TubeArchivist:
+        icon: tubearchivist.png
+        href: http://192.168.1.3:0888
+        description: YouTube Downloader
+        server: neo-docker
+        container: tubearchivist
 
 - Network & IoT:
     - UniFi:
