@@ -40,7 +40,7 @@
     - Plex:
         icon: plex.png
         href: http://192.168.1.3:32400
-        description: Media Streaming
+        description: Video Streaming
         siteMonitor: http://192.168.1.3:32400
         #widget:
         #    type: plex
@@ -50,7 +50,7 @@
     - Tautulli:
         icon: tautulli.png
         href: http://192.168.1.3:8181
-        description: Media Streaming Stats
+        description: Video Streaming Stats
         server: neo-docker
         container: tautulli
         widget:
@@ -60,6 +60,13 @@
             enableUser: true # optional, defaults to false
             showEpisodeNumber: true # optional, defaults to false
             expandOneStreamToTwoRows: false # optional, defaults to true
+
+    - Navidrome:
+        icon: navidrome.png
+        href: http://192.168.1.3:4533
+        description: Music Streaming
+        server: neo-docker
+        container: navidrome
 
 - Usenet:
 
