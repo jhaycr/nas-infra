@@ -1,0 +1,32 @@
+---
+- name: Copy and unpack the TubeArchivist Agent/Scanner bundle
+  ansible.builtin.unarchive:
+    src: https://github.com/tubearchivist/tubearchivist-plex/archive/refs/heads/main.zip
+    dest: /tmp
+    remote_src: yes
+
+- name: Copy unpacked Scanners folder to Plex
+  ansible.builtin.copy: 
+    remote_src: yes 
+    src: /tmp/tubearchivist-plex-main/Scanners
+    dest: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/'
+    owner: plex
+    group: plex
+
+- name: Templatize TubeArchivist config
+  ansible.builtin.template:
+    src: "../templates/tubearchivist/ta_config.json.j2"
+    dest: "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Scanners/Series/ta_config.json"
+
+- name: Delete unpacked Scanners folder
+  ansible.builtin.file:
+    path:  /tmp/tubearchivist-plex-main/Scanners
+    state: absent
+
+- name: Copy unpacked bundle folder to Plex
+  ansible.builtin.copy: 
+    remote_src: yes 
+    src: /tmp/tubearchivist-plex-main/
+    dest: '/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-ins/TubeArchivist-Agent.bundle/'
+    owner: plex
+    group: plex
