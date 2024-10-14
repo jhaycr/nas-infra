@@ -1,0 +1,10 @@
+---
+- name: Install TubeArchivist agent and scanner
+  include_tasks: "tubearchivist.yml"
+
+- name: Restart Plex
+  ansible.builtin.service:
+    name: plexmediaserver
+    state: restarted
+    enabled: yes
+    

@@ -20,6 +20,8 @@
       tags: compose
       become: yes
     - role: joenyland.plexmediaserver
+    - role: jhaycr-local.plex
+      become: yes
     - role: IronicBadger.proxmox_nag_removal
 
   tasks:
