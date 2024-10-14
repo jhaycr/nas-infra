@@ -200,6 +200,21 @@ services:
       - {{ docker_home_appdata_path }}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
 
+  jackett:
+    <<: *common-keys
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      <<: *common-env
+      AUTO_UPDATE: true #optional
+      # RUN_OPTS= #optional
+    volumes:
+      - {{ docker_home_appdata_path }}/jackett:/config
+      - {{ docker_storage_path }}/downloads:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
   jdownloader:
     image: jlesage/jdownloader-2
     container_name: jdownloader
@@ -541,6 +556,8 @@ services:
     command: --interval 30
 
   netdata:
+    profiles:
+      - donotstart
     image: netdata/netdata
     container_name: netdata
     pid: host
