@@ -279,6 +279,15 @@
 
 - Monitoring:
 
+    - Health Checks:
+        icon: healthchecks.png
+        href: https://healthchecks.io
+        widget:
+            type: healthchecks
+            url: https://healthchecks.io
+            key: {{ secret_healthcheck_project_api_key }}
+            # uuid: <CHECK_UUID> # optional, if not included total statistics for all checks is shown
+
     - Uptime:
         icon: uptime-kuma.png
         href: http://192.168.1.3:3001
