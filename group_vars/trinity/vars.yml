@@ -6,6 +6,17 @@ main_username: josh
 # grog.package
 # -----
 package_list:
-  - name: git
   - name: curl
+  - name: git
+  - name: gnome-tweaks
+  - name: gramps
   - name: iperf
+  - name: keepassxc
+  - name: peazip
+  - name: pwgen
+  - name: steam
+  - name: syncthing
+  - name: unrar
+  - name: veracrypt
+  - name: virtualbox
+  - name: wireguard

@@ -46,3 +46,8 @@
     - role: geerlingguy.docker
     - role: jhaycr-local.docker_compose
       tags: compose
+
+- hosts: trinity
+  roles:
+    - role: grog.package
+      become: yes
