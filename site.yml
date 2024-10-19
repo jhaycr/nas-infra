@@ -51,3 +51,14 @@
   roles:
     - role: grog.package
       become: yes
+
+  tasks:
+    - name: Install Snaps
+      become: yes
+      community.general.snap:
+        name: "{{ item.name }}"
+        state: "{{ item.state | default('present') }}"
+        channel: "{{ item.channel | default('stable') }}"
+        classic: "{{ item.classic | default(false) }}"
+        dangerous: "{{ item.dangerous | default(false) }}"
+      with_items: "{{ snap_list }}"

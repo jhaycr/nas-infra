@@ -33,7 +33,7 @@ morpheus:
 	ansible-playbook -v site.yml --limit morpheus
 
 trinity:
-	ansible-playbook -v site.yml --limit trinity
+	ansible-playbook -v site.yml --limit trinity -K
 
 compose:
 	ansible-playbook -v site.yml --tags compose
