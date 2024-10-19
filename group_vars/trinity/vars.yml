@@ -20,3 +20,28 @@ package_list:
   - name: veracrypt
   - name: virtualbox
   - name: wireguard
+
+snap_list:
+  - name: audible-for-linux
+  - name: authy
+  - name: brave
+  - name: cups
+  - name: curl
+  - name: discord
+  - name: everdo
+  - name: ffmpeg
+  - name: firefox
+  - name: jdownloader2
+  - name: joplin-desktop
+  - name: kolourpaint
+  - name: obsidian
+    classic: true
+  - name: organize-my-files
+  - name: plex-desktop
+  - name: poddr
+  - name: retroarch
+  - name: slack
+  - name: spotify
+  - name: sublime-text
+    classic: true
+  - name: ufw 
