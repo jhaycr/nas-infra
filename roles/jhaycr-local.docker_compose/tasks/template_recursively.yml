@@ -1,9 +1,16 @@
 ---
+- name: Validate or create destination paths
+  file:
+    path: "{{ dest_path_base }}/{{ item.path }}"
+    state: directory
+  with_filetree: "{{ src_path_base }}/{{ inventory_group_name }}/{{src_path_suffix}}"
+  when: item.state == 'directory'
+
 # https://stackoverflow.com/questions/41667864/can-the-templates-module-handle-multiple-templates-directories
 - name: Template all the templates and place them in the corresponding path
   template:
     src: "{{ item.src }}"
-    dest: "{{ docker_home_appdata_path }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+    dest: "{{ dest_path_base }}/{{ item.path | regex_replace('\\.j2$', '') }}"
     force: yes
-  with_filetree: "./templates/{{ group_name }}/docker/appdata"
+  with_filetree: "{{ src_path_base }}/{{ inventory_group_name }}/{{src_path_suffix}}"
   when: item.state == 'file'
