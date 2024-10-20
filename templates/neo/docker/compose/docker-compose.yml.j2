@@ -20,6 +20,9 @@ x-common-volumes:
   - &localtime /etc/localtime:/etc/localtime:ro
   - &storage {{ docker_storage_path }}:/storage
 
+include:
+  - ./compose-includes/nginx-proxy-manager.yml
+
 services:
   audiobookshelf:
     <<: *common-keys
