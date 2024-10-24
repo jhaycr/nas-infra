@@ -28,8 +28,8 @@ networks:
         - subnet: "192.168.1.0/24"
           ip_range: "192.168.1.9/32"
           gateway: "192.168.1.1"
-  macvlan_bridge: 
-    name: macvlan_bridge
+  external_proxy_bridge: 
+    name: external_proxy_bridge
     ipam: 
       config: 
         - gateway: 10.10.0.1
@@ -43,9 +43,6 @@ services:
     environment:
       <<: *common-env
       DISABLE_IPV6: 'true'
-    networks:
-      default:
-      gaseous:
     ports:
       # These ports are in format <host-port>:<container-port>
       - '80:80' # Public HTTP Port
@@ -53,8 +50,8 @@ services:
       - '81:81' # Admin Web Port
 
     volumes:
-      - {{ docker_home_appdata_path }}/npm/data:/data
-      - {{ docker_home_appdata_path }}/npm/letsencrypt:/etc/letsencrypt
+      - {{ docker_home_appdata_path }}/npm-internal/data:/data
+      - {{ docker_home_appdata_path }}/npm-internal/letsencrypt:/etc/letsencrypt
 
   npm-external:
     <<: *common-keys
@@ -63,12 +60,19 @@ services:
     environment:
       <<: *common-env
       DISABLE_IPV6: 'true'
+    # ports:
+    #  These ports are in format <host-port>:<container-port>
+    #  - '80:80' # Public HTTP Port
+    #  - '443:443' # Public HTTPS Port
+    #  - '81:81' # Admin Web Port
     networks:
-      default:
-      macvlan_bridge:
+      external_proxy_bridge:
       proxy-vlan:
         ipv4_address: 192.168.1.9 # IP address inside the defined range
+    # Note that proxy host destinations must use hostname:internal-port
+    # Example:
+    #   http://overseerr:5055
 
     volumes:
-      - {{ docker_home_appdata_path }}/npm-external/data:/data
-      - {{ docker_home_appdata_path }}/npm-external/letsencrypt:/etc/letsencrypt
+      - {{ docker_home_appdata_path }}/npm/data:/data
+      - {{ docker_home_appdata_path }}/npm/letsencrypt:/etc/letsencrypt

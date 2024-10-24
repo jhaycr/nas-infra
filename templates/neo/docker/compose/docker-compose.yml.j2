@@ -322,6 +322,9 @@ services:
     image: linuxserver/overseerr:1.33.2
     environment:
       <<: *common-env
+    networks:
+      external_proxy_bridge:
+      default:
     ports:
       - "5055:5055"
     volumes:
