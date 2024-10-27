@@ -48,10 +48,16 @@ services:
       - '80:80' # Public HTTP Port
       - '443:443' # Public HTTPS Port
       - '81:81' # Admin Web Port
-
+    networks:
+      default:
+      gaseous:
     volumes:
       - {{ docker_home_appdata_path }}/npm-internal/data:/data
       - {{ docker_home_appdata_path }}/npm-internal/letsencrypt:/etc/letsencrypt
+    # 1) Add A record in domain registrar mapping internal subdomain (e.g. 'internal.example.com') to internal proxy' IP (e.g. 192.168.1.54)
+    # 2) Add wildcard record in DNS Resolver for same
+    #    https://docs.netgate.com/pfsense/en/latest/services/dns/wildcards.html#dns-resolver-unbound
+    # 3) Define proxy hosts with (Docker) internal hostnames (e.g. roms.internal.example.com -> gaseous-server:80 )
 
   npm-external:
     <<: *common-keys
