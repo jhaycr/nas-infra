@@ -22,6 +22,8 @@ x-common-volumes:
 
 include:
   - ./compose-includes/nginx-proxy-manager.yml
+  - path: ./compose-includes/authentik.yml
+    env_file: ./compose-includes/.env.authentik
   - ./compose-includes/gaseous.yml
 
 services:
