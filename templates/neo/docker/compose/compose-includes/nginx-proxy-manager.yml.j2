@@ -50,6 +50,7 @@ services:
       - '81:81' # Admin Web Port
     networks:
       default:
+      authentik:
       gaseous:
     volumes:
       - {{ docker_home_appdata_path }}/npm-internal/data:/data
