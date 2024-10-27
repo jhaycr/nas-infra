@@ -1,0 +1,7 @@
+[INCLUDES]
+
+[Definition]
+
+failregex = ^.* (405|404|403|401|\-) (405|404|403|401) - .* \[Client <HOST>\] \[Length .*\] .* \[Sent-to <F-CONTAINER>.*</F-CONTAINER>\] <F-USERAGENT>".*"</F-USERAGENT> .*$
+
+ignoreregex = ^.* (404|\-) (404) - .*".*(\.png|\.txt|\.jpg|\.ico|\.js|\.css|\.ttf|\.woff|\.woff2)(/)*?" \[Client <HOST>\] \[Length .*\] ".*" .*$
