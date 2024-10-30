@@ -493,7 +493,7 @@ services:
       REDIS_HOST: tubearchivist-redis          # don't add protocol
       HOST_UID: 1000
       HOST_GID: 1000
-      TA_HOST: 192.168.1.3 tubearchivist.local         # set your host name
+      TA_HOST: {{ secret_tubearchivist_host }}         # set your host name
       TA_USERNAME: {{ secret_tubearchivist_user }}           # your initial TA credentials
       TA_PASSWORD: {{ secret_tubearchivist_pass }}              # your initial TA credentials
       ELASTIC_PASSWORD: {{ secret_tubearchivist_es_pass }}         # set password for Elasticsearch
