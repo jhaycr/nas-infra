@@ -50,7 +50,6 @@ services:
       - '81:81' # Admin Web Port
     networks:
       default:
-      authentik:
       gaseous:
     volumes:
       - {{ docker_home_appdata_path }}/npm-internal/data:/data
@@ -73,6 +72,7 @@ services:
     #  - '443:443' # Public HTTPS Port
     #  - '81:81' # Admin Web Port
     networks:
+      authentik:
       external_proxy_bridge:
       proxy-vlan:
         ipv4_address: 192.168.1.9 # IP address inside the defined range
