@@ -33,6 +33,11 @@ services:
       - {{ docker_storage_path }}/storage/Games/Emulation/Roms/General:/romm/library/roms
       - {{ docker_home_appdata_path }}/romm/assets:/romm/assets # Uploaded saves, states, etc.
       - {{ docker_home_appdata_path }}/romm/config:/romm/config # Path where config.yml is stored
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 500M
     depends_on:
       - romm-db
 
