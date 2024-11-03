@@ -33,6 +33,8 @@ services:
     image: ghcr.io/advplyr/audiobookshelf:latest
     environment:
       <<: *common-env
+    networks:
+      external_proxy_bridge:
     ports:
       - "13378:80"
     volumes:
@@ -82,6 +84,8 @@ services:
     image: lscr.io/linuxserver/calibre-web:latest
     environment:
       <<: *common-env
+    networks:
+      external_proxy_bridge:
     ports:
       - "8083:8083"
     volumes:
