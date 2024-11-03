@@ -510,6 +510,12 @@ services:
       TA_USERNAME: {{ secret_tubearchivist_user }}           # your initial TA credentials
       TA_PASSWORD: {{ secret_tubearchivist_pass }}              # your initial TA credentials
       ELASTIC_PASSWORD: {{ secret_tubearchivist_es_pass }}         # set password for Elasticsearch
+
+      # prevents the browser extension from working and breaks existing users
+      # https://docs.tubearchivist.com/configuration/forward-auth/
+      # TA_ENABLE_AUTH_PROXY: "true"
+      # TA_AUTH_PROXY_USERNAME_HEADER: "HTTP_REMOTE_USER"
+      # TA_AUTH_PROXY_LOGOUT_URL: "https://auth.{{ secret_domain }}/logout"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 2m
