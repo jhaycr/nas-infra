@@ -1,0 +1,51 @@
+volumes:
+  romm_mysql_data:
+  romm_resources:
+  romm_redis_data:
+
+networks:
+  romm:
+    driver: bridge
+
+services:
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    restart: unless-stopped
+    environment:
+      - DB_HOST=romm-db
+      - DB_NAME=romm # Should match MYSQL_DATABASE in mariadb
+      - DB_USER=romm-user # Should match MYSQL_USER in mariadb
+      - DB_PASSWD=pass # Should match MYSQL_PASSWORD in mariadb
+      - ROMM_AUTH_SECRET_KEY={{ secret_romm_auth_secret_key }} # Generate a key with `openssl rand -hex 32`
+      - IGDB_CLIENT_ID={{ secret_igdb_client_id }} # Generate an ID and SECRET in IGDB
+      - IGDB_CLIENT_SECRET={{ secret_igdb_api_client_secret }} # https://api-docs.igdb.com/#account-creation
+      - MOBYGAMES_API_KEY= # https://www.mobygames.com/info/api/
+      - STEAMGRIDDB_API_KEY # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
+    networks:
+        romm:
+    ports:
+        - 8089:8080
+    volumes:
+      - romm_resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
+      - romm_redis_data:/redis-data # Cached data for background tasks
+      - {{ docker_home_appdata_path }}/romm/library:/romm/library # Your game library
+      - {{ docker_storage_path }}/storage/Games/Emulation/Roms/General:/romm/library/roms
+      - {{ docker_home_appdata_path }}/romm/assets:/romm/assets # Uploaded saves, states, etc.
+      - {{ docker_home_appdata_path }}/romm/config:/romm/config # Path where config.yml is stored
+    depends_on:
+      - romm-db
+
+  romm-db:
+    image: mariadb:latest # if you experience issues, try: linuxserver/mariadb:latest
+    container_name: romm-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD={{ secret_romm_db_root_pass }} # Use a unique, secure password
+      - MYSQL_DATABASE=romm
+      - MYSQL_USER=romm-user
+      - MYSQL_PASSWORD=pass
+    networks:
+        romm:
+    volumes:
+      - romm_mysql_data:/var/lib/mysql
