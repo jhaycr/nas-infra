@@ -160,9 +160,17 @@ services:
   freshrss:
     <<: *common-keys
     container_name: freshrss
-    image: lscr.io/linuxserver/freshrss:latest
+    image: freshrss/freshrss:latest
     environment:
       <<: *common-env
+      OIDC_ENABLED : 1
+      OIDC_PROVIDER_METADATA_URL : https://auth.{{ secret_domain }}/application/o/freshrss/.well-known/openid-configuration
+      OIDC_CLIENT_ID : {{ secret_freshrss_oidc_client_id }}
+      OIDC_CLIENT_SECRET : {{ secret_freshrss_oidc_client_secret }}
+      OIDC_X_FORWARDED_HEADERS : X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
+      OIDC_SCOPES : openid email profile
+    networks:
+      external_proxy_bridge:
     ports:
       - "8012:80"
     volumes:
@@ -326,7 +334,6 @@ services:
       <<: *common-env
     networks:
       external_proxy_bridge:
-      default:
     ports:
       - "5055:5055"
     volumes:
