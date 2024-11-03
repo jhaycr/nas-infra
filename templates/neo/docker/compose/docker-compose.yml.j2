@@ -235,8 +235,11 @@ services:
     restart: unless-stopped
 
   jdownloader:
+    <<: *common-keys
     image: jlesage/jdownloader-2
     container_name: jdownloader
+    environment:
+      <<: *common-env
     ports:
       - "5801:5800"
     volumes:
@@ -275,6 +278,8 @@ services:
     <<: *common-keys
     image: ghcr.io/alexta69/metube
     container_name: metube
+    environment:
+      <<: *common-env
     ports:
       - "8087:8081"
     volumes:
@@ -430,8 +435,11 @@ services:
   
   # https://github.com/AnalogJ/scrutiny
   scrutiny:
+    <<: *common-keys
     container_name: scrutiny
     image: ghcr.io/analogj/scrutiny:master-omnibus
+    environment:
+      <<: *common-env
     cap_add:
       - SYS_RAWIO
     ports:
@@ -574,6 +582,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   watchtower:
+    <<: *common-keys
     image: containrrr/watchtower
     container_name: watchtower
     volumes:
@@ -581,35 +590,10 @@ services:
     ports:
       - 8085:8080
     environment:
+      <<: *common-env
       WATCHTOWER_MONITOR_ONLY: 'true'
     command: --interval 30
 
-  netdata:
-    profiles:
-      - donotstart
-    image: netdata/netdata
-    container_name: netdata
-    pid: host
-    network_mode: host
-    restart: unless-stopped
-    cap_add:
-      - SYS_PTRACE
-      - SYS_ADMIN
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - netdataconfig:/etc/netdata
-      - netdatalib:/var/lib/netdata
-      - netdatacache:/var/cache/netdata
-      - /:/host/root:ro,rslave
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
-      - /var/log:/host/var/log:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
 volumes:
   netdataconfig:
