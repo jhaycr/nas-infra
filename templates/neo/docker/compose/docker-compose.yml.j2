@@ -245,6 +245,8 @@ services:
     environment:
       <<: *common-env
       KOMGA_OAUTH2_ACCOUNT_CREATION: "true"
+    networks:
+      external_proxy_bridge:
     ports:
       - "25600:25600"
     volumes:

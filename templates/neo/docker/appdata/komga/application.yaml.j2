@@ -1,0 +1,19 @@
+komga:
+  ## Comment if you don't want automatic account creation.
+  oauth2-account-creation: true
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          authentik:
+            client-id: {{ secret_komga_oidc_client_id }}
+            client-secret: {{ secret_komga_oidc_client_secret }}
+            client-name: Authentik SSO
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: "https://comics.{{ secret_domain }}/login/oauth2/code/authentik"
+        provider:
+          authentik:
+            issuer-uri: https://auth.{{ secret_domain }}/application/o/komga/
+            user-name-attribute: preferred_username
