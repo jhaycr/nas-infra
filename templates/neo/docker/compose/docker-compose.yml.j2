@@ -93,6 +93,7 @@ services:
       - *localtime
       - *storage
       - {{ docker_home_appdata_path }}/calibreweb:/config
+      - {{ docker_storage_path}}/storage/Books/Calibre:/books
 
   deluge:
     <<: *common-keys
