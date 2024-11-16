@@ -1,0 +1,25 @@
+
+services:
+
+  jdownloader:
+    <<: *common-keys
+    image: jlesage/jdownloader-2
+    container_name: jdownloader
+    environment:
+      <<: *common-env
+    ports:
+      - "5801:5800"
+    volumes:
+      - {{ docker_home_appdata_path }}/jdownloader:/config:rw
+      - {{ docker_storage_path }}/downloads:/output:rw"
+
+  metube:
+    <<: *common-keys
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    environment:
+      <<: *common-env
+    ports:
+      - "8087:8081"
+    volumes:
+      - {{ docker_storage_path }}/downloads:/downloads

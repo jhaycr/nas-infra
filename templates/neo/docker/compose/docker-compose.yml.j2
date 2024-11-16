@@ -94,6 +94,10 @@ services:
       - *storage
       - {{ docker_home_appdata_path }}/calibreweb:/config
       - {{ docker_storage_path}}/storage/Books/Calibre:/books
+    # https://www.reddit.com/r/selfhosted/comments/ys6n76/authentik_ldap_in_calibreweb/
+    # https://www.davidbuhlman.com/calibre-web-integration-with-authentik/
+    # https://www.davidbuhlman.com/calibre-web-integration-with-authentik-part-two/
+    # 
 
   deluge:
     <<: *common-keys
@@ -235,18 +239,6 @@ services:
       - 9117:9117
     restart: unless-stopped
 
-  jdownloader:
-    <<: *common-keys
-    image: jlesage/jdownloader-2
-    container_name: jdownloader
-    environment:
-      <<: *common-env
-    ports:
-      - "5801:5800"
-    volumes:
-      - {{ docker_home_appdata_path }}/jdownloader:/config:rw
-      - {{ docker_storage_path }}/downloads:/output:rw"
-
   komga:
     <<: *common-keys
     container_name: komga
@@ -274,17 +266,6 @@ services:
     user: 1000:1000
     volumes:
       - {{ docker_home_appdata_path }}/maintainerr:/opt/data
-
-  metube:
-    <<: *common-keys
-    image: ghcr.io/alexta69/metube
-    container_name: metube
-    environment:
-      <<: *common-env
-    ports:
-      - "8087:8081"
-    volumes:
-      - {{ docker_storage_path }}/downloads:/downloads
 
   mylar3:
     <<: *common-keys
