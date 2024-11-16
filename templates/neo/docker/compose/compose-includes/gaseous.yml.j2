@@ -11,14 +11,17 @@ services:
     ports:
       - 5198:80
     volumes:
-      - gs:/root/.gaseous-server
+      - {{ docker_home_appdata_path }}/gaseous-server:/root/.gaseous-server
+      - {{ docker_storage_path }}/storage/Games/Emulation/Roms/General:/roms:ro
     environment:
-      - TZ=Australia/Sydney
+      - TZ=America/Los_Angeles
       - dbhost=gaseous-db
       - dbuser=root
       - dbpass=gaseous
       - igdbclientid={{ secret_gaseous_api_client_id }}
       - igdbclientsecret={{ secret_gaseous_api_client_secret }}
+    # note, create first user workflow: https://github.com/gaseous-project/gaseous-server/issues/362
+
   gaseous-db:
     container_name: gaseous-db
     image: mariadb
@@ -31,9 +34,10 @@ services:
       - MARIADB_ROOT_PASSWORD=gaseous
       - MARIADB_USER=gaseous
       - MARIADB_PASSWORD=gaseous
+
 networks:
   gaseous:
     driver: bridge
+
 volumes:
-  gs:
   gaseous-db:
