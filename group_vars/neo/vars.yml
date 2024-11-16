@@ -11,6 +11,7 @@ docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/
 docker_appdata_folders_to_own:
 - maintainerr
 - navidrome
+- gaseous-server
 
 # -----
 # fuzzymistborn.autorestic
