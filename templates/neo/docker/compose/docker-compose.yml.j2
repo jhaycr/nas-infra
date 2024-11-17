@@ -295,9 +295,13 @@ services:
       ND_LOGLEVEL: info  
       ND_SESSIONTIMEOUT: 24h
       ND_BASEURL: ""
+      ND_REVERSEPROXYUSERHEADER: "X-authentik-username"
+      ND_REVERSEPROXYWHITELIST: "0.0.0.0/0"
+    networks:
+      external_proxy_bridge:
     volumes:
       - {{ docker_home_appdata_path }}/navidrome:/data
-      - {{ docker_storage_path }}/media/audio/Music:/music:ro"
+      - {{ docker_storage_path }}/media/audio/music:/music:ro"
 
   ouroboros:
     <<: *common-keys
