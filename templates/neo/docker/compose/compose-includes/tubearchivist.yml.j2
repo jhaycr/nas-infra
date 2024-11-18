@@ -1,0 +1,99 @@
+version: '3'
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-file: "10"
+    max-size: 200k
+
+x-common-keys: &common-keys
+  restart: unless-stopped
+  logging: *default-logging
+
+x-common-env: &common-env
+  PGID: "1000"
+  PUID: "1000"
+  TZ: America/Los_Angeles
+
+x-common-volumes:
+  - &localtime /etc/localtime:/etc/localtime:ro
+  - &storage {{ docker_storage_path }}:/storage
+  
+networks:
+  ta-network:
+    driver: bridge
+
+services:
+
+  tubearchivist:
+    <<: *common-keys
+    container_name: tubearchivist
+    image: bbilly1/tubearchivist
+    networks:
+      - ta-network
+    ports:
+      - 8088:8000
+    volumes:
+      - tubearchivist-media:/youtube
+      - tubearchivist-cache:/cache
+    environment:
+      <<: *common-env
+      ES_URL: http://tubearchivist-es:9200     # needs protocol e.g. http and port
+      REDIS_HOST: tubearchivist-redis          # don't add protocol
+      HOST_UID: 1000
+      HOST_GID: 1000
+      TA_HOST: {{ secret_tubearchivist_host }}         # set your host name
+      TA_USERNAME: {{ secret_tubearchivist_user }}           # your initial TA credentials
+      TA_PASSWORD: {{ secret_tubearchivist_pass }}              # your initial TA credentials
+      ELASTIC_PASSWORD: {{ secret_tubearchivist_es_pass }}         # set password for Elasticsearch
+
+      # prevents the browser extension from working and breaks existing users
+      # https://docs.tubearchivist.com/configuration/forward-auth/
+      # TA_ENABLE_AUTH_PROXY: "true"
+      # TA_AUTH_PROXY_USERNAME_HEADER: "HTTP_REMOTE_USER"
+      # TA_AUTH_PROXY_LOGOUT_URL: "https://auth.{{ secret_domain }}/logout"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 2m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - tubearchivist-es
+      - tubearchivist-redis
+  
+  tubearchivist-redis:
+    <<: *common-keys
+    image: redis/redis-stack-server
+    container_name: tubearchivist-redis
+    restart: unless-stopped
+    networks:
+      - ta-network
+    expose:
+      - "6379"
+    volumes:
+      - tubearchivist-redis:/data
+    depends_on:
+      - tubearchivist-es
+  
+  tubearchivist-es:
+    <<: *common-keys
+    image: bbilly1/tubearchivist-es         # only for amd64, or use official es 8.14.3
+    container_name: tubearchivist-es
+    restart: unless-stopped
+    networks:
+      - ta-network
+    environment:
+      - "ELASTIC_PASSWORD={{ secret_tubearchivist_es_pass }}"       # matching Elasticsearch password
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "xpack.security.enabled=true"
+      - "discovery.type=single-node"
+      - "path.repo=/usr/share/elasticsearch/data/snapshot"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - tubearchivist-es:/usr/share/elasticsearch/data    # check for permission error when using bind mount, see readme
+    expose:
+      - "9200"
