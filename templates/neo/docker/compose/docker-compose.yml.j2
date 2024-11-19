@@ -494,6 +494,19 @@ services:
       - *storage
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+  vaultwarden:
+    <<: *common-keys
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+      DOMAIN: "https://vw.lab.{{ secret_domain }}"
+    volumes:
+      - {{ docker_home_appdata_path }}/vaultwarden/:/data/
+    ports:
+      - 8087:80
+
   watchtower:
     <<: *common-keys
     image: containrrr/watchtower
