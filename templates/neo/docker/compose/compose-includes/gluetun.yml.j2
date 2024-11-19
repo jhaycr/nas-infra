@@ -1,0 +1,57 @@
+version: '3'
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-file: "10"
+    max-size: 200k
+
+x-common-keys: &common-keys
+  restart: unless-stopped
+  logging: *default-logging
+
+x-common-env: &common-env
+  PGID: "1000"
+  PUID: "1000"
+  TZ: America/Los_Angeles
+
+x-common-volumes:
+  - &localtime /etc/localtime:/etc/localtime:ro
+  - &storage {{ docker_storage_path }}:/storage
+  
+networks:
+  gluetun_bridge:
+    driver: bridge
+
+services:
+
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    hostname: gluetun
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    volumes:
+      - {{ docker_home_appdata_path }}/gluetun:/gluetun
+    networks:
+    - gluetun_bridge
+    ports:
+      - 8088:8088 # tubearchivist
+    expose:
+      - "6379"  # tubearchivist-redis
+      - "9200"  # tubearchivist-es
+    environment:
+      - VPN_SERVICE_PROVIDER={{ secret_gluetun_vpn_service_provider }}
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER={{ secret_gluetun_openvpn_user }}+pmp
+      - OPENVPN_PASSWORD={{ secret_gluetun_openvpn_pass }}
+      # If using Wireguard, uncomment below:
+      # - VPN_TYPE=wireguard
+      # - WIREGUARD_PRIVATE_KEY={{ secret_gluetun_wireguard_private_key }}
+      # - VPN_PORT_FORWARDING_PROVIDER={{ secret_gluetun_vpn_service_provider }}
+      - VPN_PORT_FORWARDING=on
+      - SERVER_COUNTRIES={{ secret_gluetun_vpn_server_countries }}
+      - PORT_FORWARD_ONLY=on
