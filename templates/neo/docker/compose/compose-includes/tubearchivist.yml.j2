@@ -41,7 +41,7 @@ services:
       REDIS_HOST: localhost          # don't add protocol
       HOST_UID: 1000
       HOST_GID: 1000
-      TA_PORT: 8088
+      TA_PORT: 8088 # https://docs.tubearchivist.com/installation/docker-compose/#port-collisions
       TA_HOST: {{ secret_tubearchivist_host }}         # set your host name
       TA_USERNAME: {{ secret_tubearchivist_user }}           # your initial TA credentials
       TA_PASSWORD: {{ secret_tubearchivist_pass }}              # your initial TA credentials
