@@ -507,21 +507,6 @@ services:
       WATCHTOWER_MONITOR_ONLY: 'true'
     command: --interval 30
 
-
-volumes:
-  netdataconfig:
-  netdatalib:
-  netdatacache:
-  tubearchivist-media:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device:  {{ docker_storage_path }}/media/TV/Youtube
-  tubearchivist-cache:
-  tubearchivist-es:
-  tubearchivist-redis:
-
 networks:
   default:
     name: compose_default
