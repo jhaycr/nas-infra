@@ -50,7 +50,7 @@ services:
       - '81:81' # Admin Web Port
     networks:
       default:
-      ta-network:
+      gluetun_bridge:
     volumes:
       - {{ docker_home_appdata_path }}/npm-internal/data:/data
       - {{ docker_home_appdata_path }}/npm-internal/letsencrypt:/etc/letsencrypt
