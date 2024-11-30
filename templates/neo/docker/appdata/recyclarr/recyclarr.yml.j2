@@ -12,7 +12,7 @@
 # Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
 radarr:
   hd-bluray-web:
-    base_url: http://radarr
+    base_url: http://radarr:7878
     api_key: {{ secret_arr_api_key_radarr }}
 
     include:
@@ -71,7 +71,7 @@ radarr:
 # Instance Definition: https://recyclarr.dev/wiki/yaml/config-reference/basic/
 sonarr:
   web-1080p-v4:
-    base_url: http://sonarr
+    base_url: http://sonarr:8989
     api_key: {{ secret_arr_api_key_sonarr }}
 
     include:
