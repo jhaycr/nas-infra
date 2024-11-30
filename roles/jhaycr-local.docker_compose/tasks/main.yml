@@ -24,6 +24,12 @@
   loop_control:
     loop_var: inventory_group_name
 
+- name: Create containers' appdata volumes
+  ansible.builtin.file:
+    path: "{{ docker_home_appdata_path }}/{{ item }}"
+    state: directory
+  with_items: "{{ docker_appdata_folders_to_own }}"
+
 - name: Update ownership of containers' appdata volumes
   ansible.builtin.file:
     path: "{{ docker_home_appdata_path }}/{{ item }}"
