@@ -12,6 +12,7 @@ docker_appdata_folders_to_own:
 - maintainerr
 - navidrome
 - gaseous-server
+- jellyfin
 
 # -----
 # fuzzymistborn.autorestic
