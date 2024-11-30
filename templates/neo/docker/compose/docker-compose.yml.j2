@@ -25,6 +25,7 @@ include:
   - path: ./compose-includes/authentik.yml
     env_file: ./compose-includes/.env.authentik
   - path: ./compose-includes/gluetun.yml
+  - path: ./compose-includes/recyclarr.yml
   - path: ./compose-includes/gaseous.yml
   - path: ./compose-includes/tubearchivist.yml
 
@@ -398,6 +399,9 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     environment:
       <<: *common-env
+    networks:
+      - default
+      - recyclarr
     ports:
       - "7878:7878"
     volumes:
@@ -479,6 +483,9 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     environment:
       <<: *common-env
+    networks:
+      - default
+      - recyclarr
     ports:
       - "8989:8989"
     volumes:
