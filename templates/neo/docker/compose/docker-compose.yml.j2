@@ -21,10 +21,13 @@ x-common-volumes:
   - &storage {{ docker_storage_path }}:/storage
 
 include:
+  # auth and network includes
   - path: ./compose-includes/nginx-proxy-manager.yml
   - path: ./compose-includes/authentik.yml
     env_file: ./compose-includes/.env.authentik
   - path: ./compose-includes/gluetun.yml
+  
+  # service includes
   - path: ./compose-includes/jellyfin.yml
   - path: ./compose-includes/recyclarr.yml
   - path: ./compose-includes/gaseous.yml
