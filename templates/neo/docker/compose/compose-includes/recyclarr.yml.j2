@@ -13,3 +13,6 @@ services:
       -  {{ docker_home_appdata_path }}/recyclarr:/config
     environment:
       - TZ=America/Los_Angeles
+    security_opt: ['no-new-privileges:true']
+    read_only: true
+    tmpfs: /tmp
