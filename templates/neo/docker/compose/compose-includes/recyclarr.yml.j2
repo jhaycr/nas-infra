@@ -1,0 +1,15 @@
+networks:
+  recyclarr:
+    name: recyclarr
+
+services:
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr
+    container_name: recyclarr
+    user: 1000:1000
+    networks:
+    - recyclarr
+    volumes:
+      -  {{ docker_home_appdata_path }}/recyclarr:/config
+    environment:
+      - TZ=America/Los_Angeles
