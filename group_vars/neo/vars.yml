@@ -13,6 +13,7 @@ docker_appdata_folders_to_own:
 - jellyfin
 - maintainerr
 - navidrome
+- notifiarr
 - recyclarr
 
 # -----
