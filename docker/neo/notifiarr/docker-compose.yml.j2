@@ -1,0 +1,37 @@
+---
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-file: "10"
+    max-size: 200k
+
+x-common-keys: &common-keys
+  restart: unless-stopped
+  logging: *default-logging
+
+x-common-env: &common-env
+  PGID: "1000"
+  PUID: "1000"
+  TZ: America/Los_Angeles
+
+x-common-volumes:
+  - &localtime /etc/localtime:/etc/localtime:ro
+  - &storage {{ docker_storage_path }}:/storage
+
+services:
+ 
+  notifiarr:
+    <<: *common-keys
+    container_name: notifiarr
+    hostname: notifiarr
+    image: golift/notifiarr
+    environment:
+      <<: *common-env
+    restart: unless-stopped
+    ports:
+      - "5454:5454"
+    volumes:
+      - {{ docker_home_appdata_path }}//notifiarr:/config
+      - /var/run/utmp:/var/run/utmp
+      - /etc/machine-id:/etc/machine-id
