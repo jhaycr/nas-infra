@@ -46,7 +46,6 @@ snap_list:
     classic: true
   - name: ufw 
 
-  # flatpaks
-  # - flatpak install flathub io.github.streetpea.Chiaki4deck
-  # https://streetpea.github.io/chiaki-ng/setup/configuration/
-  # https://streetpea.github.io/chiaki-ng/setup/remoteconnection/#test-connection
+
+flatpak_list:
+  - name: io.github.streetpea.Chiaki4deck
