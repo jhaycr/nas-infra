@@ -62,3 +62,13 @@
         classic: "{{ item.classic | default(false) }}"
         dangerous: "{{ item.dangerous | default(false) }}"
       with_items: "{{ snap_list }}"
+
+    - name: Install flatpaks
+      become: yes
+      community.general.flatpak:
+        name: "{{ item.name }}"
+        method: "{{ item.method | default('system') }}"
+        no_dependencies: "{{ item.no_dependencies | default('false') }}"
+        remote: "{{ item.remote | default('flathub') }}"
+        state: "{{ item.state | default('present') }}"
+      with_items: "{{ flatpak_list }}"
