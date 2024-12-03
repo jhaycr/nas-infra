@@ -156,7 +156,7 @@ services:
       # DOCKER_HOST: tcp://socket-proxy:2375 # enable when using socket proxy
       DOZZLE_REMOTE_AGENT: 192.168.1.2:7007
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # disable when using socket proxy
+      - /var/run/docker.sock:/var/run/docker.sock:ro # disable when using socket proxy
       
   filebot:
     <<: *common-keys
