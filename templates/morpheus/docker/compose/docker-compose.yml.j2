@@ -74,6 +74,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
 
   dozzle-agent:
+    <<: *common-keys
     container_name: dozzle-agent
     image: amir20/dozzle:latest
     command: agent
@@ -99,6 +100,7 @@ services:
       - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
 
   portainer-agent:
+    <<: *common-keys
     container_name: portainer-agent
     # Use the portainer/agent Docker image
     image: portainer/agent
