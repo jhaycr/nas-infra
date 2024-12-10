@@ -19,6 +19,9 @@
     - role: jhaycr-local.docker_compose
       tags: compose
       become: yes
+    #- role: jhaycr-local.docker_compose_v2
+    #  tags: compose
+    #  become: yes
     - role: joenyland.plexmediaserver
     - role: jhaycr-local.plex
       become: yes
@@ -72,3 +75,10 @@
         remote: "{{ item.remote | default('flathub') }}"
         state: "{{ item.state | default('present') }}"
       with_items: "{{ flatpak_list }}"
+
+    - name: Swappiness to 10%
+      become: yes
+      ansible.posix.sysctl:
+        name: vm.swappiness
+        value: '10'
+        state: present
