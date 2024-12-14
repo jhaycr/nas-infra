@@ -1,3 +1,37 @@
 ---
-docker_home_appdata_path: "/opt/docker/appdata"
+# Base path for Docker-related configurations
+docker_home_base_path: "/opt/docker"
+
+# Path for Docker compose files
+docker_home_compose_path: "{{ docker_home_base_path }}/compose"
+
+# Path for application data volumes
+docker_home_appdata_path: "{{ docker_home_base_path }}/appdata"
+
+# List of appdata folders to set ownership for
 docker_appdata_folders_to_own: []
+
+# Default owner and group for appdata directories
+docker_appdata_owner: "1000"
+docker_appdata_group: "1000"
+
+# Base path to search for Docker compose files in templates
+docker_templates_base_path: "./docker"
+
+# Subdirectory name for application-specific data in templates
+docker_templates_appdata_subdir: "appdata"
+
+# Whether to start Docker stacks after deployment
+docker_compose_start: true
+
+# Docker Compose v2 specific configuration
+docker_compose_files:
+  - docker-compose.yml
+  - docker-compose.override.yml
+
+# Environment files to use with Docker Compose
+docker_compose_env_files:
+  - .env
+
+# Whether to remove orphaned containers
+docker_compose_remove_orphans: true
