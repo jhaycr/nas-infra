@@ -29,6 +29,9 @@ neo:
 neo-compose:
 	ansible-playbook -vv site.yml --limit neo --tags compose
 
+neo-disks:
+	ansible-playbook -vv site.yml --limit neo --tags disks
+
 morpheus:
 	ansible-playbook -v site.yml --limit morpheus
 

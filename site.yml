@@ -10,9 +10,12 @@
     - role: geerlingguy.pip
     - role: geerlingguy.docker
     - role: jhaycr.luks_disks
+      tags: disks
     - role: IronicBadger.snapraid
       become: yes
+      tags: disks
     - role: tigattack.mergerfs
+      tags: disks
     - role: geerlingguy.nfs
     - role: jhaycr-local.backup
       become: yes
