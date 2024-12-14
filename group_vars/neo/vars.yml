@@ -72,9 +72,13 @@ snapraid_data_disks:
     content: true
   - path: /mnt/data2
     content: true
+  - path: /mnt/data3
+    content: true
 
 snapraid_parity_disks:
   - path: /mnt/parity1
+    content: false
+  - path: /mnt/parity2
     content: false
 
 snapraid_content_files:
