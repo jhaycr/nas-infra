@@ -22,9 +22,6 @@
     - role: jhaycr-local.docker_compose
       tags: compose
       become: yes
-    #- role: jhaycr-local.docker_compose_v2
-    #  tags: compose
-    #  become: yes
     - role: joenyland.plexmediaserver
     - role: jhaycr-local.plex
       become: yes

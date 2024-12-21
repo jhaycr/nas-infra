@@ -1,41 +1,9 @@
 ---
-- name: Validate or create Docker appdata path
-  file:
-    path: "{{ docker_home_appdata_path }}"
-    state: directory
-
-- name: Copy templates for Docker compose recursively
-  include_tasks: "template_recursively.yml"
-  vars:
-    src_path_base: "./templates"
-    src_path_suffix: "docker/compose"
-    dest_path_base: "{{ docker_home_compose_path }}"
+- name: Process Docker configurations for each host group
+  include_tasks: "1_process_group.yml"
   loop: "{{ group_names }}"
   loop_control:
     loop_var: inventory_group_name
-
-- name: Copy templates for Docker apps recursively
-  include_tasks: "template_recursively.yml"
-  vars:
-    src_path_base: "./templates"
-    src_path_suffix: "docker/appdata"
-    dest_path_base: "{{ docker_home_appdata_path }}"
-  loop: "{{ group_names }}"
-  loop_control:
-    loop_var: inventory_group_name
-
-- name: Create containers' appdata volumes
-  ansible.builtin.file:
-    path: "{{ docker_home_appdata_path }}/{{ item }}"
-    state: directory
-  with_items: "{{ docker_appdata_folders_to_own }}"
-
-- name: Update ownership of containers' appdata volumes
-  ansible.builtin.file:
-    path: "{{ docker_home_appdata_path }}/{{ item }}"
-    owner: 1000
-    group: 1000
-  with_items: "{{ docker_appdata_folders_to_own }}"
 
 - name: Start Docker stack
   become: yes

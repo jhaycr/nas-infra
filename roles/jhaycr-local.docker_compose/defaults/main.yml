@@ -1,37 +1,33 @@
 ---
-# Base path for Docker-related configurations
-docker_home_base_path: "/opt/docker"
+# Base paths for Docker files and data (overridable by group_vars)
+docker_base_path: "{{ docker_home_compose_path | default('/opt/docker') }}"
+docker_appdata_path: "{{ docker_home_appdata_path }}"
 
-# Path for Docker compose files
-docker_home_compose_path: "{{ docker_home_base_path }}/compose"
+# Template paths and structure (v2 compatibility)
+templates_path: "docker"
+appdata_subdir: "appdata"
 
-# Path for application data volumes
-docker_home_appdata_path: "{{ docker_home_base_path }}/appdata"
+# Template paths and structure (v3)
+template_sources:
+  - path: "{{ docker_compose_templates_path | default('templates/' + inventory_group_name + '/docker/compose') }}"
+    appdata_subdir: "templates/{{ inventory_group_name }}/docker/appdata"
+  - path: "docker"
+    appdata_subdir: "appdata"
 
-# List of appdata folders to set ownership for
-docker_appdata_folders_to_own: []
+# Legacy template processing (disable after migration to docker/neo)
+process_legacy_templates: true
 
-# Default owner and group for appdata directories
-docker_appdata_owner: "1000"
-docker_appdata_group: "1000"
+# Debug mode - set to true to enable debug output and halt after debug
+# Can be set via:
+# - ansible-playbook -e "docker_compose_debug=true"
+# - make target DOCKER_COMPOSE_DEBUG=true
+# - make target docker_compose_debug=true
+docker_compose_debug: "{{ DOCKER_COMPOSE_DEBUG | default(docker_compose_debug_lower) | default('false') }}"
+docker_compose_debug_lower: "{{ lookup('env', 'docker_compose_debug') | default('false') }}"
 
-# Base path to search for Docker compose files in templates
-docker_templates_base_path: "./docker"
+# File ownership (overridable by group_vars)
+appdata_owner: "{{ main_username | default('1000') }}"
+appdata_group: "{{ main_username | default('1000') }}"
 
-# Subdirectory name for application-specific data in templates
-docker_templates_appdata_subdir: "appdata"
-
-# Whether to start Docker stacks after deployment
-docker_compose_start: true
-
-# Docker Compose v2 specific configuration
-docker_compose_files:
-  - docker-compose.yml
-  - docker-compose.override.yml
-
-# Environment files to use with Docker Compose
-docker_compose_env_files:
-  - .env
-
-# Whether to remove orphaned containers
-docker_compose_remove_orphans: true
+# Deployment options
+compose_start: true
