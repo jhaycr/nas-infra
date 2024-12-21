@@ -1,0 +1,136 @@
+---
+# Enhanced implementation supporting multiple template sources
+- name: Process all docker and appdata files
+  block:
+    - name: Initialize file lists
+      ansible.builtin.set_fact:
+        docker_compose_files: []
+        docker_compose_root_files: []
+        docker_compose_appdata_files: []
+        private: yes
+
+    - name: Debug template sources
+      ansible.builtin.debug:
+        msg: "Processing path: {{ item.path }}"
+      loop: "{{ template_sources }}"
+      when: docker_compose_debug | bool
+
+    - name: Gather application files
+      ansible.builtin.set_fact:
+        docker_compose_files: "{{ docker_compose_files + (lookup('ansible.builtin.filetree', playbook_dir + '/' + item.path + '/') | 
+                                selectattr('state', 'ne', 'directory') |
+                                selectattr('path', 'regex', '.*/((docker-compose.*|.env)\\.(yml|j2))$') |
+                                list) }}"
+        docker_compose_appdata_files: "{{ docker_compose_appdata_files + (lookup('ansible.builtin.filetree', playbook_dir + '/' + item.appdata_subdir + '/') |
+                                        selectattr('state', 'ne', 'directory') |
+                                        list) }}"
+      loop: "{{ template_sources }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Debug found files
+      ansible.builtin.debug:
+        msg: "Found file: {{ item.src }} -> {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
+      loop: "{{ docker_compose_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: docker_compose_debug | bool
+
+    - name: Halt after debug if debug mode is enabled
+      ansible.builtin.fail:
+        msg: "Halting after debug output as requested"
+      when: docker_compose_debug | bool
+
+    - name: Ensure base docker compose directory exists
+      ansible.builtin.file:
+        path: "{{ docker_base_path }}"
+        state: directory
+        owner: "{{ appdata_owner | default('1000') }}"
+        group: "{{ appdata_group | default('1000') }}"
+        mode: '0755'
+
+    - name: Ensure docker-compose application directories exist
+      ansible.builtin.file:
+        path: "{{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | dirname }}"
+        state: directory
+        owner: "{{ appdata_owner | default('1000') }}"
+        group: "{{ appdata_group | default('1000') }}"
+        mode: '0755'
+      loop: "{{ docker_compose_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Template application files
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
+        force: yes
+        owner: "{{ appdata_owner | default('1000') }}"
+        group: "{{ appdata_group | default('1000') }}"
+        mode: '0644'
+      loop: "{{ docker_compose_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Ensure appdata directories exist
+      ansible.builtin.file:
+        path: "{{ docker_appdata_path }}/{{ item.path | dirname }}"
+        state: directory
+        owner: "{{ appdata_owner | default('1000') }}"
+        group: "{{ appdata_group | default('1000') }}"
+        mode: '0755'
+      loop: "{{ docker_compose_appdata_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Template appdata files
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+        force: yes
+        owner: "{{ appdata_owner | default('1000') }}"
+        group: "{{ appdata_group | default('1000') }}"
+        mode: '0644'
+      loop: "{{ docker_compose_appdata_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Process legacy templates
+      when: process_legacy_templates | bool
+      block:
+        - name: Template root docker-compose.yml
+          ansible.builtin.template:
+            src: "{{ playbook_dir }}/templates/{{ inventory_group_name }}/docker/compose/docker-compose.yml.j2"
+            dest: "{{ docker_base_path }}/docker-compose.yml"
+            force: yes
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: '0644'
+
+        - name: Template root docker-compose.override.yml if exists
+          ansible.builtin.template:
+            src: "{{ playbook_dir }}/templates/{{ inventory_group_name }}/docker/compose/docker-compose.override.yml.j2"
+            dest: "{{ docker_base_path }}/docker-compose.override.yml"
+            force: yes
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: '0644'
+          ignore_errors: yes
+
+        - name: Template root .env if exists
+          ansible.builtin.template:
+            src: "{{ playbook_dir }}/templates/{{ inventory_group_name }}/docker/compose/.env.j2"
+            dest: "{{ docker_base_path }}/.env"
+            force: yes
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: '0644'
+          ignore_errors: yes
+
+        - name: Ensure compose-includes directory exists
+          ansible.builtin.file:
+            path: "{{ docker_base_path }}/compose-includes"
+            state: directory
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: '0755'
