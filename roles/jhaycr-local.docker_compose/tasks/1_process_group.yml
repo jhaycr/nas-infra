@@ -28,10 +28,18 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Debug found files
+    - name: Debug found compose files
       ansible.builtin.debug:
         msg: "Found file: {{ item.src }} -> {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
       loop: "{{ docker_compose_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: docker_compose_debug | bool
+
+    - name: Debug found appdata files
+      ansible.builtin.debug:
+        msg: "Found appdata file: {{ item.src }} -> {{ docker_appdata_path }}/{{ item.path | regex_replace('\\.j2$', '') }}"
+      loop: "{{ docker_compose_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"
       when: docker_compose_debug | bool
