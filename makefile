@@ -24,19 +24,19 @@ vault-unlock:
 	find ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault decrypt
 
 neo:
-	ansible-playbook -v site.yml --limit neo $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit neo $(EXTRA_VARS:%=-e '%')
 
 neo-compose:
-	ansible-playbook -v site.yml --limit neo --tags compose $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit neo --tags compose $(EXTRA_VARS:%=-e '%')
 
 neo-disks:
-	ansible-playbook -v site.yml --limit neo --tags disks $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit neo --tags disks $(EXTRA_VARS:%=-e '%')
 
 morpheus:
-	ansible-playbook -v site.yml --limit morpheus $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit morpheus $(EXTRA_VARS:%=-e '%')
 
 trinity:
-	ansible-playbook -v site.yml --limit trinity -K $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit trinity -K $(EXTRA_VARS:%=-e '%')
 
 compose:
-	ansible-playbook -v site.yml --tags compose $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --tags compose $(EXTRA_VARS:%=-e '%')
