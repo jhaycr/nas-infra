@@ -1,0 +1,29 @@
+---
+- name: Debug docker path
+  ansible.builtin.debug:
+    msg: "Looking for docker-compose files in: {{ docker_home_compose_path }}"
+
+- name: Start Docker stack
+  become: yes
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_home_compose_path }}"
+    state: present
+    recreate: "{{ docker_compose_restart }}"
+    env_files:
+    - .env
+    files:
+    - docker-compose.yml
+    - docker-compose.override.yml
+    remove_orphans: true
+  register: compose_output
+  # when: docker_compose_start_stack | bool and compose_file.stat.exists
+
+- name: Show results
+  ansible.builtin.debug:
+    msg: |
+      Container Status:
+      {% for container in compose_output.containers %}
+      - Container: {{ container.Name }}
+        Networks: {{ container.Networks | join(', ') }}
+        Status: {{ container.State }} (Status: {{ container.Status }})
+      {% endfor %}

@@ -5,14 +5,6 @@
   loop_control:
     loop_var: inventory_group_name
 
-- name: Start Docker stack
-  become: yes
-  community.docker.docker_compose_v2:
-    project_src: "{{ docker_home_compose_path }}"
-    state: present
-    env_files:
-    - .env
-    files:
-    - docker-compose.yml
-    - docker-compose.override.yml
-    remove_orphans: true
+- name: Docker operations
+  ansible.builtin.include_tasks:
+    file: 2_docker_operations.yml
