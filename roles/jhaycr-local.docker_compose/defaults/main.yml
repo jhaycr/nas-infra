@@ -9,7 +9,9 @@ appdata_subdir: "appdata"
 
 # Template paths and structure (v3)
 template_sources:
-  - path: "{{ docker_compose_templates_path | default('templates/' + inventory_group_name + '/docker/compose') }}"
+  - path: "docker/{{ inventory_group_name }}"
+    appdata_subdir: "docker/{{ inventory_group_name }}"
+  - path: "templates/{{ inventory_group_name }}/docker/compose"
     appdata_subdir: "templates/{{ inventory_group_name }}/docker/appdata"
   - path: "docker"
     appdata_subdir: "appdata"
