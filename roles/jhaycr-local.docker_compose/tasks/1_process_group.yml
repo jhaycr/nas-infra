@@ -41,6 +41,16 @@
           {% endfor %}
       when: docker_compose_debug_print | bool or docker_compose_debug | bool
 
+    - name: Debug compose path transformations
+      ansible.builtin.debug:
+        msg: |
+          File: {{ item.path }}
+          Directory: {{ item.path | dirname }}
+          Final path: {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
+      loop: "{{ docker_compose_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
     - name: Gather appdata files from templates
       ansible.builtin.set_fact:
         docker_compose_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/templates/' + inventory_group_name + '/docker/appdata/') | 
@@ -65,6 +75,16 @@
           {{ item.src }} -> {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
           {% endfor %}
       when: docker_compose_debug_print | bool or docker_compose_debug | bool
+
+    - name: Debug path transformations
+      ansible.builtin.debug:
+        msg: |
+          File: {{ item.path }}
+          Directory: {{ item.path | regex_replace('/appdata/', '/') | dirname }}
+          Final path: {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
+      loop: "{{ docker_compose_appdata_files }}"
+      loop_control:
+        label: "{{ item.path }}"
 
     - name: Halt after debug if debug halt is enabled
       ansible.builtin.fail:
@@ -102,17 +122,6 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Debug path transformations
-      ansible.builtin.debug:
-        msg: |
-          File: {{ item.path }}
-          Directory: {{ item.path | regex_replace('/appdata/', '/') | dirname }}
-          Final path: {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
-      loop: "{{ docker_compose_appdata_files }}"
-      loop_control:
-        label: "{{ item.path }}"
-      when: docker_compose_debug_print | bool or docker_compose_debug | bool
-
     - name: Create appdata directories
       ansible.builtin.file:
         path: "{{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | dirname }}"
@@ -135,11 +144,6 @@
       loop: "{{ docker_compose_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"
-
-    - name: Halt after debug if debug halt is enabled
-      ansible.builtin.fail:
-        msg: "Halting after debug output as requested"
-      when: docker_compose_debug_halt | bool or docker_compose_debug | bool
 
     - name: Process legacy templates
       when: process_legacy_templates | bool
