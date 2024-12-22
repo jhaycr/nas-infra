@@ -19,7 +19,7 @@
       ansible.builtin.set_fact:
         docker_compose_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
                                 selectattr('state', 'ne', 'directory') |
-                                selectattr('path', 'regex', '.*/((docker-compose.*|.env)\\.(yml|j2))$') |
+                                selectattr('path', 'regex', '.*/((docker-compose.*|.env.*)\\.j2)$') |
                                 rejectattr('path', 'regex', '.*/appdata/.*') |
                                 list) }}"
       run_once: true
@@ -28,7 +28,7 @@
       ansible.builtin.set_fact:
         docker_compose_files: "{{ docker_compose_files + (lookup('ansible.builtin.filetree', playbook_dir + '/' + templates_dir + '/' + inventory_group_name + '/' + docker_dir + '/' + compose_subdir + '/') | 
                                 selectattr('state', 'ne', 'directory') |
-                                selectattr('path', 'regex', '.*/((docker-compose.*|.env)\\.(yml|j2))$') |
+                                selectattr('path', 'regex', '.*/((docker-compose.*|.env.*)\\.j2)$') |
                                 list) }}"
       run_once: true
 
@@ -161,16 +161,6 @@
           ansible.builtin.template:
             src: "{{ playbook_dir }}/{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ compose_subdir }}/docker-compose.override.yml.j2"
             dest: "{{ docker_base_path }}/docker-compose.override.yml"
-            force: yes
-            owner: "{{ appdata_owner | default('1000') }}"
-            group: "{{ appdata_group | default('1000') }}"
-            mode: '0644'
-          ignore_errors: yes
-
-        - name: Template root .env if exists
-          ansible.builtin.template:
-            src: "{{ playbook_dir }}/{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ compose_subdir }}/.env.j2"
-            dest: "{{ docker_base_path }}/.env"
             force: yes
             owner: "{{ appdata_owner | default('1000') }}"
             group: "{{ appdata_group | default('1000') }}"
