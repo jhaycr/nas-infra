@@ -1,6 +1,6 @@
 ---
 # Base paths for Docker files and data (overridable by group_vars)
-docker_base_path: "{{ docker_home_compose_path | default('/opt/docker') }}"
+docker_base_path: "{{ docker_home_compose_path }}"
 docker_appdata_path: "{{ docker_home_appdata_path }}"
 
 # Template paths and structure (v2 compatibility)
@@ -18,6 +18,12 @@ template_sources:
 
 # Legacy template processing (disable after migration to docker/neo)
 process_legacy_templates: true
+
+# Operation control
+docker_compose_copy_templates: "{{ DOCKER_COMPOSE_COPY_TEMPLATES | default('true') }}"
+docker_compose_start_stack: "{{ DOCKER_COMPOSE_START_STACK | default('true') }}"
+docker_compose_show_status: "{{ DOCKER_COMPOSE_SHOW_STATUS | default('true') }}"
+docker_compose_restart: "{{ DOCKER_COMPOSE_RESTART | default('never') }}"  # valid values: always, never, auto
 
 # Debug mode can be enabled in several ways:
 # - ansible-playbook -e "docker_compose_debug=true"
