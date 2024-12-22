@@ -21,16 +21,16 @@ x-common-volumes:
 
 include:
   # auth and network includes
-  - path: ./compose-includes/nginx-proxy-manager.yml
-  - path: ./compose-includes/authentik.yml
-    env_file: ./compose-includes/.env.authentik
-  - path: ./compose-includes/gluetun.yml
+  - path: ./nginx-proxy-manager/docker-compose.yml
+  - path: ./authentik/docker-compose.yml
+    env_file: ./authentik/.env
+  - path: ./gluetun/docker-compose.yml
   
   # service includes
-  - path: ./compose-includes/jellyfin.yml
-  # - path: ./compose-includes/recyclarr.yml
-  - path: ./compose-includes/gaseous.yml
-  - path: ./compose-includes/tubearchivist.yml
+  - path: ./jellyfin/docker-compose.yml
+  # - path: ./recyclarr/docker-compose.yml
+  - path: ./gaseous/docker-compose.yml
+  - path: ./tubearchivist/docker-compose.yml
   - path: ./notifiarr/docker-compose.yml
 
 services:
