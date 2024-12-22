@@ -3,20 +3,22 @@
 docker_base_path: "{{ docker_home_compose_path }}"
 docker_appdata_path: "{{ docker_home_appdata_path }}"
 
-# Template paths and structure (v2 compatibility)
-templates_path: "docker"
+# Directory structure
+docker_dir: "docker"
+templates_dir: "templates"
+compose_subdir: "compose"
 appdata_subdir: "appdata"
 
-# Template paths and structure (v3)
+# Template sources structure
 template_sources:
-  - path: "docker/{{ inventory_group_name }}"
-    appdata_subdir: "docker/{{ inventory_group_name }}"
-  - path: "templates/{{ inventory_group_name }}/docker/compose"
-    appdata_subdir: "templates/{{ inventory_group_name }}/docker/appdata"
-  - path: "docker"
-    appdata_subdir: "appdata"
+  - path: "{{ docker_dir }}/{{ inventory_group_name }}"
+    appdata_subdir: "{{ docker_dir }}/{{ inventory_group_name }}"
+  - path: "{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ compose_subdir }}"
+    appdata_subdir: "{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ appdata_subdir }}"
+  - path: "{{ docker_dir }}"
+    appdata_subdir: "{{ appdata_subdir }}"
 
-# Legacy template processing (disable after migration to docker/neo)
+# Legacy template processing
 process_legacy_templates: true
 
 # Operation control
@@ -25,20 +27,6 @@ docker_compose_start_stack: "{{ DOCKER_COMPOSE_START_STACK | default('true') }}"
 docker_compose_show_status: "{{ DOCKER_COMPOSE_SHOW_STATUS | default('true') }}"
 docker_compose_restart: "{{ DOCKER_COMPOSE_RESTART | default('never') }}"  # valid values: always, never, auto
 
-# Debug mode can be enabled in several ways:
-# - ansible-playbook -e "docker_compose_debug=true"
-# - make target DOCKER_COMPOSE_DEBUG=true
-# - make target docker_compose_debug=true
-docker_compose_debug_print: "{{ DOCKER_COMPOSE_DEBUG_PRINT | default(docker_compose_debug_print_lower) | default('false') }}"
-docker_compose_debug_print_lower: "{{ lookup('env', 'docker_compose_debug_print') | default('false') }}"
-docker_compose_debug_halt: "{{ DOCKER_COMPOSE_DEBUG_HALT | default(docker_compose_debug_halt_lower) | default('false') }}"
-docker_compose_debug_halt_lower: "{{ lookup('env', 'docker_compose_debug_halt') | default('false') }}"
-docker_compose_debug: "{{ DOCKER_COMPOSE_DEBUG | default(docker_compose_debug_lower) | default('false') }}"
-docker_compose_debug_lower: "{{ lookup('env', 'docker_compose_debug') | default('false') }}"
-
-# File ownership (overridable by group_vars)
-appdata_owner: "{{ main_username | default('1000') }}"
-appdata_group: "{{ main_username | default('1000') }}"
-
-# Deployment options
-compose_start: true
+# Debug mode
+docker_compose_debug_print: "{{ DOCKER_COMPOSE_DEBUG_PRINT | default('false') }}"
+docker_compose_debug_halt: "{{ DOCKER_COMPOSE_DEBUG_HALT | default('false') }}"
