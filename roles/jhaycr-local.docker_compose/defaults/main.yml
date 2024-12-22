@@ -19,11 +19,14 @@ template_sources:
 # Legacy template processing (disable after migration to docker/neo)
 process_legacy_templates: true
 
-# Debug mode - set to true to enable debug output and halt after debug
-# Can be set via:
+# Debug mode can be enabled in several ways:
 # - ansible-playbook -e "docker_compose_debug=true"
 # - make target DOCKER_COMPOSE_DEBUG=true
 # - make target docker_compose_debug=true
+docker_compose_debug_print: "{{ DOCKER_COMPOSE_DEBUG_PRINT | default(docker_compose_debug_print_lower) | default('false') }}"
+docker_compose_debug_print_lower: "{{ lookup('env', 'docker_compose_debug_print') | default('false') }}"
+docker_compose_debug_halt: "{{ DOCKER_COMPOSE_DEBUG_HALT | default(docker_compose_debug_halt_lower) | default('false') }}"
+docker_compose_debug_halt_lower: "{{ lookup('env', 'docker_compose_debug_halt') | default('false') }}"
 docker_compose_debug: "{{ DOCKER_COMPOSE_DEBUG | default(docker_compose_debug_lower) | default('false') }}"
 docker_compose_debug_lower: "{{ lookup('env', 'docker_compose_debug') | default('false') }}"
 

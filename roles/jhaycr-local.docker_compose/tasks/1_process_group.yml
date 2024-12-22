@@ -13,7 +13,7 @@
       ansible.builtin.debug:
         msg: "Processing path: {{ item.path }}"
       loop: "{{ template_sources }}"
-      when: docker_compose_debug | bool
+      when: docker_compose_debug_print | bool or docker_compose_debug | bool
 
     - name: Gather compose files from docker
       ansible.builtin.set_fact:
@@ -37,9 +37,9 @@
         msg: |
           Found compose files:
           {% for item in (docker_compose_files | unique) %}
-          {{ '%-60s' | format(item.src) }} -> {{ '%-60s' | format(docker_base_path + '/' + (item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', ''))) }}
+          {{ item.src }} -> {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
           {% endfor %}
-      when: docker_compose_debug | bool
+      when: docker_compose_debug_print | bool or docker_compose_debug | bool
 
     - name: Gather appdata files from templates
       ansible.builtin.set_fact:
@@ -62,14 +62,14 @@
         msg: |
           Found appdata files:
           {% for item in (docker_compose_appdata_files | unique) %}
-          {{ '%-60s' | format(item.src) }} -> {{ '%-60s' | format(docker_appdata_path + '/' + (item.path | regex_replace('^appdata/', '') | regex_replace('\\.j2$', ''))) }}
+          {{ item.src }} -> {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
           {% endfor %}
-      when: docker_compose_debug | bool
+      when: docker_compose_debug_print | bool or docker_compose_debug | bool
 
-    - name: Halt after debug if debug mode is enabled
+    - name: Halt after debug if debug halt is enabled
       ansible.builtin.fail:
         msg: "Halting after debug output as requested"
-      when: docker_compose_debug | bool
+      when: docker_compose_debug_halt | bool or docker_compose_debug | bool
 
     - name: Ensure base docker compose directory exists
       ansible.builtin.file:
@@ -102,13 +102,24 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Ensure appdata directories exist
+    - name: Debug path transformations
+      ansible.builtin.debug:
+        msg: |
+          File: {{ item.path }}
+          Directory: {{ item.path | regex_replace('/appdata/', '/') | dirname }}
+          Final path: {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
+      loop: "{{ docker_compose_appdata_files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: docker_compose_debug_print | bool or docker_compose_debug | bool
+
+    - name: Create appdata directories
       ansible.builtin.file:
-        path: "{{ docker_appdata_path }}/{{ item.path | dirname }}"
+        path: "{{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | dirname }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
-        mode: '0755'
+        mode: "0755"
       loop: "{{ docker_compose_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"
@@ -116,14 +127,19 @@
     - name: Template appdata files
       ansible.builtin.template:
         src: "{{ item.src }}"
-        dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^appdata/', '') | regex_replace('\\.j2$', '') }}"
+        dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}"
         force: yes
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
-        mode: '0644'
+        mode: "0644"
       loop: "{{ docker_compose_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"
+
+    - name: Halt after debug if debug halt is enabled
+      ansible.builtin.fail:
+        msg: "Halting after debug output as requested"
+      when: docker_compose_debug_halt | bool or docker_compose_debug | bool
 
     - name: Process legacy templates
       when: process_legacy_templates | bool
