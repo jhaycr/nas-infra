@@ -28,7 +28,7 @@
     - role: IronicBadger.proxmox_nag_removal
 
   tasks:
-    - name: create downloads directory
+    - name: create home downloads directory
       ansible.builtin.file:
         path: "/home/{{ main_username }}/downloads"
         owner: "{{ main_username }}"
