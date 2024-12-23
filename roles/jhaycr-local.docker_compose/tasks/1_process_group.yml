@@ -39,7 +39,7 @@
           {% for item in (docker_compose_files | unique) %}
           {{ item.src }} -> {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
           {% endfor %}
-      when: docker_compose_debug_print | bool
+      # when: docker_compose_debug_print | bool
 
     - name: Debug compose path transformations
       ansible.builtin.debug:
@@ -110,7 +110,7 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Template application files
+    - name: Template application compose files
       ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
