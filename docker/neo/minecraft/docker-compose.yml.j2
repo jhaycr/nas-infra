@@ -8,34 +8,24 @@ volumes:
   minecraft-java-data: {}
 
 services:
-  minecraft-bedrock:
-    container_name: minecraft-bedrock
-    # image: itzg/minecraft-server
-    image: itzg/minecraft-bedrock-server
-    environment:
-      EULA: "true"
-    networks:
-      - minecraft
-    ports:
-      # - "25565:25565"
-      - "19132:19132/udp"
-    volumes:
-      - minecraft-bedrock-data:/data
-    stdin_open: true
-    tty: true
-    restart: unless-stopped
 
-  minecraft-java:
+  minecraft:
     container_name: minecraft-java
     image: itzg/minecraft-server
     # image: itzg/minecraft-bedrock-server
     environment:
       EULA: "true"
+      TYPE: "PAPER"
+      VERSION: 1.21.3
+      PLUGINS: |
+        https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
+        https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
+        https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.2.0/PAPER/ViaVersion-5.2.0.jar
     networks:
       - minecraft
     ports:
-       - "25565:25565"
-      # - "19132:19132/udp"
+      - "25565:25565"
+      - "19132:19132/udp"
     volumes:
       - minecraft-java-data:/data
     stdin_open: true
