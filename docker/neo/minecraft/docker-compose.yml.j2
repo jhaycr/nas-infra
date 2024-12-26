@@ -3,18 +3,17 @@ networks:
   minecraft:
     driver: bridge
 
-volumes:
-  minecraft-bedrock-data: {}
-  minecraft-java-data: {}
-
 services:
 
-  minecraft:
-    container_name: minecraft-java
-    image: itzg/minecraft-server
-    # image: itzg/minecraft-bedrock-server
+  minecraft-1:
+    # https://github.com/itzg/docker-minecraft-server
+    # https://docker-minecraft-server.readthedocs.io/en/latest/
+    container_name: minecraft-java-1
+    image: itzg/minecraft-server # itzg/minecraft-server | itzg/minecraft-bedrock-server
     environment:
       EULA: "true"
+      SERVER_NAME: HomeSurvival
+      MODE: "survival" # survival | creative | adventure | spectator
       TYPE: "PAPER"
       VERSION: 1.21.3
       PLUGINS: |
@@ -27,7 +26,7 @@ services:
       - "25565:25565"
       - "19132:19132/udp"
     volumes:
-      - minecraft-java-data:/data
+      - {{ docker_home_appdata_path }}/minecraft-1:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
