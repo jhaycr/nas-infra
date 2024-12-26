@@ -14,11 +14,30 @@ services:
     image: itzg/minecraft-bedrock-server
     environment:
       EULA: "true"
+    networks:
+      - minecraft
     ports:
       # - "25565:25565"
       - "19132:19132/udp"
     volumes:
       - minecraft-bedrock-data:/data
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  minecraft-java:
+    container_name: minecraft-java
+    image: itzg/minecraft-server
+    # image: itzg/minecraft-bedrock-server
+    environment:
+      EULA: "true"
+    networks:
+      - minecraft
+    ports:
+       - "25565:25565"
+      # - "19132:19132/udp"
+    volumes:
+      - minecraft-java-data:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
