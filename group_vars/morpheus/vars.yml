@@ -2,5 +2,8 @@
 ansible_ssh_user: root
 ansible_ssh_pass: "{{ secret_morpheus_ssh_pass }}"
 
+docker_compose_debug_print: true
+docker_compose_debug_halt: true
+
 docker_home_compose_path: '/opt/docker'
 docker_home_appdata_path: '/opt/docker/appdata'
