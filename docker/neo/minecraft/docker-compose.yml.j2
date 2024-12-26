@@ -1,0 +1,24 @@
+---
+networks:
+  minecraft:
+    driver: bridge
+
+volumes:
+  minecraft-bedrock-data: {}
+  minecraft-java-data: {}
+
+services:
+  minecraft-bedrock:
+    container_name: minecraft-bedrock
+    # image: itzg/minecraft-server
+    image: itzg/minecraft-bedrock-server
+    environment:
+      EULA: "true"
+    ports:
+      # - "25565:25565"
+      - "19132:19132/udp"
+    volumes:
+      - minecraft-bedrock-data:/data
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
