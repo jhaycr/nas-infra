@@ -1,24 +1,5 @@
 ---
 
-x-logging: &default-logging
-  driver: json-file
-  options:
-    max-file: "10"
-    max-size: 200k
-
-x-common-keys: &common-keys
-  restart: unless-stopped
-  logging: *default-logging
-
-x-common-env: &common-env
-  PGID: "1000"
-  PUID: "1000"
-  TZ: America/Los_Angeles
-
-x-common-volumes:
-  - &localtime /etc/localtime:/etc/localtime:ro
-  - &storage {{ docker_storage_path }}:/storage
-
 networks:
   notifiarr:
     driver: bridge
@@ -26,12 +7,9 @@ networks:
 services:
  
   notifiarr:
-    <<: *common-keys
     container_name: notifiarr
     hostname: notifiarr
     image: golift/notifiarr
-    environment:
-      <<: *common-env
     restart: unless-stopped
     networks:
       - notifiarr
