@@ -387,6 +387,7 @@ services:
       <<: *common-env
     networks:
       - default
+      - notifiarr
     ports:
       - "7878:7878"
     volumes:
@@ -413,6 +414,9 @@ services:
     image: lscr.io/linuxserver/sabnzbd:latest
     environment:
       <<: *common-env
+    networks:
+    - default
+    - notifiarr
     ports:
       - "8080:8080"
     volumes:
@@ -472,6 +476,7 @@ services:
       <<: *common-env
     networks:
       - default
+      - notifiarr
     ports:
       - "8989:8989"
     volumes:

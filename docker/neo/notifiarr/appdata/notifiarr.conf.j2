@@ -4,7 +4,7 @@
 ###############################################
 
 ## This API key must be copied from your notifiarr.com account.
-api_key = "api-key-from-notifiarr.com"
+api_key = "{{ secret_notifiarr_api_key_global }}"
 
 ## Setting a UI password enables the human accessible web GUI. Must be at least 9 characters.
 ## The default username is admin; change it by setting ui_password to "username:password"
@@ -12,7 +12,7 @@ api_key = "api-key-from-notifiarr.com"
 ## Your auth proxy must pass the x-webauth-user header if you set this to "webauth".
 ## You may also set a custom auth header by setting to "webauth:<header>" e.g. "webauth:remote-user"
 ## Disable auth by setting this to "noauth". Not recommended. Requires "upstreams" being set.
-ui_password = ""
+ui_password = "{{ secret_notifiarr_ui_pass }}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
 ## You may use "127.0.0.1:5454" to listen only on localhost; good if using a local proxy.
@@ -116,10 +116,10 @@ retries = 4
 #api_key  = ""
 
 
-#[[radarr]]
-#name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:7878/"
-#api_key   = ""
+[[radarr]]
+name      = "radarr" # Set a name to enable checks of your service.
+url       = "http://radarr:7878"
+api_key   = "{{ secret_arr_api_key_radarr }}"
 
 
 #[[readarr]]
@@ -128,10 +128,10 @@ retries = 4
 #api_key   = ""
 
 
-#[[sonarr]]
-#name      = ""  # Set a name to enable checks of your service.
-#url       = "http://sonarr:8989/"
-#api_key   = ""
+[[sonarr]]
+name      = "sonarr"  # Set a name to enable checks of your service.
+url       = "http://sonarr:8989/"
+api_key   = "{{ secret_arr_api_key_sonarr }}"
 
 
 # Download Client Configs (below) are used for dashboard state and service checks.
@@ -163,10 +163,10 @@ retries = 4
 #pass     = ""
 
 
-#[[sabnzbd]]
-#name     = ""  # Set a name to enable checks of this application.
-#url      = "http://sabnzbd:8080/"
-#api_key  = ""
+[[sabnzbd]]
+name     = "sabnzbd"  # Set a name to enable checks of this application.
+url      = "http://sabnzbd:8080/"
+api_key  = "{{ secret_arr_api_key_sabnzbd }}"
 
 
 #################

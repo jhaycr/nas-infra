@@ -19,6 +19,10 @@ x-common-volumes:
   - &localtime /etc/localtime:/etc/localtime:ro
   - &storage {{ docker_storage_path }}:/storage
 
+networks:
+  notifiarr:
+    driver: bridge
+
 services:
  
   notifiarr:
@@ -29,6 +33,8 @@ services:
     environment:
       <<: *common-env
     restart: unless-stopped
+    networks:
+      - notifiarr
     ports:
       - "5454:5454"
     volumes:
