@@ -100,33 +100,3 @@
       loop: "{{ docker_compose_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"
-
-    - name: Process legacy templates
-      when: process_legacy_templates | bool
-      block:
-        - name: Template root docker-compose.yml
-          ansible.builtin.template:
-            src: "{{ playbook_dir }}/{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ compose_subdir }}/docker-compose.yml.j2"
-            dest: "{{ docker_base_path }}/docker-compose.yml"
-            force: yes
-            owner: "{{ appdata_owner | default('1000') }}"
-            group: "{{ appdata_group | default('1000') }}"
-            mode: '0644'
-
-        - name: Template root docker-compose.override.yml if exists
-          ansible.builtin.template:
-            src: "{{ playbook_dir }}/{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ compose_subdir }}/docker-compose.override.yml.j2"
-            dest: "{{ docker_base_path }}/docker-compose.override.yml"
-            force: yes
-            owner: "{{ appdata_owner | default('1000') }}"
-            group: "{{ appdata_group | default('1000') }}"
-            mode: '0644'
-          ignore_errors: yes
-
-        - name: Ensure compose-includes directory exists
-          ansible.builtin.file:
-            path: "{{ docker_base_path }}/compose-includes"
-            state: directory
-            owner: "{{ appdata_owner | default('1000') }}"
-            group: "{{ appdata_group | default('1000') }}"
-            mode: '0755'

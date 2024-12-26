@@ -18,7 +18,7 @@
   register: compose_output
   when: docker_compose_start_stack | bool
 
-- name: Show results
+- name: Show compose-up results
   ansible.builtin.debug:
     msg: |
       Container Status:
