@@ -3,7 +3,6 @@
 main_username: user0
 ntp_timezone: America/Los_Angeles
 
-docker_compose_templates_path: '../templates/neo/docker/compose'
 docker_compose_debug_print: false
 docker_compose_debug_halt: false
 
