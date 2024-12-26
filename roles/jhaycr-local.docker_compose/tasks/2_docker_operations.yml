@@ -8,7 +8,7 @@
   community.docker.docker_compose_v2:
     project_src: "{{ docker_base_path }}"
     state: present
-    recreate: "never"
+    recreate: "auto"
     env_files:
     - .env
     files:
