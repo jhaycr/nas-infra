@@ -28,3 +28,16 @@
         Status: {{ container.State }} (Status: {{ container.Status }})
       {% endfor %}
   when: docker_compose_show_status | bool
+
+- name: Prune
+  community.docker.docker_prune:
+    containers: false
+    images: true
+    networks: false
+    volumes: false
+    builder_cache: false
+  register: prune_output
+
+- name: Show prune results
+  ansible.builtin.debug:
+    msg: "{{ prune_output }}"
