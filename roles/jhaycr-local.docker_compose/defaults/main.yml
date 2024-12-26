@@ -9,15 +9,6 @@ templates_dir: "templates"
 compose_subdir: "compose"
 appdata_subdir: "appdata"
 
-# Template sources structure
-template_sources:
-  - path: "{{ docker_dir }}/{{ inventory_group_name }}"
-    appdata_subdir: "{{ docker_dir }}/{{ inventory_group_name }}"
-  - path: "{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ compose_subdir }}"
-    appdata_subdir: "{{ templates_dir }}/{{ inventory_group_name }}/{{ docker_dir }}/{{ appdata_subdir }}"
-  - path: "{{ docker_dir }}"
-    appdata_subdir: "{{ appdata_subdir }}"
-
 # Legacy template processing
 process_legacy_templates: true
 

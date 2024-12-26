@@ -1,34 +1,18 @@
 ---
-# Enhanced implementation supporting multiple template sources
 - name: Process all docker and appdata files
   block:
     - name: Initialize file lists
       ansible.builtin.set_fact:
         docker_compose_files: []
-        docker_compose_root_files: []
         docker_compose_appdata_files: []
         private: yes
 
-    - name: Debug template sources
-      ansible.builtin.debug:
-        msg: "Processing path: {{ item.path }}"
-      loop: "{{ template_sources }}"
-      when: docker_compose_debug_print | bool
-
-    - name: Gather compose files from docker
+    - name: Gather compose files
       ansible.builtin.set_fact:
         docker_compose_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
                                 selectattr('state', 'ne', 'directory') |
                                 selectattr('path', 'regex', '.*/((docker-compose.*|.env.*)\\.j2)$') |
                                 rejectattr('path', 'regex', '.*/appdata/.*') |
-                                list) }}"
-      run_once: true
-
-    - name: Gather compose files from templates
-      ansible.builtin.set_fact:
-        docker_compose_files: "{{ docker_compose_files + (lookup('ansible.builtin.filetree', playbook_dir + '/' + templates_dir + '/' + inventory_group_name + '/' + docker_dir + '/' + compose_subdir + '/') | 
-                                selectattr('state', 'ne', 'directory') |
-                                selectattr('path', 'regex', '.*/((docker-compose.*|.env.*)\\.j2)$') |
                                 list) }}"
       run_once: true
 
@@ -39,29 +23,11 @@
           {% for item in (docker_compose_files | unique) %}
           {{ item.src }} -> {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
           {% endfor %}
-      # when: docker_compose_debug_print | bool
+      when: docker_compose_debug_print | bool
 
-    - name: Debug compose path transformations
-      ansible.builtin.debug:
-        msg: |
-          File: {{ item.path }}
-          Directory: {{ item.path | dirname }}
-          Final path: {{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
-      loop: "{{ docker_compose_files }}"
-      loop_control:
-        label: "{{ item.path }}"
-
-    - name: Gather appdata files from templates
+    - name: Gather appdata files
       ansible.builtin.set_fact:
-        docker_compose_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + templates_dir + '/' + inventory_group_name + '/' + docker_dir + '/' + appdata_subdir + '/') | 
-                                        selectattr('state', 'ne', 'directory') |
-                                        selectattr('path', 'regex', '.*\\.j2$') |
-                                        list) }}"
-      run_once: true
-
-    - name: Gather appdata files from docker
-      ansible.builtin.set_fact:
-        docker_compose_appdata_files: "{{ docker_compose_appdata_files + (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
+        docker_compose_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
                                         selectattr('state', 'ne', 'directory') |
                                         selectattr('path', 'regex', '.*/appdata/.*\\.j2$') |
                                         list) }}"
@@ -76,16 +42,6 @@
           {% endfor %}
       when: docker_compose_debug_print | bool
 
-    - name: Debug path transformations
-      ansible.builtin.debug:
-        msg: |
-          File: {{ item.path }}
-          Directory: {{ item.path | regex_replace('/appdata/', '/') | dirname }}
-          Final path: {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
-      loop: "{{ docker_compose_appdata_files }}"
-      loop_control:
-        label: "{{ item.path }}"
-
     - name: Halt after debug if debug halt is enabled
       ansible.builtin.fail:
         msg: "Halting after debug output as requested"
@@ -99,7 +55,7 @@
         group: "{{ appdata_group | default('1000') }}"
         mode: '0755'
 
-    - name: Ensure docker-compose application directories exist
+    - name: Ensure application-specific directories exist
       ansible.builtin.file:
         path: "{{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | dirname }}"
         state: directory
@@ -110,7 +66,7 @@
       loop_control:
         label: "{{ item.path }}"
 
-    - name: Template application compose files
+    - name: Template compose files
       ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ docker_base_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
