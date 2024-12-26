@@ -11,7 +11,7 @@
       ansible.builtin.set_fact:
         docker_compose_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
                                 selectattr('state', 'ne', 'directory') |
-                                selectattr('path', 'regex', '.*/((docker-compose.*|.env.*)\\.j2)$') |
+                                selectattr('path', 'regex', '(.*/)*((docker-compose.*|.env.*)\\.j2)$') |
                                 rejectattr('path', 'regex', '.*/appdata/.*') |
                                 list) }}"
       run_once: true

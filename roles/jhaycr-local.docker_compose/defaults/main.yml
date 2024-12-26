@@ -9,9 +9,6 @@ templates_dir: "templates"
 compose_subdir: "compose"
 appdata_subdir: "appdata"
 
-# Legacy template processing
-process_legacy_templates: true
-
 # Operation control
 docker_compose_copy_templates: "{{ DOCKER_COMPOSE_COPY_TEMPLATES | default('true') }}"
 docker_compose_start_stack: "{{ DOCKER_COMPOSE_START_STACK | default('true') }}"
