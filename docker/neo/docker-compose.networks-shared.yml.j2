@@ -1,7 +1,7 @@
 ---
 networks:
-  proxy-vlan:
-    name: proxy-vlan
+  vlan_proxy_external:
+    name: vlan_proxy_external
     driver: ipvlan
     driver_opts:
       parent: vmbr0 # using ifconfig
@@ -11,16 +11,17 @@ networks:
           ip_range: "192.168.1.9/32"
           gateway: "192.168.1.1"
 
-  external_proxy_bridge: 
-    name: external_proxy_bridge
+  bridge_proxy_external: 
+    name: bridge_proxy_external
     ipam: 
       config: 
         - gateway: 10.10.0.1
           subnet: 10.10.0.0/24
 
-  gluetun_bridge:
+  vpn_gluetun:
+    name: vpn_gluetun
     driver: bridge
 
-  gaseous:
-    name: gaseous
+  app_authentik:
+    name: app_authentik
     driver: bridge

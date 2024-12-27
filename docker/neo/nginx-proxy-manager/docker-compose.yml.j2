@@ -32,7 +32,7 @@ services:
       - '81:81' # Admin Web Port
     networks:
       default:
-      gluetun_bridge:
+      vpn_gluetun:
     volumes:
       - {{ docker_home_appdata_path }}/npm-internal/data:/data
       - {{ docker_home_appdata_path }}/npm-internal/letsencrypt:/etc/letsencrypt
@@ -54,10 +54,9 @@ services:
     #  - '443:443' # Public HTTPS Port
     #  - '81:81' # Admin Web Port
     networks:
-      authentik:
-      gaseous:
-      external_proxy_bridge:
-      proxy-vlan:
+      app_authentik:
+      bridge_proxy_external:
+      vlan_proxy_external:
         ipv4_address: 192.168.1.9 # IP address inside the defined range
     # Note that proxy host destinations must use hostname:internal-port
     # Example:

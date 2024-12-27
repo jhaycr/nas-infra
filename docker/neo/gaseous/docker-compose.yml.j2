@@ -6,7 +6,7 @@ services:
     image: gaseousgames/gaseousserver:latest
     restart: unless-stopped
     networks:
-      - gaseous
+      - app_gaseous
     depends_on:
       - gaseous-db
     ports:
@@ -28,7 +28,7 @@ services:
     image: mariadb
     restart: unless-stopped
     networks:
-      - gaseous
+      - app_gaseous
     volumes:
       - gaseous-db:/var/lib/mysql
     environment:
@@ -36,6 +36,10 @@ services:
       - MARIADB_USER=gaseous
       - MARIADB_PASSWORD=gaseous
 
+networks:
+  app_gaseous:
+    name: app_gaseous
+    driver: bridge
 
 volumes:
   gaseous-db:
