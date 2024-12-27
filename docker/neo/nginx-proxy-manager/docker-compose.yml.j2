@@ -17,24 +17,6 @@ x-common-volumes:
   - &localtime /etc/localtime:/etc/localtime:ro
   - &storage {{ docker_storage_path }}:/storage
 
-networks:
-  proxy-vlan:
-    name: proxy-vlan
-    driver: ipvlan
-    driver_opts:
-      parent: vmbr0 # using ifconfig
-    ipam:
-      config:
-        - subnet: "192.168.1.0/24"
-          ip_range: "192.168.1.9/32"
-          gateway: "192.168.1.1"
-  external_proxy_bridge: 
-    name: external_proxy_bridge
-    ipam: 
-      config: 
-        - gateway: 10.10.0.1
-          subnet: 10.10.0.0/24
-
 services:
   npm-internal:
     <<: *common-keys

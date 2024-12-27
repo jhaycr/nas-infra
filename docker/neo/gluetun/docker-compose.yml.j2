@@ -19,9 +19,6 @@ x-common-volumes:
   - &localtime /etc/localtime:/etc/localtime:ro
   - &storage {{ docker_storage_path }}:/storage
   
-networks:
-  gluetun_bridge:
-    driver: bridge
 
 services:
 

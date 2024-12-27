@@ -21,6 +21,7 @@ x-common-volumes:
 
 include:
   # auth and network includes
+  - path: docker-compose.networks-shared.yml
   - path: ./nginx-proxy-manager/docker-compose.yml
   - path: ./authentik/docker-compose.yml
     env_file: ./authentik/.env
