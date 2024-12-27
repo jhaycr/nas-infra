@@ -1,0 +1,53 @@
+---
+- name: Initialize file lists
+  ansible.builtin.set_fact:
+    included_compose_files: []
+    services: {}
+    private: yes
+
+- name: Parse include section from root docker-compose.yml.j2
+  ansible.builtin.set_fact:
+    include_paths: >-
+      {{
+        (lookup('ansible.builtin.template', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/docker-compose.yml.j2') | from_yaml).include
+        | map(attribute='path')
+        | map('regex_replace', '^', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/')
+        | list
+      }}
+  run_once: true
+
+- name: Debug include paths
+  ansible.builtin.debug:
+    var: include_paths
+
+- name: Gather compose files from included paths
+  ansible.builtin.set_fact:
+    included_compose_files: "{{ included_compose_files + (lookup('ansible.builtin.filetree', item) | 
+                            selectattr('state', 'ne', 'directory') |
+                            selectattr('path', 'regex', '(.*/)*((docker-compose(?!\\.override).*|\\.env.*)\\.j2)$') |
+                            list) }}"
+  loop: "{{ include_paths }}"
+  run_once: true
+
+- name: Debug found compose files
+  ansible.builtin.debug:
+    var: included_compose_files
+
+- name: Gather service names from docker-compose files
+  ansible.builtin.set_fact:
+    services: "{{ services | combine((lookup('ansible.builtin.template', item.src) | from_yaml).services) }}"
+  loop: "{{ included_compose_files }}"
+  when: "(lookup('ansible.builtin.template', item.src) | from_yaml).services is defined"
+  run_once: true
+
+- name: Debug gathered services
+  ansible.builtin.debug:
+    var: services
+
+- name: Extend and template compose override
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/{{ docker_dir }}/{{ inventory_group_name }}/docker-compose.override.yml.j2"
+    dest: "{{ docker_home_compose_path }}/docker-compose.override.yml"
+    mode: "0644"
+  vars:
+    services: "{{ services }}"
