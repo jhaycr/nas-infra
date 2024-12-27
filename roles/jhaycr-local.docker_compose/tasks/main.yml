@@ -1,17 +1,17 @@
 ---
-- name: Process Docker configurations for each host group
-  include_tasks: "1_process_group.yml"
+- name: Template Docker compose and appdata
+  include_tasks: "1_templates.yml"
   loop: "{{ group_names }}"
   loop_control:
     loop_var: inventory_group_name
 
-- name: Add common overrides for included containers
+- name: Build docker-compose.override.yml
   ansible.builtin.include_tasks:
     file: 2_overrides.yml
   loop: "{{ group_names }}"
   loop_control:
     loop_var: inventory_group_name
 
-- name: Docker operations
+- name: Run Docker stack
   ansible.builtin.include_tasks:
-    file: 2_docker_operations.yml
+    file: 3_docker.yml
