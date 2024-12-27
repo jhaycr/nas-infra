@@ -43,7 +43,7 @@ services:
     environment:
       <<: *common-env
     networks:
-      external_proxy_bridge:
+      bridge_proxy_external:
     ports:
       - "13378:80"
     volumes:
@@ -94,7 +94,7 @@ services:
     environment:
       <<: *common-env
     networks:
-      external_proxy_bridge:
+      bridge_proxy_external:
     ports:
       - "8083:8083"
     volumes:
@@ -189,7 +189,7 @@ services:
       OIDC_X_FORWARDED_HEADERS : X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
       OIDC_SCOPES : openid email profile
     networks:
-      external_proxy_bridge:
+      bridge_proxy_external:
     ports:
       - "8012:80"
     volumes:
@@ -257,7 +257,7 @@ services:
       <<: *common-env
       KOMGA_OAUTH2_ACCOUNT_CREATION: "true"
     networks:
-      external_proxy_bridge:
+      bridge_proxy_external:
     ports:
       - "25600:25600"
     volumes:
@@ -333,7 +333,7 @@ services:
     environment:
       <<: *common-env
     networks:
-      external_proxy_bridge:
+      bridge_proxy_external:
     ports:
       - "5055:5055"
     volumes:

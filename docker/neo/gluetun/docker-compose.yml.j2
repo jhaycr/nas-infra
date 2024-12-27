@@ -34,7 +34,7 @@ services:
     volumes:
       - {{ docker_home_appdata_path }}/gluetun:/gluetun
     networks:
-    - gluetun_bridge
+    - vpn_gluetun
     ports:
       - 8088:8088 # tubearchivist
     expose:

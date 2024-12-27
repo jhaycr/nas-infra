@@ -18,10 +18,6 @@ x-common-env: &common-env
 x-common-volumes:
   - &localtime /etc/localtime:/etc/localtime:ro
   - &storage {{ docker_storage_path }}:/storage
-  
-networks:
-  authentik:
-    driver: bridge
 
 services:
 
@@ -42,7 +38,7 @@ services:
     env_file:
       - .env.authentik
     networks:
-      - authentik
+      - app_authentik
     ports:
       - "${COMPOSE_PORT_HTTP:-9090}:9000"
       - "${COMPOSE_PORT_HTTPS:-9443}:9443"
@@ -61,7 +57,7 @@ services:
       retries: 5
       timeout: 5s
     networks:
-      - authentik
+      - app_authentik
     volumes:
       - authentik-database:/var/lib/postgresql/data
     environment:
@@ -83,7 +79,7 @@ services:
       retries: 5
       timeout: 3s
     networks:
-      - authentik
+      - app_authentik
     volumes:
       - authentik-redis:/data
 
@@ -106,7 +102,7 @@ services:
     # (1000:1000 by default)
     user: root
     networks:
-      - authentik
+      - app_authentik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - {{ docker_home_appdata_path }}/authentik/media:/media
