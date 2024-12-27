@@ -1,0 +1,26 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: default
+platforms:
+  - name: instance
+    # No image is needed for the delegated driver
+    # You can specify the connection details if needed
+    # For local testing, you can leave it as is
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+scenario:
+  name: default
+  test_sequence:
+    - destroy
+    - dependency
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy
+verifier:
+  name: ansible
