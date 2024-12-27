@@ -1,12 +1,12 @@
 ---
 - name: Debug docker path
   ansible.builtin.debug:
-    msg: "Looking for docker-compose files in: {{ docker_base_path }}"
+    msg: "Looking for docker-compose files in: {{ docker_home_compose_path }}"
 
 - name: Start Docker stack
   become: yes
   community.docker.docker_compose_v2:
-    project_src: "{{ docker_base_path }}"
+    project_src: "{{ docker_home_compose_path }}"
     state: present
     recreate: "auto"
     env_files:
