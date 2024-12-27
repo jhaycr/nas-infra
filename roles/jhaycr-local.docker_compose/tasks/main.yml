@@ -5,6 +5,13 @@
   loop_control:
     loop_var: inventory_group_name
 
+- name: Add common overrides for included containers
+  ansible.builtin.include_tasks:
+    file: 2_overrides.yml
+  loop: "{{ group_names }}"
+  loop_control:
+    loop_var: inventory_group_name
+
 - name: Docker operations
   ansible.builtin.include_tasks:
     file: 2_docker_operations.yml
