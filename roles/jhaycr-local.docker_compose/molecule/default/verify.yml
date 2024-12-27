@@ -1,0 +1,13 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Check if docker-compose.override.yml exists
+      ansible.builtin.stat:
+        path: /opt/docker/docker-compose.override.yml
+      register: result
+
+    - name: Assert docker-compose.override.yml exists
+      ansible.builtin.assert:
+        that:
+          - result.stat.exists
