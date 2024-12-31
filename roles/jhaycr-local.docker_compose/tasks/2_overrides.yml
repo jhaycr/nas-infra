@@ -4,7 +4,7 @@
     services: []
     private: yes
 
-- name: Parse include section from root docker-compose.yml.j2
+- name: Parse include section from root docker-compose
   ansible.builtin.set_fact:
     include_paths: >-
       {{
@@ -14,7 +14,6 @@
         | map('regex_replace', '$', '.j2')
         | list
       }}
-  run_once: true
 
 - name: Debug include paths
   ansible.builtin.debug:
@@ -23,10 +22,9 @@
 
 - name: Gather service names from files
   ansible.builtin.set_fact:
-    services: "{{ services + (lookup('ansible.builtin.template', item) | from_yaml).services.keys() | list }}"
+    services: "{{ services + (lookup('ansible.builtin.template', item) | from_yaml).services.keys() | list | unique }}"
   with_items: "{{ include_paths }}"
   when: "(lookup('ansible.builtin.template', item) | from_yaml).services is defined"
-  run_once: true
 
 - name: Debug gathered services
   ansible.builtin.debug:
