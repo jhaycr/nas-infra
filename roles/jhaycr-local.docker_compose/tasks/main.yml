@@ -4,6 +4,7 @@
   loop: "{{ group_names }}"
   loop_control:
     loop_var: inventory_group_name
+  when: false
 
 - name: Build docker-compose.override.yml
   ansible.builtin.include_tasks:
@@ -15,3 +16,4 @@
 - name: Run Docker stack
   ansible.builtin.include_tasks:
     file: 3_docker.yml
+  when: false
