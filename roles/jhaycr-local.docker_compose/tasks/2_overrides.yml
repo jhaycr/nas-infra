@@ -19,6 +19,7 @@
 - name: Debug include paths
   ansible.builtin.debug:
     var: include_paths
+  when: docker_compose_debug_print | bool
 
 - name: Gather service names from files
   ansible.builtin.set_fact:
@@ -30,6 +31,7 @@
 - name: Debug gathered services
   ansible.builtin.debug:
     var: services
+  when: docker_compose_debug_print | bool
 
 - name: Extend and template compose override
   ansible.builtin.template:
