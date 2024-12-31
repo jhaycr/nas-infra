@@ -30,6 +30,7 @@ include:
   - path: ./nginx-proxy-manager/docker-compose.yml
 
   # services
+  - path: ./arr/docker-compose.yml
   - path: ./gaseous/docker-compose.yml
   - path: ./jellyfin/docker-compose.yml
   - path: ./minecraft/docker-compose.yml
@@ -75,19 +76,6 @@ services:
     restart: unless-stopped
     ports:
       - 9898:9898
-  
-  bazarr:
-    <<: *common-keys
-    container_name: bazarr
-    image: lscr.io/linuxserver/bazarr:latest
-    environment:
-      <<: *common-env
-    ports:
-      - "6767:6767"
-    volumes:
-      - *localtime
-      - *storage
-      - {{ docker_home_appdata_path }}/bazarr:/config
 
   calibreweb:
     <<: *common-keys
@@ -236,21 +224,6 @@ services:
       - {{ docker_home_appdata_path }}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
 
-  jackett:
-    <<: *common-keys
-    image: lscr.io/linuxserver/jackett:latest
-    container_name: jackett
-    environment:
-      <<: *common-env
-      AUTO_UPDATE: true #optional
-      # RUN_OPTS= #optional
-    volumes:
-      - {{ docker_home_appdata_path }}/jackett:/config
-      - {{ docker_storage_path }}/downloads:/downloads
-    ports:
-      - 9117:9117
-    restart: unless-stopped
-
   komga:
     <<: *common-keys
     container_name: komga
@@ -356,19 +329,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - {{ docker_home_appdata_path }}/portainer:/data
 
-  prowlarr:
-    <<: *common-keys
-    container_name: prowlarr
-    image: lscr.io/linuxserver/prowlarr:latest
-    environment:
-      <<: *common-env
-    ports:
-      - "9696:9696"
-    volumes:
-      - *localtime
-      - *storage
-      - {{ docker_home_appdata_path }}/prowlarr:/config
-
   pyload-ng:
     <<: *common-keys
     image: lscr.io/linuxserver/pyload-ng:latest
@@ -382,24 +342,6 @@ services:
       - 8000:8000
       - 9666:9666 #optional
     restart: unless-stopped
-
-  radarr:
-    <<: *common-keys
-    container_name: radarr
-    image: lscr.io/linuxserver/radarr:latest
-    environment:
-      <<: *common-env
-    networks:
-      - default
-      - notifiarr
-    ports:
-      - "7878:7878"
-    volumes:
-      - *localtime
-      - *storage
-      - {{ docker_home_appdata_path }}/radarr:/config
-      - {{ docker_storage_path }}/downloads:/downloads
-      - {{ docker_storage_path }}/media/Movies:/storage/movies
   
   restic:
     <<: *common-keys
@@ -471,24 +413,6 @@ services:
     ports:
       - 8084:80
     restart: unless-stopped
-
-  sonarr:
-    <<: *common-keys
-    container_name: sonarr
-    image: lscr.io/linuxserver/sonarr:latest
-    environment:
-      <<: *common-env
-    networks:
-      - default
-      - notifiarr
-    ports:
-      - "8989:8989"
-    volumes:
-      - *localtime
-      - *storage
-      - {{ docker_home_appdata_path }}/sonarr:/config
-      - {{ docker_storage_path }}/downloads:/downloads
-      - {{ docker_storage_path }}/media/TV:/storage/tv
 
   tautulli:
     <<: *common-keys
