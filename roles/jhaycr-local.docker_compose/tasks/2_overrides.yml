@@ -13,6 +13,7 @@
         | map('regex_replace', '^(\.\/)?', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/')
         | map('regex_replace', '$', '.j2')
         | list
+        | sort
       }}
 
 - name: Debug include paths
@@ -22,9 +23,13 @@
 
 - name: Gather service names from files
   ansible.builtin.set_fact:
-    services: "{{ services + (lookup('ansible.builtin.template', item) | from_yaml).services.keys() | list | unique }}"
+    services: "{{ services + (lookup('ansible.builtin.template', item) | from_yaml).services.keys() | list }}"
   with_items: "{{ include_paths }}"
   when: "(lookup('ansible.builtin.template', item) | from_yaml).services is defined"
+
+- name: Filter and sort gathered services
+  ansible.builtin.set_fact:
+    services: "{{ services | unique | sort }}"
 
 - name: Debug gathered services
   ansible.builtin.debug:
@@ -37,4 +42,4 @@
     dest: "{{ docker_home_compose_path }}/docker-compose.override.yml"
     mode: "0644"
   vars:
-    services: "{{ services | unique }}"
+    services: "{{ services }}"
