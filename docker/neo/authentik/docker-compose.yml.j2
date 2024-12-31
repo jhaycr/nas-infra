@@ -17,7 +17,7 @@ services:
       - {{ docker_home_appdata_path }}/authentik/media:/media
       - {{ docker_home_appdata_path }}/authentik/custom-templates:/templates
     env_file:
-      - .env.authentik
+      - .env
     networks:
       - app_authentik
     ports:
@@ -46,7 +46,7 @@ services:
       POSTGRES_USER: ${PG_USER:-authentik}
       POSTGRES_DB: ${PG_DB:-authentik}
     env_file:
-      - .env.authentik
+      - .env
 
   authentik-redis:
     container_name: authentik-redis
@@ -90,7 +90,7 @@ services:
       - {{ docker_home_appdata_path }}/authentik/certs:/certs
       - {{ docker_home_appdata_path }}/authentik/custom-templates:/templates
     env_file:
-      - .env.authentik
+      - .env
     depends_on:
       - authentik-postgresql
       - authentik-redis
