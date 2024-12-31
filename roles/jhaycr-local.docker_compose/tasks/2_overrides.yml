@@ -1,8 +1,7 @@
 ---
 - name: Initialize file lists
   ansible.builtin.set_fact:
-    included_compose_files: []
-    services: {}
+    services: []
     private: yes
 
 - name: Parse include section from root docker-compose.yml.j2
@@ -11,7 +10,8 @@
       {{
         (lookup('ansible.builtin.template', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/docker-compose.yml.j2') | from_yaml).include
         | map(attribute='path')
-        | map('regex_replace', '^', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/')
+        | map('regex_replace', '^(\.\/)?', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/')
+        | map('regex_replace', '$', '.j2')
         | list
       }}
   run_once: true
@@ -20,24 +20,11 @@
   ansible.builtin.debug:
     var: include_paths
 
-- name: Gather compose files from included paths
+- name: Gather service names from files
   ansible.builtin.set_fact:
-    included_compose_files: "{{ included_compose_files + (lookup('ansible.builtin.filetree', item) | 
-                            selectattr('state', 'ne', 'directory') |
-                            selectattr('path', 'regex', '(.*/)*((docker-compose(?!\\.override).*|\\.env.*)\\.j2)$') |
-                            list) }}"
-  loop: "{{ include_paths }}"
-  run_once: true
-
-- name: Debug found compose files
-  ansible.builtin.debug:
-    var: included_compose_files
-
-- name: Gather service names from docker-compose files
-  ansible.builtin.set_fact:
-    services: "{{ services | combine((lookup('ansible.builtin.template', item.src) | from_yaml).services) }}"
-  loop: "{{ included_compose_files }}"
-  when: "(lookup('ansible.builtin.template', item.src) | from_yaml).services is defined"
+    services: "{{ services + (lookup('ansible.builtin.template', item) | from_yaml).services.keys() | list }}"
+  with_items: "{{ include_paths }}"
+  when: "(lookup('ansible.builtin.template', item) | from_yaml).services is defined"
   run_once: true
 
 - name: Debug gathered services
@@ -50,4 +37,4 @@
     dest: "{{ docker_home_compose_path }}/docker-compose.override.yml"
     mode: "0644"
   vars:
-    services: "{{ services }}"
+    services: "{{ services | unique }}"
