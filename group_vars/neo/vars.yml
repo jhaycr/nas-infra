@@ -3,7 +3,7 @@
 main_username: user0
 ntp_timezone: America/Los_Angeles
 
-docker_compose_debug_print: false
+docker_compose_debug_print: true
 docker_compose_debug_halt: false
 
 docker_storage_path: '/mnt/storage'
