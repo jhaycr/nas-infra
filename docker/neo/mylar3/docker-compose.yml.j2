@@ -9,3 +9,5 @@ services:
   volumes:
     - {{ docker_home_appdata_path }}/mylar3:/config
     - {{ docker_storage_path }}/downloads:/downloads
+    - {{ docker_storage_path }}/downloads:/storage/downloads
+    - {{ docker_storage_path }}/comics:/storage/comics/
