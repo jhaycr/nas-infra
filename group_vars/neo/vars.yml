@@ -55,6 +55,7 @@ package_list:
   - name: git
   - name: curl
   - name: iperf
+  - name: jq
 
 # -----
 # jhaycr.luks_disks
