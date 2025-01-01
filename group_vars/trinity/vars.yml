@@ -18,12 +18,10 @@ package_list:
   - name: syncthing
   - name: unrar
   - name: veracrypt
-  - name: virtualbox
   - name: wireguard
 
 snap_list:
   - name: audible-for-linux
-  - name: authy
   - name: brave
   - name: cups
   - name: curl
@@ -37,7 +35,6 @@ snap_list:
   - name: obsidian
     classic: true
   - name: organize-my-files
-  - name: plex-desktop
   - name: poddr
   - name: retroarch
   - name: slack
