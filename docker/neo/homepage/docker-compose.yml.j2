@@ -1,0 +1,11 @@
+---
+services:
+
+ homepage:
+  container_name: homepage
+  image: ghcr.io/gethomepage/homepage:latest
+  ports:
+    - 3000:3000
+  volumes:
+    - {{ docker_home_appdata_path }}/homepage:/app/config
+    - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations

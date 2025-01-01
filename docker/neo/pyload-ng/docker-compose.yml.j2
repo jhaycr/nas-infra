@@ -1,0 +1,13 @@
+---
+services:
+
+ pyload-ng:
+  image: lscr.io/linuxserver/pyload-ng:latest
+  container_name: pyload-ng
+  volumes:
+    - {{ docker_home_appdata_path }}/pyload-ng:/config
+    - {{ docker_storage_path }}/downloads:/downloads
+  ports:
+    - 8000:8000
+    - 9666:9666 #optional
+  restart: unless-stopped

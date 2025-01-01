@@ -1,0 +1,12 @@
+---
+services:
+
+ portainer:
+  container_name: portainer
+  image: portainer/portainer-ce:latest
+  command: -H tcp://192.168.1.2:9001 --tlsskipverify
+  ports:
+    - "9000:9000"
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - {{ docker_home_appdata_path }}/portainer:/data

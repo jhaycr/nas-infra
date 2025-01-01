@@ -1,0 +1,17 @@
+---
+services:
+
+ calibreweb:
+  container_name: calibreweb
+  image: lscr.io/linuxserver/calibre-web:latest
+  networks:
+    bridge_proxy_external:
+  ports:
+    - "8083:8083"
+  volumes:
+    - {{ docker_home_appdata_path }}/calibreweb:/config
+    - {{ docker_storage_path}}/storage/Books/Calibre:/books
+  # https://www.reddit.com/r/selfhosted/comments/ys6n76/authentik_ldap_in_calibreweb/
+  # https://www.davidbuhlman.com/calibre-web-integration-with-authentik/
+  # https://www.davidbuhlman.com/calibre-web-integration-with-authentik-part-two/
+  # 

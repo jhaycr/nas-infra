@@ -1,0 +1,14 @@
+---
+services:
+
+ sabnzbd:
+  container_name: sabnzbd
+  image: lscr.io/linuxserver/sabnzbd:latest
+  networks:
+  - default
+  - notifiarr
+  ports:
+    - "8080:8080"
+  volumes:
+    - {{ docker_home_appdata_path }}/sabnzbd:/config
+    - {{ docker_storage_path }}/downloads:/downloads

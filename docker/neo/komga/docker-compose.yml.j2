@@ -1,0 +1,16 @@
+---
+services:
+
+ komga:
+  container_name: komga
+  image: gotson/komga
+  environment:
+    KOMGA_OAUTH2_ACCOUNT_CREATION: "true"
+  networks:
+    bridge_proxy_external:
+  ports:
+    - "25600:25600"
+  volumes:
+    - {{ docker_home_appdata_path }}/komga:/config
+    - {{ docker_storage_path }}/comics:/data
+    - {{ docker_storage_path }}/storage/Books:/books

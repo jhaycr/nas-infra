@@ -1,0 +1,18 @@
+---
+services:
+
+ ouroboros:
+  container_name: ouroboros
+  image: pyouroboros/ouroboros:latest
+  environment:
+    CLEANUP: "true"
+    CRON: 0 4 * * *
+    IGNORE: ""
+    LOG_LEVEL: info
+    MONITOR: ""
+    NOTIFIERS: ""
+    REPO_PASS: ""
+    REPO_USER: ""
+    SELF_UPDATE: "true"
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock

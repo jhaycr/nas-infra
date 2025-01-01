@@ -1,0 +1,11 @@
+---
+services:
+
+ mylar3:
+  container_name: mylar3
+  image: lscr.io/linuxserver/mylar3:latest
+  ports:
+    - "8090:8090"
+  volumes:
+    - {{ docker_home_appdata_path }}/mylar3:/config
+    - {{ docker_storage_path }}/downloads:/downloads

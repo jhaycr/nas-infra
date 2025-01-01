@@ -1,0 +1,12 @@
+---
+services:
+
+ filebot:
+  container_name: filebot
+  image: jlesage/filebot:latest
+  ports:
+    - "5800:5800"
+  volumes:
+    - {{ docker_home_appdata_path }}/filebot:/config
+    - /mnt/filebot/output:/output
+    - /mnt/filebot/watch:/watch

@@ -1,0 +1,12 @@
+---
+services:
+
+ overseerr:
+  container_name: overseerr
+  image: linuxserver/overseerr:1.33.2
+  networks:
+    bridge_proxy_external:
+  ports:
+    - "5055:5055"
+  volumes:
+    - {{ docker_home_appdata_path }}/overseerr:/config

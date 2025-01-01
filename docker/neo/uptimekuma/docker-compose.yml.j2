@@ -1,0 +1,11 @@
+---
+services:
+
+ uptimekuma:
+  container_name: uptimekuma
+  image: louislam/uptime-kuma:latest
+  ports:
+    - "3001:3001"
+  volumes:
+    - {{ docker_home_appdata_path }}/uptimekuma:/app/data
+    - /var/run/docker.sock:/var/run/docker.sock:ro
