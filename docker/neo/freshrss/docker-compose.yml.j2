@@ -1,0 +1,19 @@
+---
+services:
+
+ freshrss:
+  container_name: freshrss
+  image: freshrss/freshrss:latest
+  environment:
+    OIDC_ENABLED : 1
+    OIDC_PROVIDER_METADATA_URL : https://auth.{{ secret_domain }}/application/o/freshrss/.well-known/openid-configuration
+    OIDC_CLIENT_ID : {{ secret_freshrss_oidc_client_id }}
+    OIDC_CLIENT_SECRET : {{ secret_freshrss_oidc_client_secret }}
+    OIDC_X_FORWARDED_HEADERS : X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
+    OIDC_SCOPES : openid email profile
+  networks:
+    bridge_proxy_external:
+  ports:
+    - "8012:80"
+  volumes:
+    - {{ docker_home_appdata_path }}/freshrss:/config

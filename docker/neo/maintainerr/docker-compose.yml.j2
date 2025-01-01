@@ -1,0 +1,11 @@
+---
+services:
+
+ maintainerr:
+  container_name: maintainerr
+  image: ghcr.io/jorenn92/maintainerr:latest
+  ports:
+    - "6246:6246"
+  user: 1000:1000
+  volumes:
+    - {{ docker_home_appdata_path }}/maintainerr:/opt/data

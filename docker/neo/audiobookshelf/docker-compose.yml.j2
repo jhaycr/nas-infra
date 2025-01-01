@@ -1,0 +1,15 @@
+---
+services:
+
+ audiobookshelf:
+  container_name: audiobookshelf
+  image: ghcr.io/advplyr/audiobookshelf:latest
+  networks:
+    bridge_proxy_external:
+  ports:
+    - "13378:80"
+  volumes:
+    - {{ docker_storage_path }}/media/audio/audiobooks:/audiobooks
+    - {{ docker_storage_path }}/media/audio/podcasts:/podcasts
+    - {{ docker_home_appdata_path }}/audiobookshelf:/config
+    - {{ docker_storage_path }}/media/audio/:/metadata1

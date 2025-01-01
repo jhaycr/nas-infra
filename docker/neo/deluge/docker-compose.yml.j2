@@ -1,0 +1,19 @@
+---
+services:
+
+ deluge:
+  container_name: deluge
+  image: linuxserver/deluge:5b398f77-ls22
+  # image: lscr.io/linuxserver/deluge:latest
+  ports:
+    - "6881:6881"
+    - "6881:6881/udp"
+    - "8112:8112"
+    - "51413:51413"
+    - "51413:51413/udp"
+    - "58846:58846"
+    - "58946:58946"
+  volumes:
+    - {{ docker_home_appdata_path }}/deluge:/config
+    - {{ docker_storage_path }}/media/Anime:/anime
+    - {{ docker_storage_path }}/downloads:/download
