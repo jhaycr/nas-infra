@@ -51,12 +51,15 @@ autorestic_config_yaml:
           - echo "Hook prevalidate"
         before:
           - echo "Hook before"
-        after:
-          - echo "Hook after"
+          - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Starting backup for location: ${AUTORESTIC_LOCATION}" {{ secret_restic_cron_healthcheck_uri }}/start'
         failure:
           - echo "Hook failure"
+          - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup failed for location: ${AUTORESTIC_LOCATION}" {{ secret_restic_cron_healthcheck_uri }}/fail'
         success:
           - echo "Hook success"
+          - 'curl -m 10 --retry 5 -X POST -H "Content-Type: text/plain" --data "Backup successful for location: ${AUTORESTIC_LOCATION}" {{ secret_restic_cron_healthcheck_uri }}'
+        after:
+          - echo "Hook after"
       options:
         forget:
           # keep-last: 5 # always keep at least X snapshots
