@@ -33,6 +33,14 @@ autorestic_run_check: true
 autorestic_config_yaml:
   version: 2
   backends:
+    nas_storage:
+      type: local
+      path: "{{ docker_storage_path }}/backups/docker_appdata"
+      requireKey: true
+      key: "{{ secret_restic_backend_keys | selectattr('name', 'equalto', 'nas_storage') | map(attribute='key') | first }}"
+      options:
+        forget:
+          keep-daily: 14 # keep X last daily snapshots
     b2_docker:
       type: s3
       path: "{{ secret_docker_backup_b2_uri }}"
@@ -45,6 +53,7 @@ autorestic_config_yaml:
       from:
         - "{{ docker_home_appdata_path}}"
       to:
+      #  - nas_storage
         - b2_docker
       forget: prune # Or only "yes" if you don't want to prune
       cron: '0 8 * * *' # Every day at 8:00
