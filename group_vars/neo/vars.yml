@@ -10,6 +10,8 @@ docker_storage_path: '/mnt/storage'
 docker_home_compose_path: '/opt/docker'
 docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
 docker_appdata_folders_to_own:
+- backrest
+- fail2ban
 - gaseous-server
 - jellyfin
 - maintainerr
@@ -23,7 +25,7 @@ docker_appdata_folders_to_own:
 autorestic_download_latest_ver: false
 autorestic_pinned_ver: 1.8.3
 restic_download_latest_ver: false
-restic_pinned_ver: 0.17.1
+restic_pinned_ver: 0.17.3
 
 autorestic_config_user: "{{ main_username}}"
 autorestic_user_directory: /home/"{{ main_username}}"
@@ -31,10 +33,50 @@ autorestic_run_check: true
 autorestic_config_yaml:
   version: 2
   backends:
-    local-home:
-      type: local
-      path: "{{ backup_path_local }}"
-      key: "{{ secret_restic_repo_password }}"
+    b2_docker:
+      type: s3
+      path: "{{ secret_docker_backup_b2_uri }}"
+      key: "{{ secret_docker_backup_restic_password}}"
+      env:
+        AWS_ACCESS_KEY_ID: "{{ secret_docker_backup_b2_bucket_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{ secret_docker_backup_b2_bucket_application_key}}"
+  locations:
+    docker_appdata:
+      from: "{{ docker_home_appdata_path}}"
+      to: b2_docker
+      forget: prune # Or only "yes" if you don't want to prune
+      cron: '0 8 * * *' # Every day at 8:00
+      hooks:
+        prevalidate:
+          - echo "Hook prevalidate"
+        before:
+          - echo "Hook before"
+        after:
+          - echo "Hook after"
+        failure:
+          - echo "Hook failure"
+        success:
+          - echo "Hook success"
+      options:
+        forget:
+          # keep-last: 5 # always keep at least X snapshots
+          # keep-hourly: 3 # keep X last hourly snapshots
+          keep-daily: 14 # keep X last daily snapshots
+          keep-weekly: 8 # keep X last weekly snapshots
+          # keep-monthly: 12 # keep X last monthly snapshots
+          # keep-yearly: 7 # keep X last yearly snapshots
+          # keep-within: '14d' # keep snapshots from the last X days
+        backup:
+          exclude:
+            - "**/cache"
+            - "**/log"
+            - "**/logs"
+            - "*.log*"
+            - ".cache"
+            - "backups/manual"
+            - "**/Signatures"
+            - "**/gaseous-server/Data/**"
+            - "**/Temp"
 
 # -----
 # arillso.system.users
