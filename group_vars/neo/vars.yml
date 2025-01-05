@@ -42,8 +42,10 @@ autorestic_config_yaml:
         AWS_SECRET_ACCESS_KEY: "{{ secret_docker_backup_b2_bucket_application_key}}"
   locations:
     docker_appdata:
-      from: "{{ docker_home_appdata_path}}"
-      to: b2_docker
+      from:
+        - "{{ docker_home_appdata_path}}"
+      to:
+        - b2_docker
       forget: prune # Or only "yes" if you don't want to prune
       cron: '0 8 * * *' # Every day at 8:00
       hooks:
