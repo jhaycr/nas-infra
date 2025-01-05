@@ -1,11 +1,23 @@
 ---
-- name: create local backup dirs
+- name: Create local backup dirs
   ansible.builtin.file:
     path: "{{ backup_path_local }}"
     owner: "{{ main_username }}"
     group: "{{ main_username }}"
     state: directory
 
-- name: set up autorestic
+- name: Set up autorestic
   ansible.builtin.import_role:
     name: fuzzymistborn.autorestic
+
+- name: Schedule autorestic cron
+  cron:
+    name: autorestic cron
+    job: "autorestic --ci cron"
+    user: "{{ main_username }}"
+    weekday: "*"
+    month: "*"
+    day: "*"
+    hour: "12"
+    minute: "0"
+    state: present
