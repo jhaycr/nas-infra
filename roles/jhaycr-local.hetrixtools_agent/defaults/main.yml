@@ -1,0 +1,6 @@
+hetrixtools_action: "install"  # "install" | "uninstall"
+hetrixtools_install_url: "https://raw.githubusercontent.com/hetrixtools/agent/master/hetrixtools_install.sh"
+hetrixtools_uninstall_url: "https://raw.githubusercontent.com/hetrixtools/agent/master/hetrixtools_uninstall.sh"
+
+secret_hetrixtools_server_id: "your_server_id"  # Replace with your actual Server ID (SID)
+  

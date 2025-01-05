@@ -26,6 +26,8 @@
     - role: jhaycr-local.plex
       become: yes
     - role: IronicBadger.proxmox_nag_removal
+    - role: jhaycr-local.hetrixtools_agent
+      become: yes
 
   tasks:
     - name: create home downloads directory
