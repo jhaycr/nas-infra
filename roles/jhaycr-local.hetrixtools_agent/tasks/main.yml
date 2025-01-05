@@ -1,0 +1,24 @@
+---
+- name: Download HetrixTools install script
+  become: yes
+  ansible.builtin.get_url:
+    url: "{{ hetrixtools_install_url }}"
+    dest: /tmp/hetrixtools_install.sh
+    mode: '0755'
+  when: hetrixtools_action == "install"
+
+- name: Run HetrixTools install script
+  ansible.builtin.shell: "/tmp/hetrixtools_install.sh {{ secret_hetrixtools_server_id }}"
+  when: hetrixtools_action == "install"
+
+- name: Download HetrixTools uninstall script
+  ansible.builtin.get_url:
+    url: "{{ hetrixtools_uninstall_url }}"
+    dest: /tmp/hetrixtools_uninstall.sh
+    mode: '0755'
+  when: hetrixtools_action == "uninstall"
+
+- name: Run HetrixTools uninstall script
+  become: yes
+  ansible.builtin.shell: "/tmp/hetrixtools_uninstall.sh"
+  when: hetrixtools_action == "uninstall"
