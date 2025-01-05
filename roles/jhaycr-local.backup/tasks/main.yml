@@ -10,7 +10,7 @@
   ansible.builtin.import_role:
     name: fuzzymistborn.autorestic
 
-- name: Schedule autorestic cron
+- name: Schedule autorestic cron (hourly)
   cron:
     name: autorestic cron
     job: "autorestic --ci cron"
@@ -18,6 +18,6 @@
     weekday: "*"
     month: "*"
     day: "*"
-    hour: "12"
+    hour: "*"
     minute: "0"
     state: present
