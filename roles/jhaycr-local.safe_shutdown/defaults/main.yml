@@ -1,0 +1,6 @@
+---
+docker_compose_path: /opt/docker
+mergerfs_mount: /mnt/storage
+shutdown_script_timeout: 180
+docker_stop_timeout: 300
+safe_shutdown_debug: false

@@ -16,6 +16,8 @@
       tags: disks
     - role: tigattack.mergerfs
       tags: disks
+    - role: jhaycr-local.safe_shutdown
+      tags: disks
     - role: geerlingguy.nfs
     - role: jhaycr-local.backup
       become: yes
