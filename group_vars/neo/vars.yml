@@ -35,7 +35,7 @@ autorestic_config_yaml:
   backends:
     nas_storage:
       type: local
-      path: "{{ docker_storage_path }}/backups/docker_appdata"
+      path: "{{ docker_storage_path }}/backups-restic"
       requireKey: true
       key: "{{ secret_restic_backend_keys | selectattr('name', 'equalto', 'nas_storage') | map(attribute='key') | first }}"
       options:
