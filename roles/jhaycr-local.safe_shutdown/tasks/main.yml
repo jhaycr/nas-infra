@@ -1,0 +1,82 @@
+# roles/pve_safe_shutdown/tasks/main.yml
+---
+- name: Ensure required directories exist
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  become: true
+  loop:
+    - { path: '/usr/local/sbin', mode: '0755' }
+    - { path: '/var/log/pve-shutdown', mode: '0755' }
+
+- name: Copy safe shutdown script
+  ansible.builtin.template:
+    src: safe-shutdown.sh.j2
+    dest: /usr/local/sbin/safe-shutdown.sh
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  register: script_copy
+
+- name: Get hook-script.conf stats if it exists
+  ansible.builtin.stat:
+    path: /etc/pve/hook-script.conf
+  register: hook_script_conf
+  become: true
+
+- name: Create hook-script.conf if it doesn't exist
+  ansible.builtin.file:
+    path: /etc/pve/hook-script.conf
+    state: touch
+    mode: '0640'
+    owner: root
+    group: www-data
+    modification_time: preserve
+    access_time: preserve
+  become: true
+  when: not hook_script_conf.stat.exists
+
+- name: Add shutdown hook to PVE configuration
+  ansible.builtin.lineinfile:
+    path: /etc/pve/hook-script.conf
+    regexp: '^pre-shutdown:'
+    line: 'pre-shutdown: /usr/local/sbin/safe-shutdown.sh'
+    owner: root
+    group: www-data
+    mode: '0640'
+  become: true
+
+- name: Verify script permissions and ownership
+  ansible.builtin.file:
+    path: /usr/local/sbin/safe-shutdown.sh
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Install logrotate configuration
+  ansible.builtin.template:
+    src: pve-shutdown.logrotate.j2
+    dest: /etc/logrotate.d/pve-shutdown
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Test shutdown script with dry-run
+  ansible.builtin.command: /usr/local/sbin/safe-shutdown.sh --dry-run
+  register: dry_run_test
+  changed_when: false
+  failed_when: 
+    - dry_run_test.rc != 0
+    - "'completed successfully' not in dry_run_test.stdout"
+  become: true
+
+- name: Display dry-run test output
+  ansible.builtin.debug:
+    var: dry_run_test.stdout_lines
+  when: safe_shutdown_debug | default(false) | bool

@@ -1,0 +1,237 @@
+#!/bin/bash
+
+# Exit on any error
+set -e
+
+# Set up logging
+LOG_DIR="/var/log/pve-shutdown"
+LOG_FILE="${LOG_DIR}/shutdown.log"
+
+# Check for dry-run mode first
+DRY_RUN=0
+if [ "$1" = "--dry-run" ]; then
+    DRY_RUN=1
+fi
+
+# Generate unique run ID
+RUN_ID=$(date '+%Y%m%d_%H%M%S')
+if [ -r "/dev/urandom" ]; then
+    RUN_ID="${RUN_ID}_$(head /dev/urandom | tr -dc 'a-f0-9' | head -c 6 || echo 'noid')"
+fi
+
+# Determine shutdown trigger
+get_shutdown_trigger() {
+    local trigger="unknown"
+    {
+        last_cmd=$(ps -eo cmd | grep -E "shutdown|reboot|poweroff|halt" | grep -v grep || true)
+        if [[ "$last_cmd" == *"-r"* ]] || [[ "$last_cmd" == *"reboot"* ]]; then
+            trigger="restart"
+        elif [[ "$last_cmd" == *"-h"* ]] || [[ "$last_cmd" == *"poweroff"* ]] || [[ "$last_cmd" == *"halt"* ]]; then
+            trigger="shutdown"
+        fi
+
+        if [ "$trigger" = "unknown" ]; then
+            if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated restart"; then
+                trigger="restart"
+            elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated shutdown"; then
+                trigger="shutdown"
+            elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "Power button pressed"; then
+                trigger="power_button"
+            fi
+        fi
+
+        if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "pvedaemon.*shutdown"; then
+            trigger="proxmox_${trigger}"
+        fi
+
+        if [ -n "$PVE_SHUTDOWN_TRIGGER" ]; then
+            trigger="${trigger}_${PVE_SHUTDOWN_TRIGGER}"
+        fi
+    } || true
+    echo "$trigger"
+}
+
+SHUTDOWN_TRIGGER=$(get_shutdown_trigger)
+CURRENT_OP="INIT"
+
+# Function to log messages with operation tags
+log_message() {
+    local timestamp="[$(date '+%Y-%m-%d %H:%M:%S')]"
+    local message="$timestamp [RUN:$RUN_ID] [TRIGGER:$SHUTDOWN_TRIGGER] [OP:$CURRENT_OP"
+    if [ "$CURRENT_OP" = "COMPLETION" ]; then
+        message="$message:$1"  # For completion, first argument is status
+        shift  # Remove the status argument
+        message="$message] $1"  # Add the actual message
+    else
+        message="$message] $1"  # Normal operation logging
+    fi
+    echo "$message"
+    logger -t "pve-safe-shutdown" "$message"
+    if [ ! -d "$LOG_DIR" ]; then
+        mkdir -p "$LOG_DIR"
+        chown root:root "$LOG_DIR"
+        chmod 755 "$LOG_DIR"
+    fi
+    echo "$message" >> "$LOG_FILE"
+}
+
+# Check execution context
+if [ -z "$PVE_PHASE" ]; then
+    if [ "$1" != "--dry-run" ]; then
+        CURRENT_OP="VALIDATION"
+        log_message "Error: This script is intended to run as a ProxMox VE shutdown hook"
+        log_message "For testing, use: $0 --dry-run"
+        exit 1
+    fi
+elif [ "$PVE_PHASE" != "pre-shutdown" ]; then
+    exit 0
+fi
+
+# If it's a dry run, simulate PVE_PHASE
+if [ $DRY_RUN -eq 1 ]; then
+    log_message "Running in dry-run mode - no actions will be taken"
+fi
+
+# Initialize shutdown sequence
+log_message "Starting safe shutdown sequence"
+log_message "System uptime: $(uptime 2>/dev/null || echo 'unavailable')"
+
+# Docker compose handling
+CURRENT_OP="DOCKER_COMPOSE"
+log_message "Starting Docker Compose shutdown at {{ docker_compose_path }}"
+if [ -f "{{ docker_compose_path }}/docker-compose.yml" ]; then
+    cd {{ docker_compose_path }}
+    if [ $DRY_RUN -eq 1 ]; then
+        log_message "Analyzing Docker Compose stack"
+        log_message "Found compose file at {{ docker_compose_path }}/docker-compose.yml"
+        docker compose ps || log_message "Failed to list compose services"
+    else
+        log_message "Stopping Docker Compose stack"
+        docker compose down --timeout {{ shutdown_script_timeout }} && log_message "Docker Compose stack stopped successfully"
+    fi
+else
+    log_message "No Docker Compose file found at {{ docker_compose_path }}"
+fi
+
+# Docker container handling
+CURRENT_OP="DOCKER_CONTAINERS"
+log_message "Starting container shutdown"
+if [ $DRY_RUN -eq 1 ]; then
+    log_message "Analyzing running containers"
+    docker ps | tail -n +2 | awk '{print $1 "\t" $NF}' | while IFS= read -r line; do
+        log_message "Found container: $line"
+    done || log_message "Failed to list containers"
+else
+    log_message "Waiting for containers to stop"
+    timeout {{ docker_stop_timeout }} sh -c 'while docker ps -q | grep -q .; do sleep 5; done' && \
+        log_message "All containers stopped successfully" || {
+            log_message "Error: Some containers failed to stop within timeout"
+            docker ps
+            exit 1
+        }
+fi
+
+# Docker service shutdown
+CURRENT_OP="DOCKER_SERVICE"
+log_message "Starting Docker service shutdown"
+if [ $DRY_RUN -eq 1 ]; then
+    log_message "Analyzing Docker service status"
+    systemctl status docker | cat
+    log_message "Would stop Docker service"
+else
+    log_message "Stopping Docker service"
+    systemctl stop docker && log_message "Docker service stopped successfully"
+fi
+
+# MergerFS handling
+CURRENT_OP="MERGERFS"
+log_message "Starting mergerfs unmount for {{ mergerfs_mount }}"
+if mountpoint -q {{ mergerfs_mount }}; then
+    if [ $DRY_RUN -eq 1 ]; then
+        log_message "Analyzing mergerfs mount"
+        MOUNT_INFO=$(df -h {{ mergerfs_mount }} | tail -n 1)
+        log_message "Current mount status: $MOUNT_INFO"
+        MOUNT_USAGE=$(lsof {{ mergerfs_mount }} 2>/dev/null || true)
+        if [ -n "$MOUNT_USAGE" ]; then
+            log_message "Found active usage:"
+            echo "$MOUNT_USAGE" | cat
+        fi
+        log_message "Would unmount {{ mergerfs_mount }}"
+    else
+        log_message "Checking for active usage"
+        if is_mount_in_use "{{ mergerfs_mount }}"; then
+            log_message "Error: Mount point is still in use"
+            lsof {{ mergerfs_mount }}
+            exit 1
+        fi
+        log_message "Unmounting mergerfs"
+        umount {{ mergerfs_mount }} && log_message "Mergerfs unmounted successfully" || {
+            log_message "Error: Failed to unmount"
+            exit 1
+        }
+    fi
+else
+    log_message "Mount point not active"
+fi
+
+# LUKS volume handling
+LUKS_VOLUMES=$(awk '!/^[[:space:]]*#/ && NF {print $1}' /etc/crypttab)
+for volume in $LUKS_VOLUMES; do
+    CURRENT_OP="LUKS_${volume}"
+    log_message "Starting LUKS operation for $volume"
+    
+    if cryptsetup status "$volume" >/dev/null 2>&1; then
+        log_message "LUKS volume is active"
+        MOUNT_POINT=$(findmnt -n -o TARGET /dev/mapper/"$volume" 2>/dev/null)
+        
+        if [ -n "$MOUNT_POINT" ]; then
+            log_message "Found mount point: $MOUNT_POINT"
+            if [ $DRY_RUN -eq 1 ]; then
+                MOUNT_INFO=$(df -h "$MOUNT_POINT" | tail -n 1)
+                log_message "Current mount status: $MOUNT_INFO"
+                MOUNT_USAGE=$(lsof "$MOUNT_POINT" 2>/dev/null || true)
+                if [ -n "$MOUNT_USAGE" ]; then
+                    log_message "Found active usage:"
+                    echo "$MOUNT_USAGE" | cat
+                fi
+                log_message "Would unmount $MOUNT_POINT"
+            else
+                log_message "Checking for active usage"
+                if is_mount_in_use "$MOUNT_POINT"; then
+                    log_message "Error: Mount point is in use"
+                    lsof "$MOUNT_POINT"
+                    exit 1
+                fi
+                log_message "Unmounting LUKS volume"
+                umount "$MOUNT_POINT" && log_message "Unmount successful" || {
+                    log_message "Error: Unmount failed"
+                    exit 1
+                }
+            fi
+        fi
+        
+        if [ $DRY_RUN -eq 1 ]; then
+            log_message "Would close LUKS volume"
+            cryptsetup status "$volume" | cat
+        else
+            log_message "Closing LUKS volume"
+            cryptsetup close "$volume" && log_message "LUKS volume closed successfully" || {
+                log_message "Error: Failed to close LUKS volume"
+                exit 1
+            }
+        fi
+    else
+        log_message "LUKS volume is not active"
+    fi
+done
+
+CURRENT_OP="COMPLETION"
+if [ $DRY_RUN -eq 1 ]; then
+    log_message "SUCCESS" "Dry run completed successfully"
+else
+    log_message "SUCCESS" "Safe shutdown sequence completed successfully"
+fi
+exit 0
+
+# Error handling - this will catch any failures and log them before exiting
+trap 'CURRENT_OP="COMPLETION"; log_message "FAILURE" "Shutdown sequence failed - check logs for details"; exit 1' ERR
