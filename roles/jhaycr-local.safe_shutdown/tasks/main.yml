@@ -1,5 +1,16 @@
-# roles/pve_safe_shutdown/tasks/main.yml
+# roles/safe_shutdown/tasks/main.yml
 ---
+- name: Detect system type
+  ansible.builtin.command: "pveversion"
+  register: pve_check
+  failed_when: false
+  changed_when: false
+  become: true
+
+- name: Set system type fact
+  ansible.builtin.set_fact:
+    is_proxmox: "{{ pve_check.rc == 0 }}"
+
 - name: Ensure required directories exist
   ansible.builtin.file:
     path: "{{ item.path }}"
@@ -10,7 +21,7 @@
   become: true
   loop:
     - { path: '/usr/local/sbin', mode: '0755' }
-    - { path: '/var/log/pve-shutdown', mode: '0755' }
+    - { path: '/var/log/safe-shutdown', mode: '0755' }
 
 - name: Copy safe shutdown script
   ansible.builtin.template:
@@ -22,46 +33,66 @@
   become: true
   register: script_copy
 
-- name: Get hook-script.conf stats if it exists
-  ansible.builtin.stat:
-    path: /etc/pve/hook-script.conf
-  register: hook_script_conf
-  become: true
+- name: Configure ProxMox integration
+  when: is_proxmox
+  block:
+    - name: Get hook-script.conf stats if it exists
+      ansible.builtin.stat:
+        path: /etc/pve/hook-script.conf
+      register: hook_script_conf
+      become: true
 
-- name: Create hook-script.conf if it doesn't exist
-  ansible.builtin.file:
-    path: /etc/pve/hook-script.conf
-    state: touch
-    mode: '0640'
-    owner: root
-    group: www-data
-    modification_time: preserve
-    access_time: preserve
-  become: true
-  when: not hook_script_conf.stat.exists
+    - name: Create hook-script.conf if it doesn't exist
+      ansible.builtin.file:
+        path: /etc/pve/hook-script.conf
+        state: touch
+        mode: '0640'
+        owner: root
+        group: www-data
+        modification_time: preserve
+        access_time: preserve
+      become: true
+      when: not hook_script_conf.stat.exists
 
-- name: Add shutdown hook to PVE configuration
-  ansible.builtin.lineinfile:
-    path: /etc/pve/hook-script.conf
-    regexp: '^pre-shutdown:'
-    line: 'pre-shutdown: /usr/local/sbin/safe-shutdown.sh'
-    owner: root
-    group: www-data
-    mode: '0640'
-  become: true
+    - name: Add shutdown hook to PVE configuration
+      ansible.builtin.lineinfile:
+        path: /etc/pve/hook-script.conf
+        regexp: '^pre-shutdown:'
+        line: 'pre-shutdown: /usr/local/sbin/safe-shutdown.sh'
+        owner: root
+        group: www-data
+        mode: '0640'
+      become: true
 
-- name: Verify script permissions and ownership
-  ansible.builtin.file:
-    path: /usr/local/sbin/safe-shutdown.sh
-    owner: root
-    group: root
-    mode: '0755'
-  become: true
+- name: Configure systemd integration
+  when: not is_proxmox
+  block:
+    - name: Install systemd service
+      ansible.builtin.template:
+        src: safe-shutdown.service.j2
+        dest: /etc/systemd/system/safe-shutdown.service
+        mode: '0644'
+        owner: root
+        group: root
+      become: true
+      register: systemd_service
+    
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      become: true
+      when: systemd_service.changed
+
+    - name: Enable systemd service
+      ansible.builtin.systemd:
+        name: safe-shutdown
+        enabled: yes
+      become: true
 
 - name: Install logrotate configuration
   ansible.builtin.template:
-    src: pve-shutdown.logrotate.j2
-    dest: /etc/logrotate.d/pve-shutdown
+    src: safe-shutdown.logrotate.j2
+    dest: /etc/logrotate.d/safe-shutdown
     owner: root
     group: root
     mode: '0644'
@@ -73,7 +104,7 @@
   changed_when: false
   failed_when: 
     - dry_run_test.rc != 0
-    - "'completed successfully' not in dry_run_test.stdout"
+    - "'COMPLETION:SUCCESS' not in dry_run_test.stdout"
   become: true
 
 - name: Display dry-run test output

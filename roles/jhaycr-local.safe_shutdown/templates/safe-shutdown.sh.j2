@@ -4,7 +4,7 @@
 set -e
 
 # Set up logging
-LOG_DIR="/var/log/pve-shutdown"
+LOG_DIR="/var/log/safe-shutdown"
 LOG_FILE="${LOG_DIR}/shutdown.log"
 
 # Check for dry-run mode first
@@ -23,29 +23,44 @@ fi
 get_shutdown_trigger() {
     local trigger="unknown"
     {
-        last_cmd=$(ps -eo cmd | grep -E "shutdown|reboot|poweroff|halt" | grep -v grep || true)
-        if [[ "$last_cmd" == *"-r"* ]] || [[ "$last_cmd" == *"reboot"* ]]; then
-            trigger="restart"
-        elif [[ "$last_cmd" == *"-h"* ]] || [[ "$last_cmd" == *"poweroff"* ]] || [[ "$last_cmd" == *"halt"* ]]; then
-            trigger="shutdown"
-        fi
-
-        if [ "$trigger" = "unknown" ]; then
-            if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated restart"; then
-                trigger="restart"
-            elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated shutdown"; then
-                trigger="shutdown"
-            elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "Power button pressed"; then
-                trigger="power_button"
+        # First determine the primary trigger source
+        if [ $DRY_RUN -eq 1 ]; then
+            trigger="dryrun"
+        elif [ -f "/usr/bin/pveversion" ] && [ -n "$PVE_PHASE" ]; then
+            trigger="proxmox"
+            if [ -n "$PVE_SHUTDOWN_TRIGGER" ]; then
+                trigger="${trigger}_${PVE_SHUTDOWN_TRIGGER}"
             fi
+        elif [ -n "$SYSTEMD_SHUTDOWN" ]; then
+            trigger="systemd"
         fi
 
-        if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "pvedaemon.*shutdown"; then
-            trigger="proxmox_${trigger}"
-        fi
+        # For non-dry-run cases, try to determine shutdown type
+        if [ $DRY_RUN -eq 0 ]; then
+            local shutdown_type=""
+            # Check current command
+            last_cmd=$(ps -eo cmd | grep -E "shutdown|reboot|poweroff|halt" | grep -v grep || true)
+            if [[ "$last_cmd" == *"-r"* ]] || [[ "$last_cmd" == *"reboot"* ]]; then
+                shutdown_type="restart"
+            elif [[ "$last_cmd" == *"-h"* ]] || [[ "$last_cmd" == *"poweroff"* ]] || [[ "$last_cmd" == *"halt"* ]]; then
+                shutdown_type="shutdown"
+            fi
 
-        if [ -n "$PVE_SHUTDOWN_TRIGGER" ]; then
-            trigger="${trigger}_${PVE_SHUTDOWN_TRIGGER}"
+            # If not found in command, check journal
+            if [ -z "$shutdown_type" ]; then
+                if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated restart"; then
+                    shutdown_type="restart"
+                elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated shutdown"; then
+                    shutdown_type="shutdown"
+                elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "Power button pressed"; then
+                    shutdown_type="power_button"
+                fi
+            fi
+
+            # Append shutdown type if found
+            if [ -n "$shutdown_type" ]; then
+                trigger="${trigger}_${shutdown_type}"
+            fi
         fi
     } || true
     echo "$trigger"
@@ -66,7 +81,7 @@ log_message() {
         message="$message] $1"  # Normal operation logging
     fi
     echo "$message"
-    logger -t "pve-safe-shutdown" "$message"
+    logger -t "safe-shutdown" "$message"
     if [ ! -d "$LOG_DIR" ]; then
         mkdir -p "$LOG_DIR"
         chown root:root "$LOG_DIR"
@@ -75,19 +90,32 @@ log_message() {
     echo "$message" >> "$LOG_FILE"
 }
 
+# Function to check if mount point is in use
+is_mount_in_use() {
+    local mount_point="$1"
+    if lsof "$mount_point" >/dev/null 2>&1; then
+        return 0  # mount point is in use
+    else
+        return 1  # mount point is not in use
+    fi
+}
+
 # Check execution context
-if [ -z "$PVE_PHASE" ]; then
+if [ -z "$PVE_PHASE" ] && [ -z "$SYSTEMD_SHUTDOWN" ]; then
     if [ "$1" != "--dry-run" ]; then
         CURRENT_OP="VALIDATION"
-        log_message "Error: This script is intended to run as a ProxMox VE shutdown hook"
+        log_message "Error: This script is intended to run as a shutdown hook"
         log_message "For testing, use: $0 --dry-run"
         exit 1
     fi
-elif [ "$PVE_PHASE" != "pre-shutdown" ]; then
+elif [ -n "$PVE_PHASE" ] && [ "$PVE_PHASE" != "pre-shutdown" ]; then
     exit 0
 fi
 
-# If it's a dry run, simulate PVE_PHASE
+# Error handling - this will catch any failures and log them before exiting
+trap 'CURRENT_OP="COMPLETION"; log_message "FAILURE" "Shutdown sequence failed - check logs for details"; exit 1' ERR
+
+# If it's a dry run, simulate shutdown phase
 if [ $DRY_RUN -eq 1 ]; then
     log_message "Running in dry-run mode - no actions will be taken"
 fi
@@ -232,6 +260,3 @@ else
     log_message "SUCCESS" "Safe shutdown sequence completed successfully"
 fi
 exit 0
-
-# Error handling - this will catch any failures and log them before exiting
-trap 'CURRENT_OP="COMPLETION"; log_message "FAILURE" "Shutdown sequence failed - check logs for details"; exit 1' ERR
