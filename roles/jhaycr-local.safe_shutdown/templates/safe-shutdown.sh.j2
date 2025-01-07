@@ -7,10 +7,16 @@ set -e
 LOG_DIR="/var/log/safe-shutdown"
 LOG_FILE="${LOG_DIR}/shutdown.log"
 
-# Check for dry-run mode first
+# Track start time
+START_TIME=$(date +%s)
+
+# Check for run mode first
 DRY_RUN=0
+MANUAL_MODE=0
 if [ "$1" = "--dry-run" ]; then
     DRY_RUN=1
+elif [ "$1" = "--manual" ]; then
+    MANUAL_MODE=1
 fi
 
 # Generate unique run ID
@@ -26,40 +32,34 @@ get_shutdown_trigger() {
         # First determine the primary trigger source
         if [ $DRY_RUN -eq 1 ]; then
             trigger="dryrun"
-        elif [ -f "/usr/bin/pveversion" ] && [ -n "$PVE_PHASE" ]; then
-            trigger="proxmox"
-            if [ -n "$PVE_SHUTDOWN_TRIGGER" ]; then
-                trigger="${trigger}_${PVE_SHUTDOWN_TRIGGER}"
-            fi
+        elif [ $MANUAL_MODE -eq 1 ]; then
+            trigger="manual"
         elif [ -n "$SYSTEMD_SHUTDOWN" ]; then
             trigger="systemd"
-        fi
-
-        # For non-dry-run cases, try to determine shutdown type
-        if [ $DRY_RUN -eq 0 ]; then
-            local shutdown_type=""
-            # Check current command
+            # Check if we can determine more specific systemd trigger
+            if systemctl list-jobs | grep -q 'reboot.target'; then
+                trigger="${trigger}_reboot"
+            elif systemctl list-jobs | grep -q 'halt.target\|poweroff.target'; then
+                trigger="${trigger}_shutdown"
+            fi
+        else
+            # Try to determine from system state
             last_cmd=$(ps -eo cmd | grep -E "shutdown|reboot|poweroff|halt" | grep -v grep || true)
             if [[ "$last_cmd" == *"-r"* ]] || [[ "$last_cmd" == *"reboot"* ]]; then
-                shutdown_type="restart"
+                trigger="system_restart"
             elif [[ "$last_cmd" == *"-h"* ]] || [[ "$last_cmd" == *"poweroff"* ]] || [[ "$last_cmd" == *"halt"* ]]; then
-                shutdown_type="shutdown"
+                trigger="system_shutdown"
             fi
+        fi
 
-            # If not found in command, check journal
-            if [ -z "$shutdown_type" ]; then
-                if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated restart"; then
-                    shutdown_type="restart"
-                elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated shutdown"; then
-                    shutdown_type="shutdown"
-                elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "Power button pressed"; then
-                    shutdown_type="power_button"
-                fi
-            fi
-
-            # Append shutdown type if found
-            if [ -n "$shutdown_type" ]; then
-                trigger="${trigger}_${shutdown_type}"
+        # Check journal for additional context if we still don't know
+        if [ "$trigger" = "unknown" ]; then
+            if journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated restart"; then
+                trigger="system_restart"
+            elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "System initiated shutdown"; then
+                trigger="system_shutdown"
+            elif journalctl -n 50 --no-pager 2>/dev/null | grep -qi "Power button pressed"; then
+                trigger="power_button"
             fi
         fi
     } || true
@@ -80,14 +80,20 @@ log_message() {
     else
         message="$message] $1"  # Normal operation logging
     fi
+
+    # Echo to console
     echo "$message"
-    logger -t "safe-shutdown" "$message"
+
+    # Try writing to journal
+    logger -t "safe-shutdown" "$message" || true
+    
+    # Try writing to our log file if possible
     if [ ! -d "$LOG_DIR" ]; then
-        mkdir -p "$LOG_DIR"
-        chown root:root "$LOG_DIR"
-        chmod 755 "$LOG_DIR"
+        mkdir -p "$LOG_DIR" 2>/dev/null || true
+        chown root:root "$LOG_DIR" 2>/dev/null || true
+        chmod 755 "$LOG_DIR" 2>/dev/null || true
     fi
-    echo "$message" >> "$LOG_FILE"
+    echo "$message" >> "$LOG_FILE" 2>/dev/null || true
 }
 
 # Function to check if mount point is in use
@@ -101,23 +107,31 @@ is_mount_in_use() {
 }
 
 # Check execution context
-if [ -z "$PVE_PHASE" ] && [ -z "$SYSTEMD_SHUTDOWN" ]; then
-    if [ "$1" != "--dry-run" ]; then
+if [ -z "$SYSTEMD_SHUTDOWN" ]; then
+    if [ "$1" != "--dry-run" ] && [ "$1" != "--manual" ]; then
         CURRENT_OP="VALIDATION"
         log_message "Error: This script is intended to run as a shutdown hook"
         log_message "For testing, use: $0 --dry-run"
+        log_message "For manual execution, use: $0 --manual"
         exit 1
     fi
-elif [ -n "$PVE_PHASE" ] && [ "$PVE_PHASE" != "pre-shutdown" ]; then
-    exit 0
 fi
 
 # Error handling - this will catch any failures and log them before exiting
 trap 'CURRENT_OP="COMPLETION"; log_message "FAILURE" "Shutdown sequence failed - check logs for details"; exit 1' ERR
 
-# If it's a dry run, simulate shutdown phase
+# If it's a special mode, indicate it
 if [ $DRY_RUN -eq 1 ]; then
     log_message "Running in dry-run mode - no actions will be taken"
+elif [ $MANUAL_MODE -eq 1 ]; then
+    log_message "Running in manual mode - actions will be performed"
+    read -p "Are you sure you want to proceed with shutdown operations? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_message "Manual operation cancelled by user"
+        exit 1
+    fi
+    log_message "Manual operation confirmed by user"
 fi
 
 # Initialize shutdown sequence
@@ -254,9 +268,18 @@ for volume in $LUKS_VOLUMES; do
 done
 
 CURRENT_OP="COMPLETION"
+# Calculate elapsed time
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+ELAPSED_MIN=$((ELAPSED / 60))
+ELAPSED_SEC=$((ELAPSED % 60))
+ELAPSED_STR="${ELAPSED_MIN}m${ELAPSED_SEC}s"
+
 if [ $DRY_RUN -eq 1 ]; then
-    log_message "SUCCESS" "Dry run completed successfully"
+    log_message "SUCCESS" "Dry run completed successfully (took ${ELAPSED_STR})"
+elif [ $MANUAL_MODE -eq 1 ]; then
+    log_message "SUCCESS" "Manual shutdown sequence completed successfully (took ${ELAPSED_STR})"
 else
-    log_message "SUCCESS" "Safe shutdown sequence completed successfully"
+    log_message "SUCCESS" "Safe shutdown sequence completed successfully (took ${ELAPSED_STR})"
 fi
 exit 0

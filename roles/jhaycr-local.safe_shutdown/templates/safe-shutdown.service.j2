@@ -3,7 +3,7 @@ Description=Safe System Shutdown Handler
 DefaultDependencies=no
 Before=shutdown.target reboot.target halt.target
 Before=umount.target
-After=docker.service
+After=network.target docker.service
 
 [Service]
 Type=oneshot

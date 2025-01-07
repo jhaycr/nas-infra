@@ -1,15 +1,14 @@
 # roles/safe_shutdown/tasks/main.yml
 ---
-- name: Detect system type
-  ansible.builtin.command: "pveversion"
-  register: pve_check
-  failed_when: false
+- name: Detect init system
+  ansible.builtin.command: ps --no-headers -o comm 1
+  register: init_system
   changed_when: false
   become: true
 
-- name: Set system type fact
+- name: Set init system fact
   ansible.builtin.set_fact:
-    is_proxmox: "{{ pve_check.rc == 0 }}"
+    is_systemd: "{{ init_system.stdout == 'systemd' }}"
 
 - name: Ensure required directories exist
   ansible.builtin.file:
@@ -33,39 +32,8 @@
   become: true
   register: script_copy
 
-- name: Configure ProxMox integration
-  when: is_proxmox
-  block:
-    - name: Get hook-script.conf stats if it exists
-      ansible.builtin.stat:
-        path: /etc/pve/hook-script.conf
-      register: hook_script_conf
-      become: true
-
-    - name: Create hook-script.conf if it doesn't exist
-      ansible.builtin.file:
-        path: /etc/pve/hook-script.conf
-        state: touch
-        mode: '0640'
-        owner: root
-        group: www-data
-        modification_time: preserve
-        access_time: preserve
-      become: true
-      when: not hook_script_conf.stat.exists
-
-    - name: Add shutdown hook to PVE configuration
-      ansible.builtin.lineinfile:
-        path: /etc/pve/hook-script.conf
-        regexp: '^pre-shutdown:'
-        line: 'pre-shutdown: /usr/local/sbin/safe-shutdown.sh'
-        owner: root
-        group: www-data
-        mode: '0640'
-      become: true
-
 - name: Configure systemd integration
-  when: not is_proxmox
+  when: is_systemd
   block:
     - name: Install systemd service
       ansible.builtin.template:
