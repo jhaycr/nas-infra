@@ -39,7 +39,7 @@
 - name: Extend and template compose override
   ansible.builtin.template:
     src: "{{ playbook_dir }}/{{ docker_dir }}/{{ inventory_group_name }}/docker-compose.override.yml.j2"
-    dest: "{{ docker_home_compose_path }}/docker-compose.override.yml"
+    dest: "{{ docker_compose_path }}/docker-compose.override.yml"
     mode: "0644"
   vars:
     services: "{{ services }}"

@@ -21,7 +21,7 @@
         msg: |
           Found compose files:
           {% for item in (docker_compose_files | unique) %}
-          {{ item.src }} -> {{ docker_home_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
+          {{ item.src }} -> {{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
           {% endfor %}
       when: docker_compose_debug_print | bool
 
@@ -49,7 +49,7 @@
 
     - name: Ensure base docker compose directory exists
       ansible.builtin.file:
-        path: "{{ docker_home_compose_path }}"
+        path: "{{ docker_compose_path }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
@@ -57,7 +57,7 @@
 
     - name: Ensure application-specific directories exist
       ansible.builtin.file:
-        path: "{{ docker_home_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | dirname }}"
+        path: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | dirname }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
@@ -69,7 +69,7 @@
     - name: Template compose files
       ansible.builtin.template:
         src: "{{ item.src }}"
-        dest: "{{ docker_home_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
+        dest: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
         force: yes
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
