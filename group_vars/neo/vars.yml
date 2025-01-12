@@ -6,6 +6,7 @@ ntp_timezone: America/Los_Angeles
 docker_compose_debug_print: true
 docker_compose_debug_halt: false
 
+nas_download_path: '/mnt/cache1/downloads'
 docker_storage_path: '/mnt/storage'
 docker_home_compose_path: '/opt/docker'
 docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'

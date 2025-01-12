@@ -8,7 +8,7 @@ services:
     DOCKER_MODS: linuxserver/mods:universal-calibre|linuxserver/mods:lazylibrarian-ffmpeg #optional
   volumes:
     - {{ docker_home_appdata_path }}/lazylibrarian:/config
-    - {{ docker_storage_path }}/downloads:/downloads
+    - {{ nas_download_path }}:/downloads
     - {{ docker_storage_path}}/storage/Books/Calibre:/books
   ports:
     - 5299:5299
