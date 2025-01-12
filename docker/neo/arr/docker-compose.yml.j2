@@ -46,7 +46,9 @@ services:
       - "7878:7878"
     volumes:
       - {{ docker_appdata_path }}/radarr:/config
-      - {{ nas_download_path }}:/downloads
+      - {{ nas_download_path }}/usenet:/data/usenet
+      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_storage_path }}/media/Movies:/data/media/movies
       - {{ nas_storage_path }}/media/Movies:/storage/movies
       - {{ nas_storage_path }}/media/Movies:/storage/media/Movies
 
@@ -60,6 +62,8 @@ services:
       - "8989:8989"
     volumes:
       - {{ docker_appdata_path }}/sonarr:/config
-      - {{ nas_download_path }}:/downloads
+      - {{ nas_download_path }}/usenet:/data/usenet
+      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_storage_path }}/media/TV:/data/media/tv
       - {{ nas_storage_path }}/media/TV:/storage/tv
       - {{ nas_storage_path }}/media/TV:/storage/media/TV

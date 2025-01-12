@@ -6,7 +6,7 @@ services:
   container_name: pyload-ng
   volumes:
     - {{ docker_appdata_path }}/pyload-ng:/config
-    - {{ nas_download_path }}:/downloads
+    - {{ nas_download_path }}/pyload:/downloads
   ports:
     - 8000:8000
     - 9666:9666 #optional

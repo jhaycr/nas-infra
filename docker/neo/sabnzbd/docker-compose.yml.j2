@@ -11,4 +11,4 @@ services:
     - "8080:8080"
   volumes:
     - {{ docker_appdata_path }}/sabnzbd:/config
-    - {{ nas_download_path }}:/downloads
+    - {{ nas_download_path }}/usenet:/data/usenet
