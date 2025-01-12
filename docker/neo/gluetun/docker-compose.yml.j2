@@ -12,7 +12,7 @@ services:
     devices:
       - /dev/net/tun
     volumes:
-      - {{ docker_home_appdata_path }}/gluetun:/gluetun
+      - {{ docker_appdata_path }}/gluetun:/gluetun
     networks:
     - vpn_gluetun
     ports:

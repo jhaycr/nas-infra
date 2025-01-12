@@ -8,8 +8,8 @@ services:
     user: 1000:1000
     network_mode: 'host'
     volumes:
-      - {{ docker_home_appdata_path }}/jellyfin/config:/config
-      - {{ docker_home_appdata_path }}/jellyfin/cache:/cache
+      - {{ docker_appdata_path }}/jellyfin/config:/config
+      - {{ docker_appdata_path }}/jellyfin/cache:/cache
       - {{ nas_storage_path }}/media:/media:ro
     restart: 'unless-stopped'
     # Optional - alternative address used for autodiscovery

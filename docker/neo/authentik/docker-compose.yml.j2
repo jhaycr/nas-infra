@@ -14,8 +14,8 @@ services:
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
       AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
     volumes:
-      - {{ docker_home_appdata_path }}/authentik/media:/media
-      - {{ docker_home_appdata_path }}/authentik/custom-templates:/templates
+      - {{ docker_appdata_path }}/authentik/media:/media
+      - {{ docker_appdata_path }}/authentik/custom-templates:/templates
     env_file:
       - .env
     networks:
@@ -86,9 +86,9 @@ services:
       - app_authentik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - {{ docker_home_appdata_path }}/authentik/media:/media
-      - {{ docker_home_appdata_path }}/authentik/certs:/certs
-      - {{ docker_home_appdata_path }}/authentik/custom-templates:/templates
+      - {{ docker_appdata_path }}/authentik/media:/media
+      - {{ docker_appdata_path }}/authentik/certs:/certs
+      - {{ docker_appdata_path }}/authentik/custom-templates:/templates
     env_file:
       - .env
     depends_on:

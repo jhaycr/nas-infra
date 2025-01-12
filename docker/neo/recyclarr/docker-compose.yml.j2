@@ -10,7 +10,7 @@ services:
     networks:
     - recyclarr
     volumes:
-      -  {{ docker_home_appdata_path }}/recyclarr:/config
+      -  {{ docker_appdata_path }}/recyclarr:/config
     environment:
       - TZ=America/Los_Angeles
     security_opt: ['no-new-privileges:true']

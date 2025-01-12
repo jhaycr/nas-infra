@@ -5,7 +5,7 @@ services:
   image: lscr.io/linuxserver/pyload-ng:latest
   container_name: pyload-ng
   volumes:
-    - {{ docker_home_appdata_path }}/pyload-ng:/config
+    - {{ docker_appdata_path }}/pyload-ng:/config
     - {{ nas_download_path }}:/downloads
   ports:
     - 8000:8000

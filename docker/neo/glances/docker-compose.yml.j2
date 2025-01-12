@@ -11,7 +11,7 @@ services:
   volumes:
     - "/var/run/docker.sock:/var/run/docker.sock:ro"
     - "/run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock:ro"
-    - {{ docker_home_appdata_path }}/glances:/glances/conf
+    - {{ docker_appdata_path }}/glances:/glances/conf
   environment:
     - TZ=${TZ}
     - "GLANCES_OPT=-C /glances/conf/glances.conf -w"

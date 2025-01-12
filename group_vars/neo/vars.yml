@@ -9,7 +9,7 @@ docker_compose_debug_halt: false
 nas_download_path: '/mnt/cache1/downloads'
 nas_storage_path: '/mnt/storage'
 docker_home_compose_path: '/opt/docker'
-docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
+docker_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
 docker_appdata_folders_to_own:
 - backrest
 - fail2ban
@@ -52,7 +52,7 @@ autorestic_config_yaml:
   locations:
     docker_appdata:
       from:
-        - "{{ docker_home_appdata_path}}"
+        - "{{ docker_appdata_path}}"
       to:
       #  - nas_storage
         - b2_docker

@@ -13,7 +13,7 @@ services:
     ports:
       - 5198:80
     volumes:
-      - {{ docker_home_appdata_path }}/gaseous-server:/root/.gaseous-server
+      - {{ docker_appdata_path }}/gaseous-server:/root/.gaseous-server
       - {{ nas_storage_path }}/storage/Games/Emulation/Roms/General:/roms:ro
     environment:
       - TZ=America/Los_Angeles
