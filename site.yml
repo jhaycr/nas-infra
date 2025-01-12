@@ -33,8 +33,25 @@
 
   tasks:
     - name: Ensure that downloads directory exists
+      become: yes
       ansible.builtin.file:
         path: "{{ nas_download_path }}"
+        owner: "{{ main_username }}"
+        group: "{{ main_username }}"
+        state: directory
+
+    - name: Ensure that downloads directory exists
+      become: yes
+      ansible.builtin.file:
+        path: "{{ nas_download_path }}/usenet/completed"
+        owner: "{{ main_username }}"
+        group: "{{ main_username }}"
+        state: directory
+
+    - name: Ensure that downloads directory exists
+      become: yes
+      ansible.builtin.file:
+        path: "{{ nas_download_path }}/usenet/incomplete-downloads"
         owner: "{{ main_username }}"
         group: "{{ main_username }}"
         state: directory

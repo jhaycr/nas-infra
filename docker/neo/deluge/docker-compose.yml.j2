@@ -16,4 +16,4 @@ services:
   volumes:
     - {{ docker_appdata_path }}/deluge:/config
     - {{ nas_storage_path }}/media/Anime:/anime
-    - {{ nas_download_path }}:/download
+    - {{ nas_download_path }}/torrents:/download
