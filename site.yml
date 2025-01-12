@@ -32,20 +32,12 @@
       become: yes
 
   tasks:
-    - name: create home downloads directory
+    - name: Ensure that downloads directory exists
       ansible.builtin.file:
-        path: "/home/{{ main_username }}/downloads"
+        path: "{{ nas_download_path }}"
         owner: "{{ main_username }}"
         group: "{{ main_username }}"
         state: directory
-
-    - name: create symbolic link to downloads
-      ansible.builtin.file:
-        src: "/home/{{ main_username }}/downloads"
-        dest: "/mnt/storage/downloads"
-        owner: "{{ main_username }}"
-        group: "{{ main_username }}"
-        state: link
       
 - hosts: morpheus
   roles:

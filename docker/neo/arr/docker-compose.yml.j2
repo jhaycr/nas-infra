@@ -19,7 +19,7 @@ services:
       # RUN_OPTS= #optional
     volumes:
       - {{ docker_home_appdata_path }}/jackett:/config
-      - {{ docker_storage_path }}/downloads:/downloads
+      - {{ nas_download_path }}:/downloads
     networks:
       - default
     ports:
@@ -46,7 +46,7 @@ services:
       - "7878:7878"
     volumes:
       - {{ docker_home_appdata_path }}/radarr:/config
-      - {{ docker_storage_path }}/downloads:/downloads
+      - {{ nas_download_path }}:/downloads
       - {{ docker_storage_path }}/media/Movies:/storage/movies
       - {{ docker_storage_path }}/media/Movies:/storage/media/Movies
 
@@ -60,6 +60,6 @@ services:
       - "8989:8989"
     volumes:
       - {{ docker_home_appdata_path }}/sonarr:/config
-      - {{ docker_storage_path }}/downloads:/downloads
+      - {{ nas_download_path }}:/downloads
       - {{ docker_storage_path }}/media/TV:/storage/tv
       - {{ docker_storage_path }}/media/TV:/storage/media/TV
