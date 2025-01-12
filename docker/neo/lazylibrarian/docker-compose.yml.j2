@@ -9,7 +9,7 @@ services:
   volumes:
     - {{ docker_home_appdata_path }}/lazylibrarian:/config
     - {{ nas_download_path }}:/downloads
-    - {{ docker_storage_path}}/storage/Books/Calibre:/books
+    - {{ nas_storage_path}}/storage/Books/Calibre:/books
   ports:
     - 5299:5299
   restart: unless-stopped

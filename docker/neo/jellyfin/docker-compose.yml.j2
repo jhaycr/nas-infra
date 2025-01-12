@@ -10,7 +10,7 @@ services:
     volumes:
       - {{ docker_home_appdata_path }}/jellyfin/config:/config
       - {{ docker_home_appdata_path }}/jellyfin/cache:/cache
-      - {{ docker_storage_path }}/media:/media:ro
+      - {{ nas_storage_path }}/media:/media:ro
     restart: 'unless-stopped'
     # Optional - alternative address used for autodiscovery
     environment:

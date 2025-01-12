@@ -47,8 +47,8 @@ services:
     volumes:
       - {{ docker_home_appdata_path }}/radarr:/config
       - {{ nas_download_path }}:/downloads
-      - {{ docker_storage_path }}/media/Movies:/storage/movies
-      - {{ docker_storage_path }}/media/Movies:/storage/media/Movies
+      - {{ nas_storage_path }}/media/Movies:/storage/movies
+      - {{ nas_storage_path }}/media/Movies:/storage/media/Movies
 
   sonarr:
     container_name: sonarr
@@ -61,5 +61,5 @@ services:
     volumes:
       - {{ docker_home_appdata_path }}/sonarr:/config
       - {{ nas_download_path }}:/downloads
-      - {{ docker_storage_path }}/media/TV:/storage/tv
-      - {{ docker_storage_path }}/media/TV:/storage/media/TV
+      - {{ nas_storage_path }}/media/TV:/storage/tv
+      - {{ nas_storage_path }}/media/TV:/storage/media/TV

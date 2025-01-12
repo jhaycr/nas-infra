@@ -17,7 +17,7 @@ x-common-env: &common-env
 
 x-common-volumes:
   - &localtime /etc/localtime:/etc/localtime:ro
-  - &storage {{ docker_storage_path }}:/storage
+  - &storage {{ nas_storage_path }}:/storage
   
 # networks:
 #  ta-network:
@@ -29,7 +29,7 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device:  {{ docker_storage_path }}/media/TV/Youtube
+      device:  {{ nas_storage_path }}/media/TV/Youtube
   tubearchivist-cache:
   tubearchivist-es:
   tubearchivist-redis:
