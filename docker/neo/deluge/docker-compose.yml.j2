@@ -15,5 +15,5 @@ services:
     - "58946:58946"
   volumes:
     - {{ docker_home_appdata_path }}/deluge:/config
-    - {{ docker_storage_path }}/media/Anime:/anime
+    - {{ nas_storage_path }}/media/Anime:/anime
     - {{ nas_download_path }}:/download

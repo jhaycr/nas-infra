@@ -7,7 +7,7 @@ docker_compose_debug_print: true
 docker_compose_debug_halt: false
 
 nas_download_path: '/mnt/cache1/downloads'
-docker_storage_path: '/mnt/storage'
+nas_storage_path: '/mnt/storage'
 docker_home_compose_path: '/opt/docker'
 docker_home_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
 docker_appdata_folders_to_own:
@@ -36,7 +36,7 @@ autorestic_config_yaml:
   backends:
     nas_storage:
       type: local
-      path: "{{ docker_storage_path }}/backups-restic"
+      path: "{{ nas_storage_path }}/backups-restic"
       requireKey: true
       key: "{{ secret_restic_backend_keys | selectattr('name', 'equalto', 'nas_storage') | map(attribute='key') | first }}"
       options:
