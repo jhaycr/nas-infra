@@ -7,7 +7,7 @@ services:
   ports:
     - "8090:8090"
   volumes:
-    - {{ docker_home_appdata_path }}/mylar3:/config
+    - {{ docker_appdata_path }}/mylar3:/config
     - {{ nas_download_path }}:/downloads
     - {{ nas_download_path }}:/storage/downloads
     - {{ nas_storage_path }}/comics:/storage/comics/

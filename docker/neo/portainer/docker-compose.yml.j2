@@ -9,4 +9,4 @@ services:
     - "9000:9000"
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - {{ docker_home_appdata_path }}/portainer:/data
+    - {{ docker_appdata_path }}/portainer:/data

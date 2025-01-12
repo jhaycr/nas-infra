@@ -1,7 +1,7 @@
 ---
 # Base paths for Docker files and data (overridable by group_vars)
 docker_home_compose_path: '/opt/docker'
-docker_appdata_path: "{{ docker_home_appdata_path }}"
+docker_appdata_path: "{{ docker_appdata_path }}"
 
 # Directory structure
 docker_dir: "docker"

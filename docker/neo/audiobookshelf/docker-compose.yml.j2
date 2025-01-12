@@ -11,5 +11,5 @@ services:
   volumes:
     - {{ nas_storage_path }}/media/audio/audiobooks:/audiobooks
     - {{ nas_storage_path }}/media/audio/podcasts:/podcasts
-    - {{ docker_home_appdata_path }}/audiobookshelf:/config
+    - {{ docker_appdata_path }}/audiobookshelf:/config
     - {{ nas_storage_path }}/media/audio/:/metadata1

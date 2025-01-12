@@ -8,6 +8,6 @@ services:
   environment:
     DOMAIN: "https://vw.lab.{{ secret_domain }}"
   volumes:
-    - {{ docker_home_appdata_path }}/vaultwarden/:/data/
+    - {{ docker_appdata_path }}/vaultwarden/:/data/
   ports:
     - 8087:80

@@ -10,5 +10,5 @@ services:
   ports:
     - "8080:8080"
   volumes:
-    - {{ docker_home_appdata_path }}/sabnzbd:/config
+    - {{ docker_appdata_path }}/sabnzbd:/config
     - {{ nas_download_path }}:/downloads

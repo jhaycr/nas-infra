@@ -9,7 +9,7 @@ services:
   ports:
     - "8083:8083"
   volumes:
-    - {{ docker_home_appdata_path }}/calibreweb:/config
+    - {{ docker_appdata_path }}/calibreweb:/config
     - {{ nas_storage_path}}/storage/Books/Calibre:/books
   # https://www.reddit.com/r/selfhosted/comments/ys6n76/authentik_ldap_in_calibreweb/
   # https://www.davidbuhlman.com/calibre-web-integration-with-authentik/

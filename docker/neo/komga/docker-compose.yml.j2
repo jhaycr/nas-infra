@@ -11,6 +11,6 @@ services:
   ports:
     - "25600:25600"
   volumes:
-    - {{ docker_home_appdata_path }}/komga:/config
+    - {{ docker_appdata_path }}/komga:/config
     - {{ nas_storage_path }}/comics:/data
     - {{ nas_storage_path }}/storage/Books:/books

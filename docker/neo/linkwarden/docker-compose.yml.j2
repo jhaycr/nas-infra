@@ -6,7 +6,7 @@ services:
     env_file: .env
     restart: always
     volumes:
-      - {{ docker_home_appdata_path }}/linkwarden/pgdata:/var/lib/postgresql/data
+      - {{ docker_appdata_path }}/linkwarden/pgdata:/var/lib/postgresql/data
 
   linkwarden:
     env_file: .env
@@ -18,6 +18,6 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - {{ docker_home_appdata_path }}/linkwarden/data:/data/data
+      - {{ docker_appdata_path }}/linkwarden/data:/data/data
     depends_on:
       - linkwarden-postgres

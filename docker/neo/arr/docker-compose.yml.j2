@@ -9,7 +9,7 @@ services:
     ports:
       - "6767:6767"
     volumes:
-      - {{ docker_home_appdata_path }}/bazarr:/config
+      - {{ docker_appdata_path }}/bazarr:/config
 
   jackett:
     image: lscr.io/linuxserver/jackett:latest
@@ -18,7 +18,7 @@ services:
       AUTO_UPDATE: true #optional
       # RUN_OPTS= #optional
     volumes:
-      - {{ docker_home_appdata_path }}/jackett:/config
+      - {{ docker_appdata_path }}/jackett:/config
       - {{ nas_download_path }}:/downloads
     networks:
       - default
@@ -34,7 +34,7 @@ services:
     ports:
       - "9696:9696"
     volumes:
-      - {{ docker_home_appdata_path }}/prowlarr:/config
+      - {{ docker_appdata_path }}/prowlarr:/config
 
   radarr:
     container_name: radarr
@@ -45,7 +45,7 @@ services:
     ports:
       - "7878:7878"
     volumes:
-      - {{ docker_home_appdata_path }}/radarr:/config
+      - {{ docker_appdata_path }}/radarr:/config
       - {{ nas_download_path }}:/downloads
       - {{ nas_storage_path }}/media/Movies:/storage/movies
       - {{ nas_storage_path }}/media/Movies:/storage/media/Movies
@@ -59,7 +59,7 @@ services:
     ports:
       - "8989:8989"
     volumes:
-      - {{ docker_home_appdata_path }}/sonarr:/config
+      - {{ docker_appdata_path }}/sonarr:/config
       - {{ nas_download_path }}:/downloads
       - {{ nas_storage_path }}/media/TV:/storage/tv
       - {{ nas_storage_path }}/media/TV:/storage/media/TV

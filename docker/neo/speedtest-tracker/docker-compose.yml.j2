@@ -12,7 +12,7 @@ services:
     PRUNE_RESULTS_OLDER_THAN: 14 #optional
     DISPLAY_TIMEZONE: America/Los_Angeles
   volumes:
-    - {{ docker_home_appdata_path }}/speedtest-tracker:/config
+    - {{ docker_appdata_path }}/speedtest-tracker:/config
   ports:
     - 8084:80
   restart: unless-stopped

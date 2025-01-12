@@ -13,8 +13,8 @@ services:
       default:
       vpn_gluetun:
     volumes:
-      - {{ docker_home_appdata_path }}/npm-internal/data:/data
-      - {{ docker_home_appdata_path }}/npm-internal/letsencrypt:/etc/letsencrypt
+      - {{ docker_appdata_path }}/npm-internal/data:/data
+      - {{ docker_appdata_path }}/npm-internal/letsencrypt:/etc/letsencrypt
     # 1) Add A record in domain registrar mapping internal subdomain (e.g. 'internal.example.com') to internal proxy' IP (e.g. 192.168.1.54)
     # 2) Add wildcard record in DNS Resolver for same
     #    https://docs.netgate.com/pfsense/en/latest/services/dns/wildcards.html#dns-resolver-unbound
@@ -40,8 +40,8 @@ services:
     #   http://overseerr:5055
 
     volumes:
-      - {{ docker_home_appdata_path }}/npm/data:/data
-      - {{ docker_home_appdata_path }}/npm/letsencrypt:/etc/letsencrypt
+      - {{ docker_appdata_path }}/npm/data:/data
+      - {{ docker_appdata_path }}/npm/letsencrypt:/etc/letsencrypt
 
   fail2ban:
     # See: https://blog.lrvt.de/fail2ban-with-nginx-proxy-manager/
@@ -57,5 +57,5 @@ services:
     network_mode: host
     restart: unless-stopped
     volumes:
-      - {{ docker_home_appdata_path }}/fail2ban:/data
-      - {{ docker_home_appdata_path }}/npm/data/logs:/var/log/npm:ro
+      - {{ docker_appdata_path }}/fail2ban:/data
+      - {{ docker_appdata_path }}/npm/data/logs:/var/log/npm:ro

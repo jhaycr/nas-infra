@@ -5,10 +5,10 @@ services:
   image: garethgeorge/backrest:latest
   container_name: backrest
   volumes:
-    - {{ docker_home_appdata_path }}/backrest/data:/data
-    - {{ docker_home_appdata_path }}/backrest/config:/config
-    - {{ docker_home_appdata_path }}/backrest/cache:/cache
-    - {{ docker_home_appdata_path }}:/userdata # [optional] mount local paths to backup here.
+    - {{ docker_appdata_path }}/backrest/data:/data
+    - {{ docker_appdata_path }}/backrest/config:/config
+    - {{ docker_appdata_path }}/backrest/cache:/cache
+    - {{ docker_appdata_path }}:/userdata # [optional] mount local paths to backup here.
     - {{ backup_path_local }}:/repos
     #- {{ nas_storage_path }}/backups:/repos # [optional] mount repos if using local storage, not necessary for remotes e.g. B2, S3, etc.
   environment:

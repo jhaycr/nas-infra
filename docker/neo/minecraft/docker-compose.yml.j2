@@ -38,7 +38,7 @@ services:
       - "25565:25565"
       - "19132:19132/udp"
     volumes:
-      - {{ docker_home_appdata_path }}/minecraft-1:/data
+      - {{ docker_appdata_path }}/minecraft-1:/data
     stdin_open: true
     tty: true
     restart: unless-stopped
