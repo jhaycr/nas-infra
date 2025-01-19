@@ -52,6 +52,20 @@ services:
       - {{ nas_storage_path }}/media/Movies:/storage/movies
       - {{ nas_storage_path }}/media/Movies:/storage/media/Movies
 
+  radarr-anime:
+    container_name: radarr-anime
+    image: lscr.io/linuxserver/radarr:latest
+    networks:
+      - default
+      - notifiarr
+    ports:
+      - "8878:7878"
+    volumes:
+      - {{ docker_appdata_path }}/radarr-anime:/config
+      - {{ nas_download_path }}/usenet:/data/usenet
+      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_storage_path }}/media/Anime/Movies:/data/media/movies/anime
+
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
@@ -67,3 +81,17 @@ services:
       - {{ nas_storage_path }}/media/TV:/data/media/tv
       - {{ nas_storage_path }}/media/TV:/storage/tv
       - {{ nas_storage_path }}/media/TV:/storage/media/TV
+
+  sonarr-anime:
+    container_name: sonarr-anime
+    image: lscr.io/linuxserver/sonarr:latest
+    networks:
+      - default
+      - notifiarr
+    ports:
+      - "9989:8989"
+    volumes:
+      - {{ docker_appdata_path }}/sonarr-anime:/config
+      - {{ nas_download_path }}/usenet:/data/usenet
+      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_storage_path }}/media/Anime/Series:/data/media/tv/anime
