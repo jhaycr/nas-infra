@@ -26,7 +26,7 @@ vault-unlock:
 neo:
 	ansible-playbook site.yml --limit neo $(EXTRA_VARS:%=-e '%')
 
-neo-compose:
+neo-docker:
 	ansible-playbook site.yml --limit neo --tags compose $(EXTRA_VARS:%=-e '%')
 
 neo-disks:
