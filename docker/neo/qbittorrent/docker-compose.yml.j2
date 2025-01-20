@@ -5,12 +5,19 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=8113
       - TORRENTING_PORT=6881
     volumes:
       - {{ docker_appdata_path }}/qbittorrent:/config
+      - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_download_path }}/torrents:/downloads
-    ports:
-      - 8112:8080
-      - 6881:6881
-      - 6881:6881/udp
+    # networks:
+    #  - default
+    #  - notifiarr
+    #ports:
+    #  - 8113:8113
+    #  - 6881:6881
+    #  - 6881:6881/udp
+    network_mode: container:gluetun
+    depends_on:
+      - gluetun
