@@ -47,7 +47,7 @@ services:
     volumes:
       - {{ docker_appdata_path }}/radarr:/config
       - {{ nas_download_path }}/usenet:/data/usenet
-      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/Movies:/data/media/movies
       - {{ nas_storage_path }}/media/Movies:/storage/movies
       - {{ nas_storage_path }}/media/Movies:/storage/media/Movies
@@ -63,7 +63,7 @@ services:
     volumes:
       - {{ docker_appdata_path }}/radarr-anime:/config
       - {{ nas_download_path }}/usenet:/data/usenet
-      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/Anime/Movies:/data/media/movies/anime
 
   sonarr:
@@ -77,7 +77,7 @@ services:
     volumes:
       - {{ docker_appdata_path }}/sonarr:/config
       - {{ nas_download_path }}/usenet:/data/usenet
-      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/TV:/data/media/tv
       - {{ nas_storage_path }}/media/TV:/storage/tv
       - {{ nas_storage_path }}/media/TV:/storage/media/TV
@@ -93,5 +93,5 @@ services:
     volumes:
       - {{ docker_appdata_path }}/sonarr-anime:/config
       - {{ nas_download_path }}/usenet:/data/usenet
-      - {{ nas_download_path }}/torrents:/data/torrent
+      - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/Anime/Series:/data/media/tv/anime
