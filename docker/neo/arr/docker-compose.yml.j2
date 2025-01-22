@@ -41,7 +41,6 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     networks:
       - default
-      - notifiarr
     ports:
       - "7878:7878"
     volumes:
@@ -57,7 +56,6 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     networks:
       - default
-      - notifiarr
     ports:
       - "8878:7878"
     volumes:
@@ -71,7 +69,6 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     networks:
       - default
-      - notifiarr
     ports:
       - "8989:8989"
     volumes:
@@ -87,7 +84,6 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     networks:
       - default
-      - notifiarr
     ports:
       - "9989:8989"
     volumes:
