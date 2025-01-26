@@ -3,11 +3,25 @@
 radarr:
 
   radarr:
-    base_url: http://192.168.1.3:7878
-    api_key: {{ secret_arr_api_key_radarr_anime }}
+    base_url: "http://{{ internal_ip_neo }}:7878"
+    api_key: {{ secret_arr_api_key_radarr }}
+
+    quality_profiles:
+      - name: SQP-1 WEB (1080p)
+      # Uncomment the below line if you don't have access to top-tier indexers
+      min_format_score: 10
+
+    include:
+      # Comment out any of the following includes to disable them
+      - template: radarr-quality-definition-sqp-streaming
+      - template: radarr-quality-profile-sqp-1-web-1080p
+      - template: radarr-custom-formats-sqp-1-web-1080p
+
+    # Custom Formats: https://recyclarr.dev/wiki/yaml/config-reference/custom-formats/
+
 
   anime-radarr:
-    base_url: http://192.168.1.3:8878
+    base_url: "http://{{ internal_ip_neo }}:8878"
     api_key: {{ secret_arr_api_key_radarr_anime }}
 
     include:
@@ -128,7 +142,7 @@ radarr:
 sonarr:
 
   anime-sonarr-v4:
-    base_url: http://192.168.1.3:9989
+    base_url: "http://{{ internal_ip_neo }}:9989"
     api_key: {{ secret_arr_api_key_sonarr_anime }}
 
     include:

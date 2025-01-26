@@ -4,7 +4,7 @@ services:
  portainer:
   container_name: portainer
   image: portainer/portainer-ce:latest
-  command: -H tcp://192.168.1.2:9001 --tlsskipverify
+  command: -H tcp://{{ ip_internal_morpheus }}:9001 --tlsskipverify
   ports:
     - "9000:9000"
   volumes:
