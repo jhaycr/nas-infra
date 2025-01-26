@@ -10,3 +10,5 @@ services:
     - {{ docker_appdata_path }}/filebot:/config
     - /mnt/filebot/output:/output
     - /mnt/filebot/watch:/watch
+    # - {{ nas_storage_path }}/media/Anime/Series:/data/media/tv/anime
+    - {{ nas_storage_path }}/media/Anime/General:/data/media/tv/anime
