@@ -8,61 +8,61 @@
 - Services:
     - AudioBookshelf:
         icon: audiobookshelf.png
-        href: http://192.168.1.3:13378
+        href: "http://{{ internal_ip_neo }}:13378"
         description: Audiobook & Podcast Manager
         server: neo-docker
         container: audiobookshelf
         widget:
             type: audiobookshelf
-            url: http://192.168.1.3:13378
+            url: "http://{{ internal_ip_neo }}:13378"
             key: {{ secret_arr_api_key_audiobookshelf }}
 
     - CalibreWeb:
         icon: calibre-web.png
-        href: http://192.168.1.3:8083
+        href: "http://{{ internal_ip_neo }}:8083"
         description: Book Manager
         server: neo-docker
         container: calibreweb
 
     - Komga:
         icon: komga.svg
-        href: http://192.168.1.3:25600
+        href: "http://{{ internal_ip_neo }}:25600"
         description: Comics Viewer
         server: neo-docker
         container: komga
 
     - FreshRSS:
         icon: freshrss.png
-        href: http://192.168.1.3:8012
+        href: "http://{{ internal_ip_neo }}:8012"
         description: RSS Manager
         server: neo-docker
         container: freshrss
         widget:
             type: freshrss
-            url: http://192.168.1.3:8012
+            url: "http://{{ internal_ip_neo }}:8012"
             username: {{ secret_arr_user_freshrss }}
             password: {{ secret_arr_pass_freshrss }}
 
 - Streaming:
     - Plex:
         icon: plex.png
-        href: http://192.168.1.3:32400
+        href: "http://{{ internal_ip_neo }}:32400"
         description: Video Streaming
-        siteMonitor: http://192.168.1.3:32400
+        siteMonitor: "http://{{ internal_ip_neo }}:32400"
         #widget:
         #    type: plex
-        #    url: http://192.168.1.3:32400
+        #    url: "http://{{ internal_ip_neo }}:32400"
         #    key: mytokenhere # see https://www.plexopedia.com/plex-media-server/general/plex-token/
 
     - Tautulli:
         icon: tautulli.png
-        href: http://192.168.1.3:8181
+        href: "http://{{ internal_ip_neo }}:8181"
         description: Video Streaming Stats
         server: neo-docker
         container: tautulli
         widget:
             type: tautulli
-            url: http://192.168.1.3:8181
+            url: "http://{{ internal_ip_neo }}:8181"
             key: {{ secret_arr_api_key_tautulli }}
             enableUser: true # optional, defaults to false
             showEpisodeNumber: true # optional, defaults to false
@@ -70,7 +70,7 @@
 
     - Navidrome:
         icon: navidrome.png
-        href: http://192.168.1.3:4533
+        href: "http://{{ internal_ip_neo }}:4533"
         description: Music Streaming
         server: neo-docker
         container: navidrome
@@ -79,89 +79,89 @@
 
     - Mylar:
         icon: mylar.png
-        href: http://192.168.1.3:8090
+        href: "http://{{ internal_ip_neo }}:8090"
         description: Comics Manager
         server: neo-docker
         container: mylar3
         widget:
             type: mylar
-            url: http://192.168.1.3:8090
+            url: "http://{{ internal_ip_neo }}:8090"
             key: {{ secret_arr_api_key_mylar3 }}
 
     - Overseerr:
         icon: overseerr.png
-        href: http://192.168.1.3:5055
+        href: "http://{{ internal_ip_neo }}:5055"
         description: Media Requests
         server: neo-docker
         container: overseerr
         widget:
             type: overseerr
-            url: http://192.168.1.3:5055
+            url: "http://{{ internal_ip_neo }}:5055"
             key: {{ secret_arr_api_key_overseerr }}
 
     - Sonarr:
         icon: sonarr.png
-        href: http://192.168.1.3:8989
+        href: "http://{{ internal_ip_neo }}:8989"
         description: TV Manager
         server: neo-docker
         container: sonarr
         widget:
             type: sonarr
-            url: http://192.168.1.3:8989
+            url: "http://{{ internal_ip_neo }}:8989"
             key: {{ secret_arr_api_key_sonarr }}
             enableQueue: false # optional, defaults to false
 
     - Radarr:
         icon: radarr.png
-        href: http://192.168.1.3:7878
+        href: "http://{{ internal_ip_neo }}:7878"
         description: Movies Manager
         server: neo-docker
         container: radarr
         widget:
             type: radarr
-            url: http://192.168.1.3:7878
+            url: "http://{{ internal_ip_neo }}:7878"
             key: {{ secret_arr_api_key_radarr }}
             enableQueue: false # optional, defaults to false
 
     - Prowlarr:
         icon: prowlarr.png
-        href: http://192.168.1.3:9696
+        href: "http://{{ internal_ip_neo }}:9696"
         description: Indexer Manager
         server: neo-docker
         container: prowlarr
         widget:
             type: prowlarr
-            url: http://192.168.1.3:9696
+            url: "http://{{ internal_ip_neo }}:9696"
             key: {{ secret_arr_api_key_prowlarr }}
 
     - Jackett:
         icon: jackett.png
-        href: http://192.168.1.3:9117
+        href: "http://{{ internal_ip_neo }}:9117"
         description: Torrent Manager
         server: neo-docker
         container: jackett
 
     - Bazarr:
         icon: bazarr.png
-        href: http://192.168.1.3:6767
+        href: "http://{{ internal_ip_neo }}:6767"
         description: Subtitle Manager
         server: neo-docker
         container: bazarr
         widget:
             type: bazarr
-            url: http://192.168.1.3:6767
+            url: "http://{{ internal_ip_neo }}:6767"
             key: {{ secret_arr_api_key_bazarr }}
 
     - FileBot:
         icon: filebot.svg
-        href: http://192.168.1.3:5800
+        href: "http://{{ internal_ip_neo }}:5800"
         description: Automated Media Changes
         server: neo-docker
         container: filebot
 
     - Maintainerr:
         abbr: MR
-        href: http://192.168.1.3:6246
+        href: "http://{{ internal_ip_neo }}:6246"
         description: Media Cleanup
         server: neo-docker
         container: maintainerr
@@ -170,35 +170,35 @@
 - Download:
     - Sabnzbd:
         icon: sabnzbd.png
-        href: http://192.168.1.3:8080
+        href: "http://{{ internal_ip_neo }}:8080"
         description: NZB Downloader
         server: neo-docker
         container: sabnzbd
         widget:
             type: sabnzbd
-            url: http://192.168.1.3:8080
+            url: "http://{{ internal_ip_neo }}:8080"
             key: {{ secret_arr_api_key_sabnzbd }}
 
     - Deluge:
         icon: deluge.png
-        href: http://192.168.1.3:8112
+        href: "http://{{ internal_ip_neo }}:8112"
         description: Torrent Downloader
         server: neo-docker
         container: deluge
         widget:
             type: deluge
-            url: http://192.168.1.3:8112
+            url: "http://{{ internal_ip_neo }}:8112"
             password: {{ secret_arr_api_key_deluge }} # webui password
 
     - Pyload:
-        href: http://192.168.1.3:8000
+        href: "http://{{ internal_ip_neo }}:8000"
         description: Downloader
         server: neo-docker
         container: pyload-ng
 
     - TubeArchivist:
         icon: youtubedl.png
-        href: http://192.168.1.3:8088
+        href: "http://{{ internal_ip_neo }}:8088"
         description: YouTube Downloader
         server: neo-docker
         container: tubearchivist
@@ -228,44 +228,44 @@
 
     - Speedtest:
         icon: speedtest-tracker.png
-        href: http://192.168.1.3:8084
+        href: "http://{{ internal_ip_neo }}:8084"
         server: neo-docker
         container: speedtest-tracker
         widget:
             type: speedtest
-            url: http://192.168.1.3:8084
+            url: "http://{{ internal_ip_neo }}:8084"
             bitratePrecision: 3 # optional, default is 0
 
 - Infrastructure:
     - Proxmox (Neo):
         icon: proxmox.png
-        href: https://192.168.1.3:8006
+        href: https://{{ internal_ip_neo }}:8006
         description: PVE Neo
-        siteMonitor: http://192.168.1.3:8006
+        siteMonitor: "http://{{ internal_ip_neo }}:8006"
 
     - Proxmox (Morpheus):
         icon: proxmox.png
-        href: https://192.168.1.2:8006
+        href: https://{{ ip_internal_morpheus }}:8006
         description: PVE Morpheus
-        siteMonitor: http://192.168.1.2:8006
+        siteMonitor: http://{{ ip_internal_morpheus }}:8006
 
     - Portainer:
         icon: portainer.png
-        href: http://192.168.1.3:9000
+        href: "http://{{ internal_ip_neo }}:9000"
         description: Docker Container Management
         server: neo-docker
         container: portainer
 
     - Dozzle:
         icon: dozzle.png
-        href: http://192.168.1.3:8081
+        href: "http://{{ internal_ip_neo }}:8081"
         description: Docker Logs
         server: neo-docker
         container: dozzle
 
     - Backrest:
         icon: restic.png
-        href: http://192.168.1.3:9898
+        href: "http://{{ internal_ip_neo }}:9898"
         description: Backups (restic)
         server: neo-docker
         container: backrest
@@ -283,22 +283,22 @@
 
     - Uptime:
         icon: uptime-kuma.png
-        href: http://192.168.1.3:3001
+        href: "http://{{ internal_ip_neo }}:3001"
         description: Uptime Monitoring
         server: neo-docker
         container: uptimekuma
         widget:
             type: uptimekuma
-            url: http://192.168.1.3:3001
+            url: "http://{{ internal_ip_neo }}:3001"
             slug: public
 
     - Scrutiny:
         icon: scrutiny.png
-        href: http://192.168.1.3:8082
+        href: "http://{{ internal_ip_neo }}:8082"
         description: Disk Monitoring
         server: neo-docker
         container: scrutiny
         widget:
             type: scrutiny
-            url: http://192.168.1.3:8082
+            url: "http://{{ internal_ip_neo }}:8082"
 
