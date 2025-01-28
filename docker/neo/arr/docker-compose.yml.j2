@@ -63,6 +63,7 @@ services:
       - {{ nas_download_path }}/usenet:/data/usenet
       - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/Anime/Movies:/data/media/movies/anime
+      - {{ nas_storage_path }}/media/Anime:/data/media/anime
 
   sonarr:
     container_name: sonarr
