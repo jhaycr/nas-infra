@@ -1,0 +1,12 @@
+---
+services:
+
+  doublecommander:
+    image: lscr.io/linuxserver/doublecommander:latest
+    container_name: doublecommander
+    volumes:
+      - {{ docker_appdata_path }}/doublecommander:/config
+    ports:
+      - 4000:3000
+      - 4001:3001
+    restart: unless-stopped
