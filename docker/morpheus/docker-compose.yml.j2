@@ -28,6 +28,7 @@ networks:
     driver: macvlan
     driver_opts:
       parent: vmbr0 # using ifconfig
+      macvlan_mode: bridge
     ipam:
       config:
         - subnet: "192.168.1.0/24"
@@ -43,6 +44,7 @@ services:
     container_name: adguardhome
     image: adguard/adguardhome
     restart: always
+    mac_address: "02:00:00:00:00:01"
     networks:
       dockervlan:
         ipv4_address: 192.168.1.225 # IP address inside the defined range
