@@ -1,0 +1,13 @@
+services:
+
+  apprise:
+    image: lscr.io/linuxserver/apprise-api:latest
+    container_name: apprise
+    environment:
+      - APPRISE_ATTACH_SIZE=0 #optional
+    volumes:
+      - {{ docker_appdata_path }}/apprise/config:/config
+      - {{ docker_appdata_path }}/apprise/attachments:/attachments #optional
+    ports:
+      - 4002:8000
+    restart: unless-stopped
