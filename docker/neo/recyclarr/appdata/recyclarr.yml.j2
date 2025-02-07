@@ -27,6 +27,17 @@ radarr:
 
 sonarr:
 
+  sonarr:
+    base_url: "http://{{ internal_ip_neo }}:8989"
+    api_key: {{ secret_arr_api_key_sonarr }}
+
+    include:
+      # Comment out any of the following includes to disable them
+      # - template: sonarr-quality-definition-anime
+      # - template: sonarr-v4-quality-profile-anime
+      # - template: sonarr-v4-custom-formats-anime
+      - config: sonarr.yml
+
   anime-sonarr-v4:
     base_url: "http://{{ internal_ip_neo }}:9989"
     api_key: {{ secret_arr_api_key_sonarr_anime }}
