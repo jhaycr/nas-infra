@@ -90,6 +90,8 @@ autorestic_config_yaml:
             - "*.log*"
             - ".cache"
             - "backups/manual"
+            - "**/MediaCover"
+            - "**/Metadata"
             - "**/Signatures"
             - "**/gaseous-server/Data/**"
             - "**/Temp"
@@ -115,6 +117,7 @@ package_list:
   - name: curl
   - name: iperf
   - name: jq
+  - name: ncdu
 
 # -----
 # jhaycr.luks_disks
