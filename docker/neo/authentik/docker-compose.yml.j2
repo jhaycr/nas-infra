@@ -20,6 +20,7 @@ services:
       - .env
     networks:
       - app_authentik
+      - bridge_proxy_external
     ports:
       - "${COMPOSE_PORT_HTTP:-9090}:9000"
       - "${COMPOSE_PORT_HTTPS:-9443}:9443"
