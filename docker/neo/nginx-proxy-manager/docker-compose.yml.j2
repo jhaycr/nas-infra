@@ -31,7 +31,6 @@ services:
     #  - '443:443' # Public HTTPS Port
     #  - '81:81' # Admin Web Port
     networks:
-      app_authentik:
       bridge_proxy_external:
       vlan_proxy_external:
         ipv4_address: 192.168.1.9 # IP address inside the defined range
