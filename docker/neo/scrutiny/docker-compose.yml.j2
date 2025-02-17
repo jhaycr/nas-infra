@@ -12,7 +12,7 @@ services:
   volumes:
     - /run/udev:/run/udev:ro
     - {{ docker_appdata_path }}/scrutiny:/opt/scrutiny/config
-    - ./appdata/scrutiny-influxdb:/opt/scrutiny/influxdb
+    - {{ docker_appdata_path }}/scrutiny-influxdb:/opt/scrutiny/influxdb
   devices:
     - "/dev/sda"
     - "/dev/sdb"
@@ -21,3 +21,4 @@ services:
     - "/dev/sde"
     - "/dev/sdf"
     - "/dev/sdg"
+    - "/dev/nvme0n1"
