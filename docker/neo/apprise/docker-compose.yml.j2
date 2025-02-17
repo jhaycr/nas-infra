@@ -4,7 +4,7 @@ services:
     image: caronc/apprise
     container_name: apprise
     environment:
-      - APPRISE_ATTACH_SIZE=0 #optional
+      - APPRISE_ATTACH_SIZE=10 #optional
     volumes:
       - {{ docker_appdata_path }}/apprise/config:/config
       - {{ docker_appdata_path }}/apprise/attachments:/attachments #optional
