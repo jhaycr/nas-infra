@@ -1,0 +1,12 @@
+services:
+
+  whatsupdocker:
+    image: getwud/wud
+    container_name: wud
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 3010:3000
+    environment:
+      - WUD_TRIGGER_DISCORD_1_URL="https://discord.com/api/webhooks/{{ secret_diun_discord_webhook_id }}/ {{ secret_diun_discord_webhook_token }}"
+      - WUD_TRIGGER_DISCORD_1_BOTUSERNAME=WUD

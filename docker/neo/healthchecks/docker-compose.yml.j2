@@ -5,10 +5,11 @@ services:
     image: lscr.io/linuxserver/healthchecks:latest
     container_name: healthchecks
     environment:
-      - SITE_ROOT='https://healthchecks.lab.{{ secret_domain }}'
-      - SITE_NAME='{{ secret_healthcheck_site_name }}'
-      - SUPERUSER_EMAIL='{{ secret_healthcheck_superuser_email }}'
-      - SUPERUSER_PASSWORD='{{ secret_healthcheck_superuser_password }}'
+      - SITE_ROOT="https://healthchecks.lab.jjosh.org"
+      - SITE_NAME="Foo"
+      - SUPERUSER_EMAIL="admin@example.com"
+      - SUPERUSER_PASSWORD="admin"
+      - APPRISE_ATTACH_SIZE=0 #optional
       - ALLOWED_HOSTS=192.168.1.3 #optional
       - APPRISE_ENABLED=True #optional
       - CSRF_TRUSTED_ORIGINS= #optional
