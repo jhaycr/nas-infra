@@ -1,6 +1,8 @@
 services:
+
   composecraft:
     image: composecraft/composecraft:latest
+    container_name: composecraft
     ports:
       - 3009:3000
     environment:
@@ -12,8 +14,10 @@ services:
       - composecraft-db
     networks:
       - app_composecraft
+
   composecraft-db:
     image: mongo:latest
+    container_name: composecraft-db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=dev
       - MONGO_INITDB_ROOT_PASSWORD=dev
