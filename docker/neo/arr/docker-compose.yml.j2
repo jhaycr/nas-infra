@@ -26,6 +26,21 @@ services:
       - 9117:9117
     restart: unless-stopped
 
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    volumes:
+      - {{ docker_appdata_path }}/lidarr:/config
+      - {{ nas_download_path }}/usenet:/data/usenet
+      - {{ nas_download_path }}/torrents:/data/torrents
+      - {{ nas_storage_path }}/media/audio/music:/data/media/music
+      - {{ nas_storage_path }}/media/audio/music:/storage/media/audio/music
+    networks:
+      - default
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+
   prowlarr:
     container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
