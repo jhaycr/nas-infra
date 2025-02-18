@@ -5,8 +5,7 @@ services:
     container_name: spotizerr
     image: cooldockerizer93/spotizerr
     volumes:
-      -  {{ docker_appdata_path }}/spotizerr/creds:/app/creds
-      - ./downloads:/app/downloads  # <-- Change this for your music library dir
-      - {{ nas_download_path }}/spotizerr:/app/downloads
+      - {{ docker_appdata_path }}/spotizerr/creds:/app/creds
+      - {{ nas_storage_path }}/media/audio/music/General:/app/downloads
     ports:
       - 7171:7171
