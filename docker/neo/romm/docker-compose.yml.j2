@@ -1,0 +1,56 @@
+volumes:
+  mysql_data:
+  romm_resources:
+    driver: local
+    driver_opts:
+      type: none
+      device: "{{ nas_cache_path }}/romm/resources"
+      o: bind
+  romm_redis_data:
+
+services:
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    restart: unless-stopped
+    environment:
+      - DB_HOST=romm-db
+      - DB_NAME=romm # Should match MARIADB_DATABASE in mariadb
+      - DB_USER=romm-user # Should match MARIADB_USER in mariadb
+      - DB_PASSWD={{ secret_romm_db_root_pass }} # Should match MARIADB_PASSWORD in mariadb
+      - ROMM_AUTH_SECRET_KEY={{ secret_romm_auth_secret_key }} # Generate a key with `openssl rand -hex 32`
+      - IGDB_CLIENT_ID={{ secret_igdb_client_id }} # Generate an ID and SECRET in IGDB
+      - IGDB_CLIENT_SECRET={{ secret_igdb_api_client_secret }} # https://api-docs.igdb.com/#account-creation
+      - MOBYGAMES_API_KEY= # https://www.mobygames.com/info/api/
+      - STEAMGRIDDB_API_KEY= # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
+    volumes:
+      - romm_resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
+      - romm_redis_data:/redis-data # Cached data for background tasks
+      - {{ nas_storage_path }}/storage/Games/Emulation/library:/romm/library:ro # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
+      - {{ docker_appdata_path }}/romm/assets:/romm/assets # Uploaded saves, states, etc.
+      - {{ docker_appdata_path }}/romm/config:/romm/config # Path where config.yml is stored
+    ports:
+      - 3011:8080
+    depends_on:
+      romm-db:
+        condition: service_healthy
+        restart: true
+
+  romm-db:
+    image: mariadb:latest
+    container_name: romm-db
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD={{ secret_romm_db_root_pass }} # Use a unique, secure password
+      - MARIADB_DATABASE=romm
+      - MARIADB_USER=romm-user
+      - MARIADB_PASSWORD={{ secret_romm_db_root_pass }}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      start_interval: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
