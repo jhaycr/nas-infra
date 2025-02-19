@@ -15,7 +15,7 @@ services:
       - 5198:80
     volumes:
       - {{ docker_appdata_path }}/gaseous-server:/root/.gaseous-server
-      - {{ nas_storage_path }}/storage/Games/Emulation/Roms/General:/roms:ro
+      - {{ nas_storage_path }}/storage/Games/Emulation/Roms/library/roms:/roms:ro
     environment:
       - TZ=America/Los_Angeles
       - dbhost=gaseous-db
