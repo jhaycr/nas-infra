@@ -96,6 +96,12 @@ autorestic_config_yaml:
             - "**/gaseous-server/Data/**"
             - "**/Temp"
             - "**/ollama/**"
+            - "**/apprise/**"
+            - "**/whatsupdocker/**"
+            - "**/backrest/**"
+            - "**/romm/**"
+            - "**/romm-db/**"
+            
 
 # -----
 # arillso.system.users
