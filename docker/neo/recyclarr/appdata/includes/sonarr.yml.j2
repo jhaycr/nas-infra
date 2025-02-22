@@ -112,6 +112,42 @@
         - name: DVD
         - name: SDTV
 
+    # find 720p to start, but settle towards 480p
+    - name: WEB-GUEST-480p
+      reset_unmatched_scores:
+        enabled: true
+      upgrade:
+        allowed: true
+        until_quality: WEB 480p
+        until_score: 10000
+      min_format_score: 0
+      score_set: default
+      quality_sort: top
+      qualities:
+        - name: WEB 1080p
+          enabled: false
+          qualities:
+            - WEBDL-1080p
+            - WEBRip-1080p
+        - name: Bluray-1080p
+          enabled: false
+        - name: HDTV-1080p
+          enabled: false
+        - name: WEB 480p
+          qualities:
+            - Bluray-576p
+            - Bluray-480p
+            - WEBDL-480p
+            - WEBRip-480p
+        - name: WEB 720p
+          qualities:
+            - WEBDL-720p
+            - WEBRip-720p
+        - name: Bluray-720p
+        - name: HDTV-720p
+        - name: DVD
+        - name: SDTV
+
     custom_formats:
       - trash_ids:
           # Unwanted
