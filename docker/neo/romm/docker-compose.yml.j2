@@ -8,6 +8,11 @@ volumes:
       o: bind
   romm_redis_data:
 
+networks:
+  app_romm:
+    name: app_romm
+    driver: bridge  
+
 services:
   romm:
     image: rommapp/romm:latest
@@ -23,6 +28,15 @@ services:
       - IGDB_CLIENT_SECRET={{ secret_igdb_api_client_secret }} # https://api-docs.igdb.com/#account-creation
       - MOBYGAMES_API_KEY= # https://www.mobygames.com/info/api/
       - STEAMGRIDDB_API_KEY= # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
+      - OIDC_ENABLED=true #: Set to true to enable OIDC authentication.
+      - OIDC_PROVIDER=authentik # The lowercase name of the provider (authentik).
+      - OIDC_CLIENT_ID={{ secret_romm_oidc_client_id }} #: The client ID copied from the Authentik application.
+      - OIDC_CLIENT_SECRET={{ secret_romm_oidc_client_secret }} #: The client secret copied from the Authentik application.
+      - OIDC_REDIRECT_URI=https://romm.{{ secret_domain }}/api/oauth/openid # The redirect URI configured in the Authentik provider, in the format https://romm.jjosh.org/api/oauth/openid.
+      - OIDC_SERVER_APPLICATION_URL=https://auth.{{ secret_domain }}/application/o/romm #: The URL of the Authentik application, e.g., http://authentik.host.local/application/o/romm.
+    networks:
+      - app_romm
+      - bridge_proxy_external
     volumes:
       - romm_resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
       - romm_redis_data:/redis-data # Cached data for background tasks
@@ -45,6 +59,8 @@ services:
       - MARIADB_DATABASE=romm
       - MARIADB_USER=romm-user
       - MARIADB_PASSWORD={{ secret_romm_db_root_pass }}
+    networks:
+      - app_romm
     volumes:
       - {{ docker_appdata_path }}/romm-db:/var/lib/mysql
     healthcheck:
