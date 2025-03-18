@@ -14,16 +14,14 @@ include:
   - path: ./arr/docker-compose.yml
   - path: ./apprise/docker-compose.yml
   - path: ./audiobookshelf/docker-compose.yml
-  - path: ./calibreweb/docker-compose.yml
-  - path: ./changedetection/docker-compose.yml
-  - path: ./composecraft/docker-compose.yml
+  # - path: ./calibreweb/docker-compose.yml
+  - path: ./calibrewebautomated/docker-compose.yml
+  # - path: ./changedetection/docker-compose.yml
+  # - path: ./composecraft/docker-compose.yml
   - path: ./dockerproxy/docker-compose.yml
   - path: ./dozzle/docker-compose.yml
   - path: ./freshrss/docker-compose.yml
-  - path: ./gaseous/docker-compose.yml
   - path: ./glances/docker-compose.yml
-  - path: ./healthchecks/docker-compose.yml
-    env_file: ./healthchecks/.env
   - path: ./homepage/docker-compose.yml
   - path: ./jellyfin/docker-compose.yml
   - path: ./komga/docker-compose.yml
@@ -56,6 +54,9 @@ include:
   # - path: ./diun/docker-compose.yml
   # - path: ./doublecommander/docker-compose.yml
   # - path: ./filebot/docker-compose.yml
+  # - path: ./gaseous/docker-compose.yml
+  # - path: ./healthchecks/docker-compose.yml
+  #   env_file: ./healthchecks/.env
   # - path: ./notifiarr/docker-compose.yml
   # - path: ./ollama/docker-compose.yml
   # - path: ./ouroboros/docker-compose.yml
