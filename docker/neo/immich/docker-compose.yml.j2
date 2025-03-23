@@ -8,6 +8,11 @@
 
 name: immich
 
+networks:
+  app_immich:
+    name: app_immich
+    driver: bridge
+
 services:
   immich-server:
     container_name: immich_server
@@ -21,6 +26,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
+    networks:
+      bridge_proxy_external:
+      app_immich:
     ports:
       - '2283:2283'
     depends_on:
@@ -42,7 +50,9 @@ services:
       - immich-model-cache:/cache
     env_file:
       - .env
-    restart: always
+    networks:
+      app_immich:
+    restart: unless-stopped
     healthcheck:
       disable: false
 
@@ -51,6 +61,8 @@ services:
     image: docker.io/redis:6.2-alpine@sha256:148bb5411c184abd288d9aaed139c98123eeb8824c5d3fce03cf721db58066d8
     env_file:
       - .env
+    networks:
+      app_immich:
     healthcheck:
       test: redis-cli ping || exit 1
     restart: always
@@ -68,6 +80,8 @@ services:
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     env_file:
       - .env
+    networks:
+      app_immich:
     healthcheck:
       test: pg_isready --dbname='${DB_DATABASE_NAME}' --username='${DB_USERNAME}' || exit 1; Chksum="$$(psql --dbname='${DB_DATABASE_NAME}' --username='${DB_USERNAME}' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
       interval: 5m
