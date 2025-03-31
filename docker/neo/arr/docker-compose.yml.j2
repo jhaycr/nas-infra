@@ -27,19 +27,21 @@ services:
     restart: unless-stopped
 
   lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
+    image: youegraillot/lidarr-on-steroids
     container_name: lidarr
-    volumes:
-      - {{ docker_appdata_path }}/lidarr:/config
-      - {{ nas_download_path }}/usenet:/data/usenet
-      - {{ nas_download_path }}/torrents:/data/torrents
-      - {{ nas_storage_path }}/media/audio/music:/data/media/music
-      - {{ nas_storage_path }}/media/audio/music:/storage/media/audio/music
+    restart: unless-stopped
     networks:
       - default
     ports:
-      - 8686:8686
-    restart: unless-stopped
+      - "8686:8686" # Lidarr web UI
+      - "6595:6595" # Deemix web UI
+    volumes:
+      - {{ docker_appdata_path }}/lidarr_deemix/config:/config
+      - {{ docker_appdata_path }}/lidarr_deemix/config_deemix:/config_deemix
+      - {{ nas_download_path }}/usenet:/data/usenet
+      - {{ nas_download_path }}/torrents:/data/torrents
+      - {{ nas_download_path }}/lidarr_deemix:/downloads
+      - {{ nas_storage_path }}/media/audio/music:/data/media/music
 
   prowlarr:
     container_name: prowlarr
