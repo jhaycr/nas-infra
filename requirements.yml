@@ -18,8 +18,6 @@ roles:
     version: v1.4.0
   - name: IronicBadger.proxmox_nag_removal
     version: 1.0.2
-  - name: IronicBadger.snapraid
-    version: 1.0.0
   - name: joenyland.plexmediaserver
     version: main
   - name: tigattack.mergerfs

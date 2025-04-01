@@ -4,3 +4,6 @@
 [submodule "roles/jhaycr.luks_disks"]
 	path = roles/jhaycr.luks_disks
 	url = git@github.com:jhaycr/ansible-role-luks-disks.git
+[submodule "roles/jhaycr.snapraid"]
+	path = roles/jhaycr.snapraid
+	url = https://github.com/jhaycr/ansible-role-snapraid
