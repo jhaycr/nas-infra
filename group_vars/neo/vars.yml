@@ -93,14 +93,17 @@ autorestic_config_yaml:
             - "**/MediaCover"
             - "**/Metadata"
             - "**/Signatures"
-            - "**/gaseous-server/Data/**"
             - "**/Temp"
-            - "**/ollama/**"
             - "**/apprise/**"
-            - "**/whatsupdocker/**"
             - "**/backrest/**"
+            - "**/diun/**"
+            - "**/gaseous-server/Data/**"
+            - "**/immich/postgres/**"
+            - "**/ollama/**"
             - "**/romm/**"
             - "**/romm-db/**"
+            - "**/scrutiny-influxdb/**"
+            - "**/whatsupdocker/**"
             
 
 # -----
@@ -136,6 +139,7 @@ luks_disks_validate_serial: true
 # -----
 snapraid_install: true
 snapraid_runner: true
+snapraid_runner_delete_threshold: -1
 
 snapraid_data_disks:
   - path: /mnt/data1

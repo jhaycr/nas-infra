@@ -13,8 +13,8 @@
 - name: Schedule autorestic cron (hourly)
   cron:
     name: autorestic cron
-    job: "autorestic --ci cron"
-    user: "{{ main_username }}"
+    job: "/usr/local/bin/autorestic -c /home/{{ main_username }}/.autorestic.yml --ci cron >> /var/log/autorestic.log 2>&1"
+    user: "root"
     weekday: "*"
     month: "*"
     day: "*"
