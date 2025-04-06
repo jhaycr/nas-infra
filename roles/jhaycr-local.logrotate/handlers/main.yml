@@ -1,0 +1,6 @@
+---
+- name: Restart logrotate
+  ansible.builtin.service:
+    name: logrotate
+    state: restarted
+  ignore_errors: yes  # logrotate might not be a service on all systems

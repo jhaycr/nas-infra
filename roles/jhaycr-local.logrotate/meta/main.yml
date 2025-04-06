@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: logrotate
+  namespace: jhaycr-local
+  author: Josh
+  description: Manages logrotate configurations
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+
+dependencies: []

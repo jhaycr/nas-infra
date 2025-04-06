@@ -1,0 +1,107 @@
+{{ item.path }} {
+    {% if item.rotate is defined %}
+    rotate {{ item.rotate }}
+    {% else %}
+    rotate {{ logrotate_defaults.rotate }}
+    {% endif %}
+
+    {% if item.frequency is defined %}
+    {{ item.frequency }}
+    {% else %}
+    {{ logrotate_defaults.frequency }}
+    {% endif %}
+
+    {% if item.create is defined and item.create %}
+    create{% if item.create_mode is defined %} {{ item.create_mode }}{% endif %}{% if item.create_owner is defined %} {{ item.create_owner }}{% endif %}{% if item.create_group is defined %} {{ item.create_group }}{% endif %}
+    {% elif logrotate_defaults.create %}
+    create {{ logrotate_defaults.create_mode }} {{ logrotate_defaults.create_owner }} {{ logrotate_defaults.create_group }}
+    {% endif %}
+
+    {% if item.compress is defined and item.compress %}
+    compress
+    {% elif logrotate_defaults.compress %}
+    compress
+    {% endif %}
+
+    {% if item.delaycompress is defined and item.delaycompress %}
+    delaycompress
+    {% elif logrotate_defaults.delaycompress %}
+    delaycompress
+    {% endif %}
+
+    {% if item.missingok is defined and item.missingok %}
+    missingok
+    {% elif logrotate_defaults.missingok %}
+    missingok
+    {% endif %}
+
+    {% if item.notifempty is defined and item.notifempty %}
+    notifempty
+    {% elif logrotate_defaults.notifempty %}
+    notifempty
+    {% endif %}
+
+    {% if item.copytruncate is defined and item.copytruncate %}
+    copytruncate
+    {% elif logrotate_defaults.copytruncate %}
+    copytruncate
+    {% endif %}
+
+    {% if item.dateext is defined and item.dateext %}
+    dateext
+    {% endif %}
+
+    {% if item.dateformat is defined %}
+    dateformat {{ item.dateformat }}
+    {% endif %}
+
+    {% if item.size is defined %}
+    size {{ item.size }}
+    {% endif %}
+
+    {% if item.maxsize is defined %}
+    maxsize {{ item.maxsize }}
+    {% endif %}
+
+    {% if item.minsize is defined %}
+    minsize {{ item.minsize }}
+    {% endif %}
+
+    {% if item.maxage is defined %}
+    maxage {{ item.maxage }}
+    {% endif %}
+
+    {% if item.su is defined and item.su %}
+    su {{ item.su_user | default('root') }} {{ item.su_group | default('root') }}
+    {% elif logrotate_defaults.su is defined and logrotate_defaults.su %}
+    su {{ logrotate_defaults.su_user | default('root') }} {{ logrotate_defaults.su_group | default('root') }}
+    {% endif %}
+
+    {% if item.sharedscripts is defined and item.sharedscripts %}
+    sharedscripts
+    {% endif %}
+
+    {% if item.prerotate is defined %}
+    prerotate
+        {{ item.prerotate | indent(8) }}
+    endscript
+    {% endif %}
+
+    {% if item.postrotate is defined %}
+    postrotate
+        {{ item.postrotate | indent(8) }}
+    endscript
+    {% endif %}
+
+    {% if item.firstaction is defined %}
+    firstaction
+        {{ item.firstaction | indent(8) }}
+    endscript
+    {% endif %}
+
+    {% if item.lastaction is defined %}
+    lastaction
+        {{ item.lastaction | indent(8) }}
+    endscript
+    {% endif %}
+}

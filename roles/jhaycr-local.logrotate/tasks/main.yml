@@ -1,0 +1,15 @@
+---
+- name: Ensure logrotate is installed
+  ansible.builtin.package:
+    name: logrotate
+    state: present
+
+- name: Create logrotate configuration files
+  ansible.builtin.template:
+    src: logrotate.conf.j2
+    dest: "/etc/logrotate.d/{{ item.path | basename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ logrotate_logs | default([]) }}"
+  notify: Restart logrotate
