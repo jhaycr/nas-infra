@@ -3,6 +3,8 @@
 - hosts: neo
 
   roles:
+    - role: jhaycr-local.logrotate
+      become: yes
     - role: arillso.system.users
       become: yes
     - role: grog.package
@@ -11,7 +13,7 @@
     - role: geerlingguy.docker
     - role: jhaycr.luks_disks
       tags: disks
-    - role: IronicBadger.snapraid
+    - role: jhaycr.snapraid
       become: yes
       tags: disks
     - role: tigattack.mergerfs

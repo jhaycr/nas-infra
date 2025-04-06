@@ -1,0 +1,49 @@
+---
+# Default logrotate settings
+logrotate_defaults:
+  rotate: 4
+  frequency: weekly
+  create: true
+  create_mode: "640"
+  create_owner: root
+  create_group: root
+  compress: true
+  delaycompress: true
+  missingok: true
+  notifempty: true
+  copytruncate: true
+
+# List of logs to rotate
+logrotate_logs: []
+
+# Example of how to override defaults for a specific log:
+# logrotate_logs:
+#   - path: /var/log/example.log
+#     rotate: 14
+#     frequency: weekly
+#     create: true
+#     create_mode: "0640"
+#     create_owner: root
+#     create_group: adm
+#     compress: true
+#     delaycompress: true
+#     missingok: true
+#     notifempty: false
+#     dateext: true
+#     dateformat: "-%Y%m%d"
+#     size: "100M"
+#     maxsize: "200M"
+#     minsize: "10M"
+#     maxage: 365
+#     su: true
+#     su_user: www-data
+#     su_group: www-data
+#     sharedscripts: true
+#     prerotate: |
+#       echo "Pre-rotation script"
+#     postrotate: |
+#       echo "Post-rotation script"
+#     firstaction: |
+#       echo "First action script"
+#     lastaction: |
+#       echo "Last action script"
