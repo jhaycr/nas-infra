@@ -10,10 +10,17 @@
   ansible.builtin.import_role:
     name: fuzzymistborn.autorestic
 
+- name: Add PATH to top of crontab
+  cron:
+    name: PATH
+    env: yes
+    job: "/usr/local/bin:/usr/bin:/bin"
+
 - name: Schedule autorestic cron (hourly)
   cron:
     name: autorestic cron
-    job: "/usr/local/bin/autorestic -c /home/{{ main_username }}/.autorestic.yml --ci cron >> /var/log/autorestic.log 2>&1"
+    # job: "bash -lc; /usr/local/bin/autorestic -c /home/{{ main_username }}/.autorestic.yml backup -avv --ci >> /var/log/autorestic.log 2>&1"
+    job: "/usr/local/bin/autorestic -c /home/{{ main_username }}/.autorestic.yml cron -v --ci >> /var/log/autorestic.log 2>&1"
     user: "root"
     weekday: "*"
     month: "*"

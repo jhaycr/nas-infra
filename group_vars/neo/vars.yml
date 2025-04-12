@@ -88,22 +88,17 @@ autorestic_config_yaml:
             - "**/log"
             - "**/logs"
             - "*.log*"
+            - "*.tmp*"
             - ".cache"
             - "backups/manual"
             - "**/MediaCover"
             - "**/Metadata"
             - "**/Signatures"
             - "**/Temp"
-            - "**/apprise/**"
-            - "**/backrest/**"
-            - "**/diun/**"
             - "**/gaseous-server/Data/**"
-            - "**/immich/postgres/**"
             - "**/ollama/**"
-            - "**/romm/**"
             - "**/romm-db/**"
             - "**/scrutiny-influxdb/**"
-            - "**/whatsupdocker/**"
             
 
 # -----
