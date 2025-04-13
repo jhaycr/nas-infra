@@ -1,10 +1,8 @@
 ---
 
 - hosts: neo
-
+  # gather_facts: no
   roles:
-    - role: jhaycr-local.logrotate
-      become: yes
     - role: arillso.system.users
       become: yes
     - role: grog.package
@@ -22,6 +20,8 @@
       tags: disks
     - role: geerlingguy.nfs
     - role: jhaycr-local.backup
+      become: yes
+    - role: jhaycr-local.logrotate
       become: yes
     - role: jhaycr-local.docker_compose
       tags: compose

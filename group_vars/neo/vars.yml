@@ -5,6 +5,10 @@ ntp_timezone: America/Los_Angeles
 
 docker_compose_debug_print: true
 docker_compose_debug_halt: false
+docker_compose_copy_templates: true
+docker_compose_start_stack: true
+docker_compose_show_status: true
+docker_compose_restart: never
 
 nas_cache_path: '/mnt/cache1'
 nas_download_path: '{{ nas_cache_path }}/downloads'
