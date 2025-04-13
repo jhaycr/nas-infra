@@ -1,0 +1,13 @@
+services:
+
+  redirecterr:
+    image: varthe/redirecterr:latest
+    container_name: redirecterr
+    hostname: redirecterr
+    ports:
+      - 8481:8481
+    volumes:
+      - {{ docker_appdata_path }}/redirecterr/config:/config
+      - {{ docker_appdata_path }}/redirecterr/logs:/logs
+    environment:
+      - LOG_LEVEL=info

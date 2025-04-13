@@ -1,0 +1,10 @@
+---
+services:
+
+  wizarr:
+    container_name: wizarr
+    image: ghcr.io/wizarrrr/wizarr:beta
+    ports:
+      - 5690:5690
+    volumes:
+      - {{ docker_appdata_path }}/wizarr/database:/data/database
