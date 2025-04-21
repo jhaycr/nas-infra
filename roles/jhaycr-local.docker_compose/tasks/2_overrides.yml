@@ -8,9 +8,9 @@
   ansible.builtin.set_fact:
     include_paths: >-
       {{
-        (lookup('ansible.builtin.template', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/docker-compose.yml.j2') | from_yaml).include
+        (lookup('ansible.builtin.template', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + 'media-server' + '/docker-compose.yml.j2') | from_yaml).include
         | map(attribute='path')
-        | map('regex_replace', '^(\.\/)?', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/')
+        | map('regex_replace', '^(\.\/)?', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + 'media-server' + '/')
         | map('regex_replace', '$', '.j2')
         | list
         | sort
@@ -38,7 +38,7 @@
 
 - name: Extend and template compose override
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/{{ docker_dir }}/{{ inventory_group_name }}/docker-compose.override.yml.j2"
+    src: "{{ playbook_dir }}/{{ docker_dir }}/{{ inventory_group_name }}/media-server/docker-compose.override.yml.j2"
     dest: "{{ docker_compose_path }}/docker-compose.override.yml"
     mode: "0644"
   vars:
