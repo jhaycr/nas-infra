@@ -9,7 +9,7 @@
 
     - name: Gather compose files
       ansible.builtin.set_fact:
-        docker_compose_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
+        docker_compose_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + 'media-server' + '/') | 
                                 selectattr('state', 'ne', 'directory') |
                                 selectattr('path', 'regex', '(.*\/)*((docker-compose(?!\\.override).*|\\.env.*)\\.j2)$') |
                                 rejectattr('path', 'regex', '.*/appdata/.*') |
@@ -27,7 +27,7 @@
 
     - name: Gather appdata files
       ansible.builtin.set_fact:
-        docker_compose_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/') | 
+        docker_compose_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + 'media-server' + '/') | 
                                         selectattr('state', 'ne', 'directory') |
                                         selectattr('path', 'regex', '.*/appdata/.*\\.j2$') |
                                         list) }}"
@@ -57,7 +57,7 @@
 
     - name: Ensure application-specific directories exist
       ansible.builtin.file:
-        path: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | dirname }}"
+        path: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/' + 'media-server' + '/', '') | dirname }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
@@ -69,7 +69,7 @@
     - name: Template compose files
       ansible.builtin.template:
         src: "{{ item.src }}"
-        dest: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}"
+        dest: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/' + 'media-server' + '/', '') | regex_replace('\\.j2$', '') }}"
         force: yes
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
