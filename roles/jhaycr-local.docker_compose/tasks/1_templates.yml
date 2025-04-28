@@ -1,43 +1,52 @@
 ---
+- debug:
+    var: local_stack_path
+  when: docker_compose_debug_print | bool
+
 - name: Process all docker and appdata files
   block:
-    - name: Initialize file lists
-      ansible.builtin.set_fact:
-        docker_compose_files: []
-        docker_compose_appdata_files: []
-        private: yes
-
     - name: Gather compose files
-      ansible.builtin.set_fact:
-        docker_compose_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + 'media-server' + '/') | 
-                                selectattr('state', 'ne', 'directory') |
-                                selectattr('path', 'regex', '(.*\/)*((docker-compose(?!\\.override).*|\\.env.*)\\.j2)$') |
-                                rejectattr('path', 'regex', '.*/appdata/.*') |
-                                list) }}"
-      run_once: true
+      ansible.builtin.find:
+        paths: 
+          - "{{ local_stack_path }}"
+        patterns: 
+          - "docker-compose*.yml.j2"
+          - ".env.j2"
+        excludes: 
+          - "*appdata*"
+          - "docker-compose.override.yml.j2"
+        hidden: true
+        file_type: file
+        recurse: yes
+      become: false
+      delegate_to: localhost
+      register: found_compose_files
+      changed_when: false
 
     - name: Debug found compose files
       ansible.builtin.debug:
         msg: |
           Found compose files:
-          {% for item in (docker_compose_files | unique) %}
-          {{ item.src }} -> {{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/', '') | regex_replace('\\.j2$', '') }}
+          {% for file in found_compose_files.files %}
+          - {{ file.path }}
           {% endfor %}
       when: docker_compose_debug_print | bool
 
-    - name: Gather appdata files
+    - name: Gather appdata files  
       ansible.builtin.set_fact:
-        docker_compose_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + 'media-server' + '/') | 
-                                        selectattr('state', 'ne', 'directory') |
-                                        selectattr('path', 'regex', '.*/appdata/.*\\.j2$') |
-                                        list) }}"
-      run_once: true
+        found_appdata_files: "{{ (lookup('ansible.builtin.filetree', playbook_dir + '/' + docker_dir + '/' + inventory_group_name + '/' + current_stack_name + '/') | 
+                                  selectattr('state', 'ne', 'directory') |
+                                  selectattr('path', 'regex', '.*/appdata/.*\\.j2$') |
+                                  list) }}"
+      become: false
+      delegate_to: localhost
+      changed_when: false
 
     - name: Debug found appdata files
       ansible.builtin.debug:
         msg: |
           Found appdata files:
-          {% for item in (docker_compose_appdata_files | unique) %}
+          {% for item in (found_appdata_files | unique) %}
           {{ item.src }} -> {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
           {% endfor %}
       when: docker_compose_debug_print | bool
@@ -49,7 +58,7 @@
 
     - name: Ensure base docker compose directory exists
       ansible.builtin.file:
-        path: "{{ docker_compose_path }}"
+        path: "{{ docker_compose_path }}/{{ current_stack_name }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
@@ -57,24 +66,24 @@
 
     - name: Ensure application-specific directories exist
       ansible.builtin.file:
-        path: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/' + 'media-server' + '/', '') | dirname }}"
+        path: "{{ docker_compose_path }}/{{ current_stack_name }}/{{ item.path | regex_replace('.*/' + inventory_group_name + '/' + current_stack_name + '/?', '') | dirname }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
         mode: '0755'
-      loop: "{{ docker_compose_files }}"
+      loop: "{{ found_compose_files.files }}"
       loop_control:
         label: "{{ item.path }}"
 
     - name: Template compose files
       ansible.builtin.template:
-        src: "{{ item.src }}"
-        dest: "{{ docker_compose_path }}/{{ item.path | regex_replace('^' + inventory_group_name + '/' + 'media-server' + '/', '') | regex_replace('\\.j2$', '') }}"
+        src: "{{ item.path }}"
+        dest: "{{ docker_compose_path }}/{{ current_stack_name }}/{{ item.path | regex_replace('.*/' + inventory_group_name + '/' + current_stack_name + '/?', '') | regex_replace('\\.j2$', '') }}"
         force: yes
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
         mode: '0644'
-      loop: "{{ docker_compose_files }}"
+      loop: "{{ found_compose_files.files }}"
       loop_control:
         label: "{{ item.path }}"
 
@@ -85,7 +94,7 @@
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
         mode: "0755"
-      loop: "{{ docker_compose_appdata_files }}"
+      loop: "{{ found_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"
 
@@ -97,6 +106,6 @@
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
         mode: "0644"
-      loop: "{{ docker_compose_appdata_files }}"
+      loop: "{{ found_appdata_files }}"
       loop_control:
         label: "{{ item.path }}"

@@ -1,0 +1,22 @@
+---
+- name: Find stacks for current group
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/{{ docker_dir }}/{{ inventory_group_name }}"
+    file_type: directory
+    recurse: no
+  become: false
+  delegate_to: localhost
+  register: found_stacks
+  changed_when: false
+
+- debug:
+    var: found_stacks
+  when: docker_compose_debug_print | bool
+
+- name: Process stacks
+  include_tasks: process_stack.yml
+  loop: "{{ found_stacks.files | map(attribute='path') | map('basename') }}"
+  loop_control:
+    loop_var: current_stack_name
+  vars:
+    local_stack_path: "{{ playbook_dir }}/{{ docker_dir }}/{{ inventory_group_name }}/{{ current_stack_name }}"
