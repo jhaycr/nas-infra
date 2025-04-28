@@ -3,10 +3,10 @@
   ansible.builtin.debug:
     msg: "Looking for docker-compose files in: {{ docker_compose_path }}"
 
-- name: Start Docker stack
+- name: Start Docker stack for {{ inventory_group_name }}/{{ current_stack_name }}
   become: yes
   community.docker.docker_compose_v2:
-    project_src: "{{ docker_compose_path }}"
+    project_src: "{{ docker_compose_path }}/{{ current_stack_name }}"
     state: present
     recreate: "auto"
     env_files:

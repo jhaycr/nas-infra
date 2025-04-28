@@ -1,0 +1,9 @@
+---
+- name: Process templates for each stack
+  include_tasks: 1_templates.yml
+
+- name: Process overrides for each stack
+  include_tasks: 2_overrides.yml
+
+- name: Start docker for each stack
+  include_tasks: 3_docker.yml

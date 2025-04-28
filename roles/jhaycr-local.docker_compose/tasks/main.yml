@@ -1,17 +1,6 @@
 ---
-- name: Template Docker compose and appdata
-  include_tasks: "1_templates.yml"
+- name: Process inventory groups
+  include_tasks: process_group.yml
   loop: "{{ group_names }}"
   loop_control:
     loop_var: inventory_group_name
-
-- name: Build docker-compose.override.yml
-  ansible.builtin.include_tasks:
-    file: 2_overrides.yml
-  loop: "{{ group_names }}"
-  loop_control:
-    loop_var: inventory_group_name
-
-- name: Run Docker stack
-  ansible.builtin.include_tasks:
-    file: 3_docker.yml
