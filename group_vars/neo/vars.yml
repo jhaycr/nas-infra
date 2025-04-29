@@ -14,8 +14,7 @@ nas_cache_path: '/mnt/cache1'
 nas_download_path: '{{ nas_cache_path }}/downloads'
 nas_storage_path: '/mnt/storage'
 docker_compose_path: '/opt/docker/compose'
-#docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
-docker_appdata_path: '/home/{{ main_username }}/docker/media-server/config/appdata'
+docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
 docker_appdata_folders_to_own:
 - backrest
 - fail2ban
