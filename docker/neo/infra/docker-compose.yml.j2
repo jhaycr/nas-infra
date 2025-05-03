@@ -2,6 +2,9 @@ name: infra
 
 include:
   - path: gitea/docker-compose.yml
+    env_file: gitea/.env
+  - path: komodo/docker-compose.yml
+    env_file: komodo/.env
 
 networks:
   default:
