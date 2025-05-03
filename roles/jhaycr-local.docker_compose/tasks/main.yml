@@ -1,4 +1,9 @@
 ---
+- name: Log into DockerHub
+  community.docker.docker_login:
+    username: "{{ secret_dockerhub_username}}"
+    password: "{{ secret_dockerhub_password }}"
+
 - name: Process inventory groups
   include_tasks: process_group.yml
   loop: "{{ group_names }}"
