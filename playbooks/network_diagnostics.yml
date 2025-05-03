@@ -1,0 +1,155 @@
+# network_diagnostics.yml
+---
+- name: Comprehensive Network Diagnostics
+  hosts: all
+  become: yes
+  serial: 1
+  vars:
+    dns_servers:
+      - "1.1.1.1"
+      - "8.8.8.8"
+      - "192.168.1.1"
+      - "192.168.1.225"
+    ping_targets:
+      - "8.8.8.8"
+      - "1.1.1.1"
+      - "192.168.1.1"
+    traceroute_targets:
+      - "google.com"
+      - "cloudflare.com"
+    iperf3_server: ""
+    speedtest_enabled: true
+    mtu_target: "8.8.8.8"
+    mtu_sizes: [1500, 1492, 1472, 1454, 1400]
+    tcp_checks:
+      - { host: "google.com", port: 80, description: "HTTP" }
+      - { host: "google.com", port: 443, description: "HTTPS" }
+
+  tasks:
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - dnsutils
+          - traceroute
+          - iputils-ping
+          - python3-pip
+          - iperf3
+        state: present
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+      ignore_errors: yes
+
+    - name: Install speedtest-cli
+      ansible.builtin.pip:
+        name: speedtest-cli
+      when: speedtest_enabled
+      ignore_errors: yes
+
+    - name: DNS resolution tests
+      ansible.builtin.shell:
+        cmd: "dig +stats @{{ item }} google.com | grep 'Query time'"
+      register: dns_results
+      loop: "{{ dns_servers }}"
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Latency and packet loss tests (Corrected)
+      ansible.builtin.shell:
+        cmd: 'ping -c 10 -i 0.2 {{ item }} | grep ''packet loss\|rtt'''
+      register: ping_results
+      loop: "{{ ping_targets }}"
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Traceroute analysis
+      ansible.builtin.shell:
+        cmd: "traceroute -w 1 -q 1 -n {{ item }}"
+      register: traceroute_results
+      loop: "{{ traceroute_targets }}"
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Internet speed test
+      ansible.builtin.command:
+        cmd: speedtest-cli --json
+      register: speedtest_results
+      when: speedtest_enabled
+      changed_when: false
+      ignore_errors: yes
+
+    - name: iperf3 bandwidth test
+      ansible.builtin.shell:
+        cmd: "iperf3 -c {{ iperf3_server }} -J"
+      register: iperf3_results
+      when: iperf3_server != ""
+      changed_when: false
+      ignore_errors: yes
+
+    - name: TCP port verification
+      ansible.builtin.wait_for:
+        host: "{{ item.host }}"
+        port: "{{ item.port }}"
+        timeout: 3
+      loop: "{{ tcp_checks }}"
+      register: tcp_results
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Extract speedtest metrics (Fixed)
+      ansible.builtin.set_fact:
+        speedtest_download: "{{ (speedtest_results.stdout | from_json).download / 1000000 | round(2) | default(0) }}"
+        speedtest_upload: "{{ (speedtest_results.stdout | from_json).upload / 1000000 | round(2) | default(0) }}"
+      when:
+        - speedtest_enabled
+        - speedtest_results.stdout | length > 0
+      ignore_errors: yes
+
+    - name: Calculate max MTU (Fixed)
+      ansible.builtin.set_fact:
+        max_mtu: "{{ mtu_sizes | first }}"
+      loop: "{{ mtu_sizes }}"
+      when:
+        - mtu_test is defined
+        - mtu_test.results[loop.index0].rc == 0
+      ignore_errors: yes
+
+    - name: Set final max MTU value
+      ansible.builtin.set_fact:
+        max_mtu: "{{ max_mtu | default('Unknown') }}"
+
+    - name: Show diagnostic results (Fixed)
+      ansible.builtin.debug:
+        msg: |-
+          ===== [{{ inventory_hostname | upper }}] NETWORK DIAGNOSTICS =====
+          
+          [INTERNET PERFORMANCE]
+          Download: {{ speedtest_download | default('N/A') }} Mbps
+          Upload: {{ speedtest_upload | default('N/A') }} Mbps
+          {% if iperf3_server != "" and iperf3_results is defined %}
+          Internal Bandwidth: {{ (iperf3_results.stdout | from_json).end.sum_received.bits_per_second / 1000000 | round(2) | default('N/A') }} Mbps
+          {% endif %}
+          
+          [LATENCY ANALYSIS]
+          {% for result in ping_results.results %}
+          {{ result.item }}:
+            {{ result.stdout | regex_replace('\n', '\n        ') | replace('time ', 'Duration: ') | default('N/A') }}
+          {% endfor %}
+          
+          [PATH ANALYSIS]
+          Max MTU to {{ mtu_target }}: {{ max_mtu | default('Unknown') }}
+          {% for result in traceroute_results.results %}
+          Traceroute to {{ result.item }}:
+          {{ result.stdout | regex_replace('(\d+  )', '\n  \\1') | regex_replace(' ms', ' ms\n') | default('N/A') }}
+          {% endfor %}
+          
+          [CONNECTIVITY CHECKS]
+          {% for result in tcp_results.results %}
+          {{ tcp_checks[loop.index0].description }} ({{ tcp_checks[loop.index0].host }}:{{ tcp_checks[loop.index0].port }}):
+            {{ 'OK' if not result.failed else 'FAILED' }}
+          {% endfor %}
+          
+          [DNS PERFORMANCE]
+          {% for result in dns_results.results %}
+          {{ result.item }}:
+            {{ result.stdout | regex_replace(';; Query time: ', '') | regex_replace(' msec', ' ms') | default('N/A') }}
+          {% endfor %}
