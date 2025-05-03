@@ -1,0 +1,9 @@
+---
+services:
+  iperf3-server:
+    image: networkstatic/iperf3
+    container_name: iperf3-server
+    command: -s
+    ports:
+      - "5201:5201"
+    restart: unless-stopped
