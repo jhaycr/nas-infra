@@ -1,7 +1,7 @@
 ---
 services:
 
-  mongo:
+  komodo-mongo:
     image: mongo
     container_name: komodo-mongo
     command: --quiet --wiredTigerCacheSizeGB 0.25
@@ -9,20 +9,20 @@ services:
     logging:
       driver: ${COMPOSE_LOGGING_DRIVER:-local}
     volumes:
-      - /mnt/user/appdata/komodo/mongo/db:/data/db
-      - /mnt/user/appdata/komodo/mongo/config:/data/configdb
+      - {{ docker_appdata_path }}/komodo/mongo/db:/data/db
+      - {{ docker_appdata_path }}/komodo/mongo/config:/data/configdb
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${KOMODO_DB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${KOMODO_DB_PASSWORD}
     labels:
       komodo.skip: # Prevent Komodo from stopping with StopAllContainers
 
-  core:
+  komodo-core:
     image: ghcr.io/moghtech/komodo-core:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-core
     restart: unless-stopped
     depends_on:
-      - mongo
+      - komodo-mongo
     logging:
       driver: ${COMPOSE_LOGGING_DRIVER:-local}
     ports:
@@ -34,12 +34,12 @@ services:
       KOMODO_DATABASE_PASSWORD: ${KOMODO_DB_PASSWORD}
     volumes:
       ## Core cache for repos for latest commit hash / contents
-      - /mnt/user/appdata/komodo/core/repos:/repo-cache
+      - {{ docker_appdata_path }}/komodo/core/repos:/repo-cache
       - /opt/docker/compose:/opt/docker/compose
     labels:
       komodo.skip: # Prevent Komodo from stopping with StopAllContainers
 
-  periphery:
+  komodo-periphery:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-periphery
     restart: unless-stopped

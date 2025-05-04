@@ -2,27 +2,27 @@
 
 services:
 
-  server:
+  gitea-server:
     image: gitea/gitea:1.23.7
     container_name: gitea-server
     restart: always
     environment:
       - TZ=America/Los_Angeles
       - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=db:5432
+      - GITEA__database__HOST=gitea-db:5432
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
     volumes:
       # replace the left-hand side from the ':' with your own path
-      - /mnt/user/appdata/gitea/data:/data
+      - {{ docker_appdata_path }}/gitea:/data
     ports:
       - 3105:3000
       - 222:22
     depends_on:
-      - db
+      - gitea-db
       
-  db:
+  gitea-db:
     image: postgres:17.4
     container_name: gitea-db
     restart: always
@@ -33,4 +33,4 @@ services:
       - POSTGRES_PASSWORD=${GITEA_DB_PASSWORD}
     volumes:
       # replace the left-hand side from the ':' with your own path
-      - /mnt/user/appdata/gitea/database:/var/lib/postgresql/data
+      - {{ docker_appdata_path }}/gitea/database:/var/lib/postgresql/data
