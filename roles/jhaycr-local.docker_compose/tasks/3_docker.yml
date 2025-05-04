@@ -9,6 +9,7 @@
     project_src: "{{ docker_compose_path }}/{{ current_stack_name }}"
     state: present
     recreate: "auto"
+    pull: "policy"
     env_files:
     - .env
     files:
