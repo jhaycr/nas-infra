@@ -18,6 +18,7 @@ services:
 {% for service in services %}
   {{ service }}:
     <<: *common-keys
+    pull_policy: if_not_present
     environment:
       <<: *common-env
 {% endfor %}
