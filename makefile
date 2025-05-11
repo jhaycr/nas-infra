@@ -18,10 +18,10 @@ bootstrap-ssh-rollback:
 	ansible-playbook -v ./playbooks/bootstrap-ssh-rollback.yml --limit=$(LIMIT)
 
 vault-lock:
-	find ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault encrypt
+	find -L ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault encrypt
 
 vault-unlock:
-	find ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault decrypt
+	find -L ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault decrypt
 
 neo:
 	ansible-playbook site.yml --limit neo $(EXTRA_VARS:%=-e '%')
