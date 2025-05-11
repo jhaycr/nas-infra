@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Find all vault.yml files in the group_vars directories
-vaults=$(find ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault view > /dev/null 2>&1; echo $?)
+vaults=$(find -L ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault view > /dev/null 2>&1; echo $?)
 
 # If any files are unencrypted, the command will return a non-zero status
 if [ "$vaults" -ne 0 ]; then
