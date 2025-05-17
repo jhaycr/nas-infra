@@ -1,7 +1,7 @@
 ---
 collections:
   - name: arillso.system
-    version: 0.0.34
+    version: 0.0.36
   - name: devsec.hardening
     version: 9.0.1
 
