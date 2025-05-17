@@ -11,7 +11,7 @@ services:
     # https://github.com/itzg/docker-minecraft-server
     # https://docker-minecraft-server.readthedocs.io/en/latest/
     container_name: minecraft-1
-    image: itzg/minecraft-server # itzg/minecraft-server | itzg/minecraft-bedrock-server
+    image: itzg/minecraft-server:2025.4.2 # itzg/minecraft-server | itzg/minecraft-bedrock-server
     environment:
       EULA: "true"
       SERVER_NAME: HomeSurvivalSafe
@@ -31,7 +31,7 @@ services:
       PLUGINS: |
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
-        https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.2.0/PAPER/ViaVersion-5.2.0.jar
+        https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.3.2/PAPER/ViaVersion-5.3.2.jar
     networks:
       - minecraft
     ports:

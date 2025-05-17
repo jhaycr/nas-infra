@@ -32,13 +32,13 @@
 
 services:
   paperless-broker:
-    image: docker.io/library/redis:7
+    image: docker.io/library/redis:7.4.3
     restart: unless-stopped
     volumes:
       - paperless-redisdata:/data
 
   paperless-db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:16.9
     restart: unless-stopped
     volumes:
       - paperless-pgdata:/var/lib/postgresql/data

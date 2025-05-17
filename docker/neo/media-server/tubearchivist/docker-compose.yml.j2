@@ -39,7 +39,7 @@ services:
   tubearchivist:
     <<: *common-keys
     container_name: tubearchivist
-    image: bbilly1/tubearchivist
+    image: bbilly1/tubearchivist:v0.5.1
     #networks:
     #  - ta-network
     network_mode: container:gluetun
@@ -77,7 +77,7 @@ services:
   
   tubearchivist-redis:
     <<: *common-keys
-    image: redis/redis-stack-server
+    image: redis/redis-stack-server:7.4.0-v3
     container_name: tubearchivist-redis
     restart: unless-stopped
     volumes:
@@ -93,7 +93,8 @@ services:
   
   tubearchivist-es:
     <<: *common-keys
-    image: bbilly1/tubearchivist-es         # only for amd64, or use official es 8.14.3
+    # as of 5/17, latest is 8.18.0
+    image: bbilly1/tubearchivist-es:latest@sha256:8a2cb0792c9b0c98aa771384fffbdd126e013507f3b177232aaab15952cb5dcc         # only for amd64, or use official es 8.14.3
     container_name: tubearchivist-es
     restart: unless-stopped
     environment:
