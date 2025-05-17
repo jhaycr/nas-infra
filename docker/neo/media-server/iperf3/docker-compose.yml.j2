@@ -1,7 +1,7 @@
 ---
 services:
   iperf3-server:
-    image: networkstatic/iperf3
+    image: networkstatic/iperf3:latest@sha256:07dcca91c0e47d82d83d91de8c3d46b840eef4180499456b4fa8d6dadb46b6c8
     container_name: iperf3-server
     command: -s
     ports:
