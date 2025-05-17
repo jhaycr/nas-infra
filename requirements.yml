@@ -15,7 +15,7 @@ roles:
   - name: geerlingguy.pip
     version: 3.0.3
   - name: grog.package
-    version: v1.4.0
+    version: v1.4.1
   - name: IronicBadger.proxmox_nag_removal
     version: 1.0.2
   - name: joenyland.plexmediaserver
