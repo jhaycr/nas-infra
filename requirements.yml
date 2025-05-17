@@ -9,7 +9,7 @@ roles:
   - name: fuzzymistborn.autorestic
     version: v0.2.3
   - name: geerlingguy.docker
-    version: 7.3.0
+    version: 7.4.7
   - name: geerlingguy.nfs
     version: 2.0.0
   - name: geerlingguy.pip
