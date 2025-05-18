@@ -14,6 +14,41 @@
   "docker-compose": {
     "fileMatch": [
       "^docker/.*\\.ya?ml\\.j2$"
+    ],
+    "hostRules": [
+      {
+        "matchHost": "docker.io",
+        "concurrentRequestLimit": 2
+      }
+    ],
+    "packageRules": [
+      {
+        "matchPackageNames": "redis",
+        "matchCurrentVersion": "6.2-alpine",
+        "enabled": false
+      },
+      {
+        "matchPackageNames": "tensorchord/pgvecto-rs",
+        "enabled": false
+      },
+      {
+        "matchPackageNames": "postgres",
+        "matchCurrentVersion": "16-alpine3.21",
+        "enabled": false
+      },
+      {
+        "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
+        "allowedVersions": "<2021"
+      },
+
+      {
+        "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
+        "allowedVersions": "<2021"
+      },
+      {
+        "matchPackageNames": "ghcr.io/hotio/duplicacy",
+        "versionCompatibility": "^(?<compatibility>release-)(?<version>.+)$"
+      }
     ]
   }
 }
