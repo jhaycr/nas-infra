@@ -23,8 +23,8 @@
     ],
     "packageRules": [
       {
-        "matchPackageNames": "redis",
-        "matchCurrentVersion": "6.2-alpine",
+        "matchPackageNames": "docker.io/valkey/valkey",
+        "matchCurrentVersion": "8-bookworm",
         "enabled": false
       },
       {
@@ -50,7 +50,7 @@
       },
       {
         "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
-        "allowedVersions": "<20"
+        "allowedVersions": "<14"
       },
       {
         "matchPackageNames": "ghcr.io/hotio/duplicacy",
