@@ -37,13 +37,20 @@
         "enabled": false
       },
       {
-        "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
+        "matchPackageNames": [
+          "lscr.io/linuxserver/mylar3", 
+          "lscr.io/linuxserver/tautulli"],
         "allowedVersions": "<2021"
       },
-
+      {
+        "matchPackageNames": [
+          "lscr.io/linuxserver/mylar3"
+        ],
+        "allowedVersions": "!/14.$/"
+      },
       {
         "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
-        "allowedVersions": "<2021"
+        "allowedVersions": "<20.04.1"
       },
       {
         "matchPackageNames": "ghcr.io/hotio/duplicacy",
