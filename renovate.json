@@ -7,6 +7,9 @@
   "dependencyDashboardTitle": "Renovate Dashboard",
   "enabledManagers": ["docker-compose"],
   "docker-compose": {
-    "fileMatch": ["^docker/(?!morpheus/)(?!neo/\\.archive/).+\\.ya?ml\\.j2$"]
+    "fileMatch": [
+      "^docker/(?!morpheus/).*\\.ya?ml\\.j2$",
+      "^docker/neo/(?!\\.archive/).*\\.ya?ml\\.j2$"
+    ]
   }
 }
