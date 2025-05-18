@@ -32,6 +32,9 @@ neo-docker:
 neo-disks:
 	ansible-playbook site.yml --limit neo --tags disks $(EXTRA_VARS:%=-e '%')
 
+neo-vm:
+	ansible-playbook site.yml --limit neo --tags vm $(EXTRA_VARS:%=-e '%')
+
 morpheus:
 	ansible-playbook site.yml --limit morpheus $(EXTRA_VARS:%=-e '%')
 
