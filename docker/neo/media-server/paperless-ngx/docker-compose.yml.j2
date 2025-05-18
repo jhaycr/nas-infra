@@ -32,13 +32,13 @@
 
 services:
   paperless-broker:
-    image: docker.io/library/redis:7.4.3
+    image: docker.io/library/redis:8
     restart: unless-stopped
     volumes:
       - paperless-redisdata:/data
 
   paperless-db:
-    image: docker.io/library/postgres:16.9
+    image: docker.io/library/postgres:17
     restart: unless-stopped
     volumes:
       - paperless-pgdata:/var/lib/postgresql/data
@@ -47,7 +47,7 @@ services:
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
 
-  webserver:
+  paperless-webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
@@ -71,7 +71,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://paperless-tika:9998
 
   paperless-gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.7
+    image: docker.io/gotenberg/gotenberg:8.20
     restart: unless-stopped
 
     # The gotenberg chromium route is used to convert .eml files. We do not
