@@ -43,12 +43,6 @@
         "allowedVersions": "<2021"
       },
       {
-        "matchPackageNames": [
-          "lscr.io/linuxserver/mylar3"
-        ],
-        "allowedVersions": "!/14.$/"
-      },
-      {
         "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
         "allowedVersions": "<14"
       },
