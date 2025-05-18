@@ -6,10 +6,14 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
   "enabledManagers": ["docker-compose"],
+  "ignorePaths": [
+    "docker/morpheus/**",
+    "docker/neo/.archive/**"
+  ],
+
   "docker-compose": {
     "fileMatch": [
-      "^docker/(?!morpheus/).*\\.ya?ml\\.j2$",
-      "^docker/neo/(?!\\.archive/).*\\.ya?ml\\.j2$"
+      "^docker/.*\\.ya?ml\\.j2$"
     ]
   }
 }
