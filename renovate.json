@@ -37,10 +37,15 @@
         "enabled": false
       },
       {
-        "matchPackageNames": [
-          "lscr.io/linuxserver/mylar3", 
-          "lscr.io/linuxserver/tautulli"],
+        "matchPackageNames": ["lscr.io/linuxserver/tautulli"],
         "allowedVersions": "<2021"
+      },
+      {
+        "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
+        "ignoreVersions": [
+          "^20\\d{2}\\..*",  // any tag starting with 2000–2099 + “.”
+          "5\\.9\\.5"
+        ]
       },
       {
         "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
