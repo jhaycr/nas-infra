@@ -32,9 +32,10 @@
     },
     {
       "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
-      "ignoreVersions": [
-        "^20\\d{2}\\..*",  // block any date‑style tag from 2000–2099
-        "5\\.9\\.5"        // block this specific bad tag
+      "allowedVersions": [
+        "<=0.8.2",
+        "!/^20\\d{2}\\..*$/",
+        "!/^5\\.9\\.5$/"
       ]
     },
     {
