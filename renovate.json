@@ -11,6 +11,42 @@
     "docker/neo/.archive/**"
   ],
 
+  "packageRules": [
+    {
+      "matchPackageNames": ["docker.io/valkey/valkey"],
+      "matchCurrentVersion": "8-bookworm",
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["tensorchord/pgvecto-rs"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["postgres"],
+      "matchCurrentVersion": "16-alpine3.21",
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["lscr.io/linuxserver/tautulli"],
+      "allowedVersions": "<2021"
+    },
+    {
+      "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
+      "ignoreVersions": [
+        "^20\\d{2}\\..*",  // block any date‑style tag from 2000–2099
+        "5\\.9\\.5"        // block this specific bad tag
+      ]
+    },
+    {
+      "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
+      "allowedVersions": "<14"
+    },
+    {
+      "matchPackageNames": ["ghcr.io/hotio/duplicacy"],
+      "versionCompatibility": "^(?<compatibility>release-)(?<version>.+)$"
+    }
+  ],
+
   "docker-compose": {
     "fileMatch": [
       "^docker/.*\\.ya?ml\\.j2$"
@@ -19,41 +55,6 @@
       {
         "matchHost": "docker.io",
         "concurrentRequestLimit": 2
-      }
-    ],
-    "packageRules": [
-      {
-        "matchPackageNames": "docker.io/valkey/valkey",
-        "matchCurrentVersion": "8-bookworm",
-        "enabled": false
-      },
-      {
-        "matchPackageNames": "tensorchord/pgvecto-rs",
-        "enabled": false
-      },
-      {
-        "matchPackageNames": "postgres",
-        "matchCurrentVersion": "16-alpine3.21",
-        "enabled": false
-      },
-      {
-        "matchPackageNames": ["lscr.io/linuxserver/tautulli"],
-        "allowedVersions": "<2021"
-      },
-      {
-        "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
-        "ignoreVersions": [
-          "^20\\d{2}\\..*",  // any tag starting with 2000–2099 + “.”
-          "5\\.9\\.5"
-        ]
-      },
-      {
-        "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
-        "allowedVersions": "<14"
-      },
-      {
-        "matchPackageNames": "ghcr.io/hotio/duplicacy",
-        "versionCompatibility": "^(?<compatibility>release-)(?<version>.+)$"
       }
     ]
   }
