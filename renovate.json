@@ -32,11 +32,7 @@
     },
     {
       "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
-      "allowedVersions": [
-        "<=0.8.2",
-        "!/^20\\d{2}\\..*$/",
-        "!/^5\\.9\\.5$/"
-      ]
+      "allowedVersions": "<=1.0.0"
     },
     {
       "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
