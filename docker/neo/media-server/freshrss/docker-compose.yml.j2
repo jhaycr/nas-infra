@@ -1,19 +1,46 @@
 ---
+networks:
+  app_freshrss:
+    name: app_freshrss
+    driver: bridge 
+
 services:
 
- freshrss:
-  container_name: freshrss
-  image: freshrss/freshrss:1.26.2
-  environment:
-    OIDC_ENABLED : 1
-    OIDC_PROVIDER_METADATA_URL : https://auth.{{ secret_domain }}/application/o/freshrss/.well-known/openid-configuration
-    OIDC_CLIENT_ID : {{ secret_freshrss_oidc_client_id }}
-    OIDC_CLIENT_SECRET : {{ secret_freshrss_oidc_client_secret }}
-    OIDC_X_FORWARDED_HEADERS : X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
-    OIDC_SCOPES : openid email profile
-  networks:
-    bridge_proxy_external:
-  ports:
-    - "8012:80"
-  volumes:
-    - {{ docker_appdata_path }}/freshrss:/config
+  freshrss:
+    container_name: freshrss
+    image: freshrss/freshrss:1.26.2
+    environment:
+      OIDC_ENABLED : 1
+      OIDC_PROVIDER_METADATA_URL : https://auth.{{ secret_domain }}/application/o/freshrss/.well-known/openid-configuration
+      OIDC_CLIENT_ID : {{ secret_freshrss_oidc_client_id }}
+      OIDC_CLIENT_SECRET : {{ secret_freshrss_oidc_client_secret }}
+      OIDC_X_FORWARDED_HEADERS : X-Forwarded-Port X-Forwarded-Proto X-Forwarded-Host
+      OIDC_SCOPES : openid email profile
+    networks:
+      - app_freshrss
+      - bridge_proxy_external
+    ports:
+      - "8012:80"
+    volumes:
+      - {{ docker_appdata_path }}/freshrss:/config
+
+  freshrss-db:
+    image: mariadb:11.3.2
+    container_name: freshrss-db
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD={{ secret_freshrss_db_root_pass }} # Use a unique, secure password
+      - MARIADB_DATABASE=freshrss
+      - MARIADB_USER=freshrss
+      - MARIADB_PASSWORD=freshrss
+    networks:
+      - app_freshrss
+    volumes:
+      - {{ docker_appdata_path }}/freshrss-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      start_interval: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
