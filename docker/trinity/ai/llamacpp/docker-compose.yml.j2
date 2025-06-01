@@ -1,6 +1,8 @@
 services:
   llama:
     image: ghcr.io/ggml-org/llama.cpp:full
+    container_name: llammacpp
+    restart: unless-stopped
     volumes:
       - {{ docker_appdata_path }}/llamacpp/models:/models
     ports:
