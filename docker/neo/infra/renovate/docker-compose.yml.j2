@@ -1,0 +1,14 @@
+---
+services:
+  renovate:
+    image: renovate/renovate:latest
+    container_name: renovate
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - {{ docker_appdata_path }}/renovate/config.js:/usr/src/app/config.js:ro
+      - {{ docker_appdata_path }}/renovate:/usr/src/app/tmp/renovate
+    command: >
+      renovate
+      ${RENOVATE_REPOSITORIES}
