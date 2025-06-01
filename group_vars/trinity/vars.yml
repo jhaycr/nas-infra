@@ -2,6 +2,9 @@
 
 main_username: josh
 
+docker_compose_path: '/opt/docker/compose'
+docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
+
 # -----
 # grog.package
 # -----
