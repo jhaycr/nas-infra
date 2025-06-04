@@ -1,10 +1,10 @@
 services:
   llama:
-    image: ghcr.io/ggml-org/llama.cpp:full
-    container_name: llammacpp
+    image: ghcr.io/ggml-org/llama.cpp:light
+    container_name: llamacpp
     restart: unless-stopped
     volumes:
-      - {{ docker_appdata_path }}/llamacpp/models:/models
+      - /opt/llamacpp/models:/models
     ports:
       - target: 8080
         published: 8080
