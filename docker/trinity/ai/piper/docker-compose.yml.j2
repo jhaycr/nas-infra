@@ -16,5 +16,19 @@ services:
     volumes:
       - {{ docker_appdata_path }}/piper/data:/config
     ports:
-      - 10200:10200
+      - 10201:10200
     restart: unless-stopped
+
+  wyoming-piper:
+    image: rhasspy/wyoming-piper
+    container_name: piper-wyoming
+    ports:
+      - 5000:5000
+      - 10200:10200
+    volumes:
+      - {{ docker_appdata_path }}/piper-data:/data
+    command: [ "--voice", "en_US-lessac-medium" ]
+    restart: unless-stopped
+
+
+    # docker exec -it piper "find "

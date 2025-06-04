@@ -4,3 +4,4 @@ main_username: user0
 
 internal_ip_neo: 192.168.1.3
 ip_internal_morpheus: 192.168.1.2
+ip_internal_trinity: 192.168.1.48
