@@ -1,0 +1,9 @@
+---
+services:
+  picard:
+    image: mikenye/picard:latest
+    ports:
+      - "5800:5800"
+    volumes:
+      - {{ docker_appdata_path }}/picard/config:/config:rw
+      - {{ nas_storage_path }}/media/audio/music:/storage:rw
