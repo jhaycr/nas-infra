@@ -57,6 +57,22 @@
         owner: "{{ main_username }}"
         group: "{{ main_username }}"
         state: directory
+
+    # https://www.reddit.com/r/gluetun/comments/1ckf1jv/how_to_force_gluetun_to_rotate_to_a_new_endpoint/
+    # https://github.com/qdm12/gluetun/issues/2236
+    - name: Schedule gluetun rotation
+      become: yes
+      cron:
+        name: gluetun cron
+        # job: "bash -lc; /usr/local/bin/autorestic -c /home/{{ main_username }}/.autorestic.yml backup -avv --ci >> /var/log/autorestic.log 2>&1"
+        job: "sudo docker exec -ti gluetun 'wget' '-qO-' '--method=PUT' '--body-data={\"status\":\"stopped\"}' 'http://127.0.0.1:8000/v1/openvpn/status'"
+        user: "root"
+        weekday: "*"
+        month: "*"
+        day: "*"
+        hour: "8"
+        minute: "0"
+        state: present
       
 - hosts: morpheus
   roles:
