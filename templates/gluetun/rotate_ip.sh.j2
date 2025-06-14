@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# https://www.reddit.com/r/gluetun/comments/1ckf1jv/how_to_force_gluetun_to_rotate_to_a_new_endpoint/
+# https://github.com/qdm12/gluetun/issues/2236
+
+set -euo pipefail
+
+LOG_FILE="/var/log/gluetun-rotation.log"
+TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
+
+echo "$TIMESTAMP: Starting Gluetun endpoint rotation..." >> "$LOG_FILE"
+
+# Trigger endpoint rotation
+docker exec gluetun wget -qO- \
+  --method=PUT \
+  --body-data='{"status":"stopped"}' \
+  http://127.0.0.1:8000/v1/openvpn/status >> "$LOG_FILE" 2>&1
+
+# Wait for the VPN to reconnect
+echo "$TIMESTAMP: Waiting for Gluetun to reconnect..." >> "$LOG_FILE"
+sleep 15  # adjust as needed
+
+# Get the new external IP with proper User-Agent
+NEW_IP=$(docker exec gluetun wget -qO- --header="User-Agent: curl" https://ifconfig.me || echo "Failed to get IP")
+echo "$TIMESTAMP: New VPN IP is: $NEW_IP" >> "$LOG_FILE"

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+docker run --rm \
+  --network container:gluetun \
+  curlimages/curl:latest \
+  -u elastic:{{ secret_tubearchivist_es_pass }} \
+  -H 'Content-Type: application/json' \
+  -X POST "http://localhost:9200/ta_download/_update_by_query?pretty" \
+  -d '{
+    "script": {
+      "source": "ctx._source.message = null",
+      "lang": "painless"
+    },
+    "query": {
+      "match_all": {}
+    }
+  }'
