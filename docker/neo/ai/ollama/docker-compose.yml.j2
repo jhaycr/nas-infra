@@ -1,0 +1,46 @@
+---
+networks:
+  app_ollama:
+    name: app_ollama
+    driver: bridge
+
+  bridge_proxy_external:
+    name: bridge_proxy_external
+    driver: bridge
+    external: true
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - 11434:11434
+    volumes:
+      - {{ docker_appdata_path }}/ollama:/root/.ollama
+    networks:
+      - app_ollama
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - {{ docker_appdata_path }}/open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - 3030:8080
+    environment:
+      - 'OLLAMA_BASE_URL=http://ollama:11434'
+      - 'WEBUI_SECRET_KEY='
+      - 'OAUTH_CLIENT_ID={{ secret_openwebui_oidc_client_id}}'
+      - 'OAUTH_CLIENT_SECRET={{ secret_openwebui_oidc_client_secret}}'
+      - 'OAUTH_PROVIDER_NAME=authentik'
+      - 'OPENID_PROVIDER_URL=https://auth.{{secret_domain}}/application/o/ollama/.well-known/openid-configuration'
+      - 'OPENID_REDIRECT_URI=https://ollama.{{secret_domain}}/oauth/oidc/callback'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - bridge_proxy_external
+      - app_ollama
+    restart: unless-stopped
