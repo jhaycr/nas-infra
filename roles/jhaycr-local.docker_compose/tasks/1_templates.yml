@@ -10,6 +10,7 @@
         paths: 
           - "{{ local_stack_path }}"
         patterns: 
+          - "Dockerfile"
           - "docker-compose*.yml.j2"
           - ".env.j2"
         excludes: 
