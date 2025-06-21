@@ -1,0 +1,34 @@
+services:
+  igir-base:
+    build: 
+      context: .
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    image: igir-app
+    volumes:
+      - ${IGIR_DATA_PATH}:/data:rw
+    user: appuser
+    working_dir: /data
+    tty: true
+    stdin_open: true
+    entrypoint: ["igir"]
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nodev,nosuid,size=64M
+    network_mode: "none"
+    
+  igir:
+    extends:
+      service: igir-base
+
+  igir-shell:
+    extends:
+      service: igir-base
+    entrypoint: ["/bin/sh"]
+    command: []
