@@ -3,7 +3,7 @@ services:
 
  portainer:
   container_name: portainer
-  image: portainer/portainer-ce:2.31.0
+  image: portainer/portainer-ce:2.31.1
   command: -H tcp://{{ ip_internal_morpheus }}:9001 --tlsskipverify
   ports:
     - "9000:9000"
