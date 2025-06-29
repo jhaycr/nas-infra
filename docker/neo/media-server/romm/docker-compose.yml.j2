@@ -26,6 +26,8 @@ services:
       - ROMM_AUTH_SECRET_KEY={{ secret_romm_auth_secret_key }} # Generate a key with `openssl rand -hex 32`
       - IGDB_CLIENT_ID={{ secret_igdb_client_id }} # Generate an ID and SECRET in IGDB
       - IGDB_CLIENT_SECRET={{ secret_igdb_api_client_secret }} # https://api-docs.igdb.com/#account-creation
+      - SCREENSCRAPER_USER={{ secret_screenscraper_user}}
+      - SCREENSCRAPER_PASSWORD={{ secret_screenscraper_password }}
       - MOBYGAMES_API_KEY= # https://www.mobygames.com/info/api/
       - STEAMGRIDDB_API_KEY= # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
       - OIDC_ENABLED=true #: Set to true to enable OIDC authentication.
@@ -40,7 +42,7 @@ services:
     volumes:
       - romm_resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
       - romm_redis_data:/redis-data # Cached data for background tasks
-      - {{ nas_storage_path }}/storage/Games/Emulation/library:/romm/library:ro # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
+      - {{ nas_storage_path }}/storage/Games/Emulation/library:/romm/library # Your game library. Check https://github.com/rommapp/romm?tab=readme-ov-file#folder-structure for more details.
       - {{ docker_appdata_path }}/romm/assets:/romm/assets # Uploaded saves, states, etc.
       - {{ docker_appdata_path }}/romm/config:/romm/config # Path where config.yml is stored
     ports:
