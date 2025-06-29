@@ -1,0 +1,10 @@
+---
+services:
+  jdownloader:
+    image: jlesage/jdownloader-2
+    container_name: jdownloader
+    ports:
+      - "5801:5800"
+    volumes:
+      - {{ docker_appdata_path }}/jdownloader:/config:rw
+      - {{ nas_download_path }}/jdownloader:/output:rw
