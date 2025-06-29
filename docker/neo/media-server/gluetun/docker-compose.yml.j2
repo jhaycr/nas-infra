@@ -17,6 +17,8 @@ services:
     - vpn_gluetun
     ports:
       - 8088:8088 # tubearchivist
+      - 8945:8945 # tubesync
+      - 4848:4848 # pinchflat
       - 8113:8113 # qbittorrent
       - 6881:6881     # qbittorrent / deluge
       - 6881:6881/udp # qbittorrent / deluge

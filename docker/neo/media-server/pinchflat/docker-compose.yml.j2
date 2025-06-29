@@ -1,0 +1,13 @@
+---
+services:
+  pinchflat:
+    image: ghcr.io/kieraneglin/pinchflat:latest
+    container_name: pinchflat
+    network_mode: container:gluetun
+    #ports:
+    #  - '8945:8945'
+    volumes:
+      - {{ docker_appdata_path }}/pinchflat:/config
+      - {{ nas_storage_path }}/media/TV/Youtube_Pinchflat:/downloads
+    depends_on:
+      - gluetun
