@@ -5,6 +5,22 @@ services:
     container_name: jdownloader
     ports:
       - "5801:5800"
+      - "3129:3129"
     volumes:
       - {{ docker_appdata_path }}/jdownloader:/config:rw
       - {{ nas_download_path }}/jdownloader:/output:rw
+    networks:
+      - app_jdownloader
+    # cap_drop:
+    #  - ALL
+    # cap_add: []
+    # read_only: false
+    # devices: []
+    # privileged: false
+    #security_opt:
+    #  - no-new-privileges:true
+
+networks:
+  app_jdownloader:
+    driver: bridge
+    internal: false 
