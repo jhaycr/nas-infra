@@ -58,7 +58,7 @@ services:
       TA_USERNAME: {{ secret_tubearchivist_user }}           # your initial TA credentials
       TA_PASSWORD: {{ secret_tubearchivist_pass }}              # your initial TA credentials
       ELASTIC_PASSWORD: {{ secret_tubearchivist_es_pass }}         # set password for Elasticsearch
-      DJANGO_DEBUG: True
+      DJANGO_DEBUG: False
 
       # prevents the browser extension from working and breaks existing users
       # https://docs.tubearchivist.com/configuration/forward-auth/
