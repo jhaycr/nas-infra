@@ -1,0 +1,12 @@
+---
+services:
+    ersatztv:
+      image: jasongdove/ersatztv
+      container_name: ersatztv
+      restart: unless-stopped
+      volumes:
+        - {{ nas_storage_path }}/media/TV:/tv:ro
+        - {{ nas_storage_path }}/media/Movies:/movies:ro
+        - {{ docker_appdata_path }}/ersatztv:/root/.local/share/ersatztv
+      ports:
+        - '8409:8409'
