@@ -30,6 +30,8 @@ services:
       - SCREENSCRAPER_PASSWORD={{ secret_screenscraper_password }}
       - MOBYGAMES_API_KEY= # https://www.mobygames.com/info/api/
       - STEAMGRIDDB_API_KEY= # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
+      - HASHEOUS_API_ENABLED=true
+      - PLAYMATCH_API_ENABLED=true
       - OIDC_ENABLED=true #: Set to true to enable OIDC authentication.
       - OIDC_PROVIDER=authentik # The lowercase name of the provider (authentik).
       - OIDC_CLIENT_ID={{ secret_romm_oidc_client_id }} #: The client ID copied from the Authentik application.
