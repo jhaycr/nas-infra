@@ -5,48 +5,62 @@
   ],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
-  "enabledManagers": ["docker-compose"],
+  "enabledManagers": [
+    "docker-compose"
+  ],
   "ignorePaths": [
     "docker/morpheus/**",
     "docker/neo/.archive/**"
   ],
-
   "packageRules": [
     {
-      "matchPackageNames": ["docker.io/valkey/valkey"],
+      "matchPackageNames": [
+        "docker.io/valkey/valkey"
+      ],
       "matchCurrentVersion": "8-bookworm",
       "enabled": false
     },
     {
-      "matchPackageNames": ["tensorchord/pgvecto-rs"],
+      "matchPackageNames": [
+        "tensorchord/pgvecto-rs"
+      ],
       "enabled": false
     },
     {
-      "matchPackageNames": ["postgres"],
+      "matchPackageNames": [
+        "postgres"
+      ],
       "matchCurrentVersion": "16-alpine3.21",
       "enabled": false
     },
     {
-      "matchPackageNames": ["lscr.io/linuxserver/tautulli"],
+      "matchPackageNames": [
+        "lscr.io/linuxserver/tautulli"
+      ],
       "allowedVersions": "<2021"
     },
     {
-      "matchPackageNames": ["lscr.io/linuxserver/mylar3"],
+      "matchPackageNames": [
+        "lscr.io/linuxserver/mylar3"
+      ],
       "allowedVersions": "<=1.0.0"
     },
     {
-      "matchPackageNames": ["lscr.io/linuxserver/qbittorrent"],
+      "matchPackageNames": [
+        "lscr.io/linuxserver/qbittorrent"
+      ],
       "allowedVersions": "<14"
     },
     {
-      "matchPackageNames": ["ghcr.io/hotio/duplicacy"],
+      "matchPackageNames": [
+        "ghcr.io/hotio/duplicacy"
+      ],
       "versionCompatibility": "^(?<compatibility>release-)(?<version>.+)$"
     }
   ],
-
   "docker-compose": {
-    "fileMatch": [
-      "^docker/.*\\.ya?ml\\.j2$"
+    "managerFilePatterns": [
+      "/^docker/.*\\.ya?ml\\.j2$/"
     ],
     "hostRules": [
       {
