@@ -13,4 +13,5 @@ services:
   volumes:
     - {{ docker_appdata_path }}/komga:/config
     - {{ nas_storage_path }}/comics:/data/comics
-    - {{ nas_storage_path }}/storage/Books:/books
+    - {{ nas_storage_path }}/storage/manga:/data/manga
+    - {{ nas_storage_path }}/storage/Books:/data/books
