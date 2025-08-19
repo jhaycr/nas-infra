@@ -8,7 +8,7 @@ services:
 
   freshrss:
     container_name: freshrss
-    image: freshrss/freshrss:1.26.3
+    image: freshrss/freshrss:1.27.0
     environment:
       OIDC_ENABLED : 1
       OIDC_PROVIDER_METADATA_URL : https://auth.{{ secret_domain }}/application/o/freshrss/.well-known/openid-configuration
