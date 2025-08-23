@@ -67,6 +67,8 @@ services:
   
       # Comment out ports: when using behind a reverse proxy , enable networks: etc.
       network_mode: container:gluetun
+      depends_on:
+      - gluetun
       #ports:
       #  - 5000:5000
       restart: unless-stopped

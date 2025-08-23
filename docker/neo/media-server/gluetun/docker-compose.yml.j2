@@ -22,6 +22,7 @@ services:
       - 8113:8113 # qbittorrent
       - 6881:6881     # qbittorrent / deluge
       - 6881:6881/udp # qbittorrent / deluge
+      - 5000:5000 # changedetection
     expose:
       - "6379"  # tubearchivist-redis
       - "9200"  # tubearchivist-es
