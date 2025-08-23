@@ -4,13 +4,12 @@ services:
     changedetection:
       image: ghcr.io/dgtlmoon/changedetection.io:0.50.10
       container_name: changedetection
-      hostname: changedetection
       volumes:
       - {{ docker_appdata_path }}/changedetection/data:/config
 # Configurable proxy list support, see https://github.com/dgtlmoon/changedetection.io/wiki/Proxy-configuration#proxy-list-support
 #        - ./proxies.json:/datastore/proxies.json
 
-  #    environment:
+      environment:
   #        Default listening port, can also be changed with the -p option
   #      - PORT=5000
   #
@@ -49,7 +48,7 @@ services:
   #      - USE_X_SETTINGS=1
   #
   #        Hides the `Referer` header so that monitored websites can't see the changedetection.io hostname.
-  #      - HIDE_REFERER=true
+         - HIDE_REFERER=true
   #        
   #        Default number of parallel/concurrent fetchers
   #      - FETCH_WORKERS=10
@@ -67,8 +66,9 @@ services:
   #      - TZ=America/Los_Angeles
   
       # Comment out ports: when using behind a reverse proxy , enable networks: etc.
-      ports:
-        - 5000:5000
+      network_mode: container:gluetun
+      #ports:
+      #  - 5000:5000
       restart: unless-stopped
 
      # Used for fetching pages via WebDriver+Chrome where you need Javascript support.
