@@ -16,24 +16,28 @@ services:
       EULA: "true"
       SERVER_NAME: HomeSurvivalSafe
       LEVEL_NAME: HomeSurvivalSafe
-      MODE: "creative" # survival | creative | adventure | spectator
+      MODE: "survival" # survival | creative | adventure | spectator
       FORCE_GAMEMODE: "true"
-      DIFFICULTY: "peaceful" # peaceful | easy | normal | hard
+      DIFFICULTY: "normal" # peaceful | easy | normal | hard
       # LEVEL_SEED: "123"
       ANNOUNCE_PLAYER_ACHIEVEMENTS: "true"
       ENABLE_COMMAND_BLOCK: "true"
       GENERATE_STRUCTURES: "true"
-      ALLOW_CHEATS: "false"
+      ALLOW_CHEATS: "true"
       MAX_PLAYERS: "8"
       DEFAULT_PLAYER_PERMISSION_LEVEL: operator
       TYPE: "PAPER"
-      VERSION: 1.21.8 # https://gist.github.com/osipxd/6119732e30059241c2192c4a8d2218d9
-      # https://hangar.papermc.io/ViaVersion/ViaVersion
+      # VERSION: 1.21.8 # https://gist.github.com/osipxd/6119732e30059241c2192c4a8d2218d9
+      VERSION: "LATEST"
+      # https://hangar.papermc.io/ViaVersion/ViaVersion/versions/
+      # https://hangar.papermc.io/ViaVersion/ViaBackwards/versions/      
+      # https://hangar.papermc.io/ViaVersion/ViaRewind/versions/
       PLUGINS: |
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.4.2/PAPER/ViaVersion-5.4.2.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/5.4.2/PAPER/ViaBackwards-5.4.2.jar
+        https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/4.0.9/PAPER/ViaRewind-4.0.9.jar
     networks:
       - minecraft
       - bridge_proxy_external
