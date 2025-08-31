@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
 
   booklore-mariadb:
-    image: lscr.io/linuxserver/mariadb:11.4.5
+    image: lscr.io/linuxserver/mariadb:11.4.8
     container_name: booklore-mariadb
     environment:
       - MYSQL_ROOT_PASSWORD=super_secure_password  # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
