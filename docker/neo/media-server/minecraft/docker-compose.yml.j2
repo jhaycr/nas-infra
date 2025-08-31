@@ -19,11 +19,17 @@ services:
       MODE: "survival" # survival | creative | adventure | spectator
       FORCE_GAMEMODE: "true"
       DIFFICULTY: "normal" # peaceful | easy | normal | hard
+      ENABLE_WHITELIST: "false"
+      ENFORCE_WHITELIST: "false"
+      # WHITELIST: {{ secret_minecraft_server_whitelist }}
+      OP: {{ secret_minecraft_server_op }}
+      FORCE_OPS: "true"
       # LEVEL_SEED: "123"
       ANNOUNCE_PLAYER_ACHIEVEMENTS: "true"
       ENABLE_COMMAND_BLOCK: "true"
       GENERATE_STRUCTURES: "true"
       ALLOW_CHEATS: "true"
+      ALLOW_FLIGHT: "true"
       MAX_PLAYERS: "8"
       DEFAULT_PLAYER_PERMISSION_LEVEL: operator
       TYPE: "PAPER"
