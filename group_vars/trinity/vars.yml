@@ -9,6 +9,7 @@ docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
 # grog.package
 # -----
 package_list:
+  - name: cheese
   - name: curl
   - name: git
   - name: gnome-tweaks
@@ -17,6 +18,7 @@ package_list:
   - name: keepassxc
   - name: peazip
   - name: pwgen
+  - name: rpi-imager
   - name: steam
   - name: syncthing
   - name: unrar
