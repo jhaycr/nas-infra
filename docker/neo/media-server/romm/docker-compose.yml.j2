@@ -36,7 +36,7 @@ services:
       - OIDC_PROVIDER=authentik # The lowercase name of the provider (authentik).
       - OIDC_CLIENT_ID={{ secret_romm_oidc_client_id }} #: The client ID copied from the Authentik application.
       - OIDC_CLIENT_SECRET={{ secret_romm_oidc_client_secret }} #: The client secret copied from the Authentik application.
-      - OIDC_REDIRECT_URI=https://romm.{{ secret_domain }}/api/oauth/openid # The redirect URI configured in the Authentik provider, in the format https://romm.jjosh.org/api/oauth/openid.
+      - OIDC_REDIRECT_URI=https://romm.{{ secret_domain }}/api/oauth/openid # The redirect URI configured in the Authentik provider, in the format https://romm.host.local/api/oauth/openid.
       - OIDC_SERVER_APPLICATION_URL=https://auth.{{ secret_domain }}/application/o/romm #: The URL of the Authentik application, e.g., http://authentik.host.local/application/o/romm.
     networks:
       - app_romm
