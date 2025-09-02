@@ -2,12 +2,11 @@
 services:
   ollama:
     image: ollama/ollama:latest
+    container_name: ollama
     ports:
       - 11434:11434
     volumes:
       - {{ docker_appdata_path }}/ollama:/root/.ollama
-    container_name: ollama
-    tty: true
     restart: unless-stopped
 
   open-webui:
