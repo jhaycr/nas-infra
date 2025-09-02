@@ -1,0 +1,9 @@
+---
+services:
+
+  kometa:
+    image: kometateam/kometa:latest
+    container_name: kometa
+    volumes:
+    - {{ docker_appdata_path }}/kometa/config:/config 
+    restart: unless-stopped
