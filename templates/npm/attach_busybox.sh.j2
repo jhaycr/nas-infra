@@ -1,0 +1,7 @@
+sudo docker run -itd --net bridge_proxy_external --name busybox busybox sh
+
+sudo docker run -itd --net vpn_gluetun --name busybox busybox sh
+
+sudo docker network inspect bridge_proxy_external
+
+sudo docker network inspect vpn_gluetun
