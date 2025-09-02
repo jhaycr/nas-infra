@@ -5,7 +5,7 @@ services:
     image: lscr.io/linuxserver/healthchecks:3.11.20250828
     container_name: healthchecks
     environment:
-      - SITE_ROOT="https://healthchecks.lab.jjosh.org"
+      - SITE_ROOT="https://healthchecks.lab.{{ secret_domain }}"
       - SITE_NAME="Foo"
       - SUPERUSER_EMAIL="admin@example.com"
       - SUPERUSER_PASSWORD="admin"
