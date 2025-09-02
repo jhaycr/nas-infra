@@ -29,19 +29,18 @@ docker compose run --rm igir copy \
 ```
 
 ```bash
-docker compose run --rm \
+docker run --rm \
   -v "$(pwd)/dats:/data/dats:ro" \
-  -v "$(pwd)/roms-unverified:/data/roms-unverified:ro" \
+  -v "$(pwd)/roms-unverified:/data/roms-unverified" \
   -v "$(pwd)/roms-verified:/data/roms-verified" \
-  igir \
+  -w /data \
+  igir-app \
   move extract report test \
-  -d dats/ \
+  -d dats \
   -i "roms-unverified/" \
   -o "roms-verified/{romm}/" \
-  --input-checksum-quick false \
-  --input-checksum-min CRC32 \
-  --input-checksum-max SHA256 \
-  --only-retail
+  --dir-dat-name
+  -v
 ```
 
 # Access shell
@@ -53,8 +52,14 @@ docker compose run --rm igir-shell
 ```
 
 ```bash
-igir --version
-igir copy --dat "*.dat" --input ROMs/ --output Cleaned/
+igir move zip report test \
+  --dat dats \
+  --input "roms-unverified/" \
+  --output "roms-verified/{romm}/" \
+  --temp-dir "/tmp/igir" \
+  --report-output "/tmp/igir/report %dddd, %MMMM %Do %YYYY, %h:%mm:%ss %a.csv" \
+  --dir-dat-name \
+  -v
 
 cd /data
 ls -l

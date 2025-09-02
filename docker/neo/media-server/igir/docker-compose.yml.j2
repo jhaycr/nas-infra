@@ -8,21 +8,20 @@ services:
     image: igir-app
     volumes:
       - ${IGIR_DATA_PATH}:/data:rw
+      - ${IGIR_TEMP_PATH}:/tmp:rw
     user: appuser
     working_dir: /data
     tty: true
     stdin_open: true
     entrypoint: ["igir"]
     # Security hardening
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nodev,nosuid,size=64M
-    network_mode: "none"
-    
+    #security_opt:
+    #  - no-new-privileges:true
+    #cap_drop:
+    #  - ALL
+    # read_only: true
+    # network_mode: "none"
+
   igir:
     extends:
       service: igir-base
