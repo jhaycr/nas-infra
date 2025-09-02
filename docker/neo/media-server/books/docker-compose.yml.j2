@@ -40,6 +40,8 @@ services:
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:V3.1.1
     container_name: calibre-web-automated
+    environment:
+      - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
     volumes:
       # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
       - {{ docker_appdata_path }}/calibrewebautomated:/config 
@@ -63,6 +65,7 @@ services:
       TZ: America/New_York
       APP_ENV: prod
       CWA_DB_PATH: /auth/app.db
+      AA_DONATOR_KEY: {{ secret_aa_donator_key }}
     ports:
       - 8084:8084
     restart: unless-stopped
