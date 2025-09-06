@@ -23,6 +23,12 @@
       become: yes
     - role: jhaycr-local.logrotate
       become: yes
+    - role: jhaycr-local.proxmox_images
+      become: yes
+      tags: pve
+    - role: jhaycr-local.proxmox_vm
+      become: yes
+      tags: pve
     - role: jhaycr-local.docker_compose
       tags: compose
       become: yes
@@ -137,12 +143,3 @@
         name: vm.swappiness
         value: '10'
         state: present
-
-- hosts: unifi
-  roles:
-    - role: jhaycr-local.proxmox_images
-      become: yes
-      tags: vm
-    - role: jhaycr-local.proxmox_vm
-      become: yes
-      tags: vm
