@@ -1,0 +1,3 @@
+---
+proxmox_image_dir: /var/lib/vz/template/qemu
+proxmox_images: []

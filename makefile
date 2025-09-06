@@ -44,5 +44,8 @@ trinity:
 trinity-docker:
 	ansible-playbook site.yml --limit trinity --tags compose -K $(EXTRA_VARS:%=-e '%')
 
+unifi:
+	ansible-playbook site.yml --limit unifi --tags vm $(EXTRA_VARS:%=-e '%')
+
 compose:
 	ansible-playbook site.yml --tags compose $(EXTRA_VARS:%=-e '%')
