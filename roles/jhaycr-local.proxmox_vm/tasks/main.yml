@@ -1,0 +1,71 @@
+---
+# roles/proxmox_vm/tasks/main.yml
+
+- name: Clone VM from template (manual qm clone)
+  ansible.builtin.command:
+    cmd: >
+      qm clone {{ item.template_vmid }}
+      {{ item.vmid }}
+      --name {{ item.name }}
+      --full
+      --storage {{ item.storage | default('local-lvm') }}
+  loop: "{{ proxmox_vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: clone_results
+  ignore_errors: yes  # avoids breaking if VM already exists
+
+- name: Wait a few seconds after cloning
+  ansible.builtin.pause:
+    seconds: 3
+  loop: "{{ proxmox_vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure cloud-init for cloned VM
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    validate_certs: false
+    node: "{{ item.node | default('neo') }}"
+    vmid: "{{ item.vmid }}"
+    ciuser: "{{ item.ciuser | default(omit) }}"
+    cipassword: "{{ item.cipassword | default(omit) }}"
+    sshkeys: "{{ item.sshkeys | default(omit) }}"
+    ipconfig: "{{ item.ipconfig | default(omit) }}"
+    update: true
+  loop: "{{ proxmox_vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Set optional VM parameters (memory, cores, sockets, net, pool)
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    validate_certs: false
+    node: "{{ item.node | default('neo') }}"
+    vmid: "{{ item.vmid }}"
+    memory: "{{ item.memory | default(omit) }}"
+    cores: "{{ item.cores | default(omit) }}"
+    sockets: "{{ item.sockets | default(omit) }}"
+    net: "{{ item.net | default(omit) }}"
+    pool: "{{ item.pool | default(omit) }}"
+    state: present
+  loop: "{{ proxmox_vms }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Start cloned VM
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    validate_certs: false
+    node: "{{ item.node | default('neo') }}"
+    vmid: "{{ item.vmid }}"
+    state: started
+  loop: "{{ proxmox_vms }}"
+  loop_control:
+    label: "{{ item.name }}"

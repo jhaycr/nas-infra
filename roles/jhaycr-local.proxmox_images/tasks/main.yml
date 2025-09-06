@@ -1,0 +1,104 @@
+---
+- name: Ensure image directory exists
+  ansible.builtin.file:
+    path: "{{ proxmox_image_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Download cloud images
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ proxmox_image_dir }}/{{ item.filename }}"
+    mode: "0644"
+    force: false
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+
+- name: Create base VM shell if import is required
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    validate_certs: false
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.vmid }}"
+    name: "{{ item.name }}"
+    memory: "{{ item.memory | default(1024) }}"
+    cores: "{{ item.cores | default(1) }}"
+    sockets: "{{ item.sockets | default(1) }}"
+    ostype: "{{ item.ostype | default('l26') }}"
+    scsihw: virtio-scsi-pci
+    pool: "{{ item.pool | default(omit) }}"
+    state: present
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+  when: item.import | default(false)
+
+- name: Import image into Proxmox storage
+  ansible.builtin.command:
+    cmd: >
+      qm importdisk {{ item.vmid }}
+      {{ proxmox_image_dir }}/{{ item.filename }}
+      {{ item.storage }}
+      --format qcow2
+  args:
+    creates: "/var/lib/vz/images/{{ item.vmid }}/vm-{{ item.vmid }}-disk-0.qcow2"
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+  when: item.import | default(false)
+
+- name: Wait a few seconds for Proxmox API to sync after import
+  ansible.builtin.pause:
+    seconds: 5
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+  when: item.import | default(false)
+
+- name: Attach imported disk + add cloud-init + set bootdisk (idempotent)
+  ansible.builtin.shell: |
+    if ! lvdisplay {{ item.storage }}/vm-{{ item.vmid }}-cloudinit >/dev/null 2>&1; then
+      qm set {{ item.vmid }} \
+        --scsi0 {{ item.storage }}:vm-{{ item.vmid }}-disk-0 \
+        --boot c \
+        --bootdisk scsi0 \
+        --ide2 {{ item.storage }}:cloudinit
+    else
+      echo "Cloud-init disk already exists, skipping"
+    fi
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+  when: item.import | default(false)
+
+- name: Convert VM to template (optional)
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    validate_certs: false
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.vmid }}"
+    template: true
+    state: present
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+  when: item.template | default(false)
+
+- name: Start VM if it is not a template
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    validate_certs: false
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.vmid }}"
+    state: started
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.filename }}"
+  when: not item.template | default(false)
