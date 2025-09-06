@@ -32,8 +32,8 @@ neo-docker:
 neo-disks:
 	ansible-playbook site.yml --limit neo --tags disks $(EXTRA_VARS:%=-e '%')
 
-neo-vm:
-	ansible-playbook site.yml --limit neo --tags vm $(EXTRA_VARS:%=-e '%')
+neo-pve:
+	ansible-playbook site.yml --limit neo --tags pve $(EXTRA_VARS:%=-e '%')
 
 morpheus:
 	ansible-playbook site.yml --limit morpheus $(EXTRA_VARS:%=-e '%')
@@ -43,9 +43,6 @@ trinity:
 
 trinity-docker:
 	ansible-playbook site.yml --limit trinity --tags compose -K $(EXTRA_VARS:%=-e '%')
-
-unifi:
-	ansible-playbook site.yml --limit unifi --tags vm $(EXTRA_VARS:%=-e '%')
 
 compose:
 	ansible-playbook site.yml --tags compose $(EXTRA_VARS:%=-e '%')
