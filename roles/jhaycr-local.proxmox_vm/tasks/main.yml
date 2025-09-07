@@ -3,10 +3,10 @@
     api_user: "{{ proxmox_api_user }}"
     api_password: "{{ proxmox_api_password }}"
     api_host: "{{ proxmox_api_host }}"
-    node: "{{ item.node }}"
-    vmid: "{{ item.vmid }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.template_vmid }}"
     name: "{{ item.name }}"
-    clone: "{{ item.template_vmid }}"
+    clone: "{{ item.name }}"
     full: true
     cores: "{{ item.cores }}"
     memory: "{{ item.memory }}"
@@ -22,5 +22,3 @@
   loop: "{{ proxmox_vms }}"
   loop_control:
     label: "{{ item.name }}"
-  register: clone_vm
-  failed_when: "'does not exist' not in clone_vm.msg and clone_vm.failed"
