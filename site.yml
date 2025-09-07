@@ -143,3 +143,8 @@
         name: vm.swappiness
         value: '10'
         state: present
+
+- hosts: unifi
+  roles:
+    - role: jhaycr-local.unifi_controller
+      become: yes
