@@ -130,7 +130,6 @@ proxmox_vms:
     cores: 2
     net:
       net0: virtio,bridge=vmbr0
-    pool: network
     ciuser: unifi
     cipassword: SuperSecurePass123
     sshkeys: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
