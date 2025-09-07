@@ -1,58 +1,40 @@
----
 - name: Ensure image directory exists
   ansible.builtin.file:
     path: "{{ proxmox_image_dir }}"
     state: directory
-    mode: "0755"
 
 - name: Download cloud images
   ansible.builtin.get_url:
     url: "{{ item.url }}"
     dest: "{{ proxmox_image_dir }}/{{ item.filename }}"
-    mode: "0644"
-    force: false
+    mode: '0644'
   loop: "{{ proxmox_images }}"
   loop_control:
     label: "{{ item.filename }}"
 
 - name: Create base VM shell if import is required
-  community.proxmox.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    validate_certs: false
-    node: "{{ proxmox_node }}"
-    vmid: "{{ item.vmid }}"
-    name: "{{ item.name }}"
-    memory: "{{ item.memory | default(1024) }}"
-    cores: "{{ item.cores | default(1) }}"
-    sockets: "{{ item.sockets | default(1) }}"
-    ostype: "{{ item.ostype | default('l26') }}"
-    scsihw: virtio-scsi-pci
-    pool: "{{ item.pool | default(omit) }}"
-    state: present
+  ansible.builtin.shell: |
+    qm create {{ item.vmid }} \
+      --name {{ item.name }} \
+      --memory {{ item.memory }} \
+      --cores {{ item.cores }} \
+      --net0 virtio,bridge=vmbr0 \
+      --ide2 {{ item.storage }}:cloudinit \
+      --scsihw virtio-scsi-pci \
+      --boot c \
+      --bootdisk scsi0 \
+      --agent 1 \
+      --serial0 socket
   loop: "{{ proxmox_images }}"
   loop_control:
     label: "{{ item.filename }}"
   when: item.import | default(false)
+  register: create_vm_shell
+  failed_when: create_vm_shell.rc not in [0, 2]  # allow "already exists"
 
 - name: Import image into Proxmox storage
   ansible.builtin.command:
-    cmd: >
-      qm importdisk {{ item.vmid }}
-      {{ proxmox_image_dir }}/{{ item.filename }}
-      {{ item.storage }}
-      --format qcow2
-  args:
-    creates: "/var/lib/vz/images/{{ item.vmid }}/vm-{{ item.vmid }}-disk-0.qcow2"
-  loop: "{{ proxmox_images }}"
-  loop_control:
-    label: "{{ item.filename }}"
-  when: item.import | default(false)
-
-- name: Wait a few seconds for Proxmox API to sync after import
-  ansible.builtin.pause:
-    seconds: 5
+    cmd: qm importdisk {{ item.vmid }} {{ proxmox_image_dir }}/{{ item.filename }} {{ item.storage }}
   loop: "{{ proxmox_images }}"
   loop_control:
     label: "{{ item.filename }}"
@@ -60,45 +42,21 @@
 
 - name: Attach imported disk + add cloud-init + set bootdisk (idempotent)
   ansible.builtin.shell: |
-    if ! lvdisplay {{ item.storage }}/vm-{{ item.vmid }}-cloudinit >/dev/null 2>&1; then
-      qm set {{ item.vmid }} \
-        --scsi0 {{ item.storage }}:vm-{{ item.vmid }}-disk-0 \
-        --boot c \
-        --bootdisk scsi0 \
-        --ide2 {{ item.storage }}:cloudinit
-    else
-      echo "Cloud-init disk already exists, skipping"
-    fi
+    qm set {{ item.vmid }} \
+      --scsi0 {{ item.storage }}:vm-{{ item.vmid }}-disk-0 \
+      --boot c \
+      --bootdisk scsi0 \
+      --ide2 {{ item.storage }}:cloudinit
   loop: "{{ proxmox_images }}"
   loop_control:
     label: "{{ item.filename }}"
-  when: item.import | default(false)
+  register: set_result
+  failed_when: set_result.rc not in [0,5]   # rc=5 = LV exists
 
 - name: Convert VM to template (optional)
-  community.proxmox.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    validate_certs: false
-    node: "{{ proxmox_node }}"
-    vmid: "{{ item.vmid }}"
-    template: true
-    state: present
+  ansible.builtin.command:
+    cmd: qm template {{ item.vmid }}
   loop: "{{ proxmox_images }}"
   loop_control:
     label: "{{ item.filename }}"
-  when: item.template | default(false)
-
-- name: Start VM if it is not a template
-  community.proxmox.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    validate_certs: false
-    node: "{{ proxmox_node }}"
-    vmid: "{{ item.vmid }}"
-    state: started
-  loop: "{{ proxmox_images }}"
-  loop_control:
-    label: "{{ item.filename }}"
-  when: not item.template | default(false)
+  when: item.template | default(true)

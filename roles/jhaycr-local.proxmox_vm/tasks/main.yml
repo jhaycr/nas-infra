@@ -1,71 +1,26 @@
----
-# roles/proxmox_vm/tasks/main.yml
-
-- name: Clone VM from template (manual qm clone)
-  ansible.builtin.command:
-    cmd: >
-      qm clone {{ item.template_vmid }}
-      {{ item.vmid }}
-      --name {{ item.name }}
-      --full
-      --storage {{ item.storage | default('local-lvm') }}
-  loop: "{{ proxmox_vms }}"
-  loop_control:
-    label: "{{ item.name }}"
-  register: clone_results
-  ignore_errors: yes  # avoids breaking if VM already exists
-
-- name: Wait a few seconds after cloning
-  ansible.builtin.pause:
-    seconds: 3
-  loop: "{{ proxmox_vms }}"
-  loop_control:
-    label: "{{ item.name }}"
-
-- name: Configure cloud-init for cloned VM
+- name: Clone VM from template
   community.proxmox.proxmox_kvm:
     api_user: "{{ proxmox_api_user }}"
     api_password: "{{ proxmox_api_password }}"
     api_host: "{{ proxmox_api_host }}"
-    validate_certs: false
-    node: "{{ item.node | default('neo') }}"
+    node: "{{ item.node }}"
     vmid: "{{ item.vmid }}"
-    ciuser: "{{ item.ciuser | default(omit) }}"
-    cipassword: "{{ item.cipassword | default(omit) }}"
-    sshkeys: "{{ item.sshkeys | default(omit) }}"
-    ipconfig: "{{ item.ipconfig | default(omit) }}"
-    update: true
-  loop: "{{ proxmox_vms }}"
-  loop_control:
-    label: "{{ item.name }}"
-
-- name: Set optional VM parameters (memory, cores, sockets, net, pool)
-  community.proxmox.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    validate_certs: false
-    node: "{{ item.node | default('neo') }}"
-    vmid: "{{ item.vmid }}"
-    memory: "{{ item.memory | default(omit) }}"
-    cores: "{{ item.cores | default(omit) }}"
-    sockets: "{{ item.sockets | default(omit) }}"
-    net: "{{ item.net | default(omit) }}"
+    name: "{{ item.name }}"
+    clone: "{{ item.template_vmid }}"
+    full: true
+    cores: "{{ item.cores }}"
+    memory: "{{ item.memory }}"
+    net: "{{ item.net }}"
     pool: "{{ item.pool | default(omit) }}"
+    sshkeys: "{{ item.sshkeys | default(omit) }}"
+    ciuser: "{{ item.ciuser }}"
+    cipassword: "{{ item.cipassword }}"
+    ipconfig: "{{ item.ipconfig }}"
+    serial: "{{ item.serial | default(omit) }}"
+    vga: "{{ item.vga | default(omit) }}"
     state: present
   loop: "{{ proxmox_vms }}"
   loop_control:
     label: "{{ item.name }}"
-
-- name: Start cloned VM
-  community.proxmox.proxmox_kvm:
-    api_user: "{{ proxmox_api_user }}"
-    api_password: "{{ proxmox_api_password }}"
-    api_host: "{{ proxmox_api_host }}"
-    validate_certs: false
-    node: "{{ item.node | default('neo') }}"
-    vmid: "{{ item.vmid }}"
-    state: started
-  loop: "{{ proxmox_vms }}"
-  loop_control:
-    label: "{{ item.name }}"
+  register: clone_vm
+  failed_when: "'does not exist' not in clone_vm.msg and clone_vm.failed"
