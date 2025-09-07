@@ -1,3 +1,4 @@
+---
 - name: Ensure image directory exists
   ansible.builtin.file:
     path: "{{ proxmox_image_dir }}"
@@ -12,51 +13,74 @@
   loop_control:
     label: "{{ item.filename }}"
 
-- name: Create base VM shell if import is required
-  ansible.builtin.shell: |
-    qm create {{ item.vmid }} \
-      --name {{ item.name }} \
-      --memory {{ item.memory }} \
-      --cores {{ item.cores }} \
-      --net0 virtio,bridge=vmbr0 \
-      --ide2 {{ item.storage }}:cloudinit \
-      --scsihw virtio-scsi-pci \
-      --boot c \
-      --bootdisk scsi0 \
-      --agent 1 \
-      --serial0 socket
+- name: Ensure VM template exists or create it
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.vmid }}"
+    name: "{{ item.name }}"
+    memory: "{{ item.memory }}"
+    cores: "{{ item.cores }}"
+    net:
+      net0: "virtio,bridge=vmbr0"  # Correct dictionary format for network
+    ide:
+      ide2: "{{ item.storage }}:cloudinit"  # Define IDE devices as a dictionary
+    scsihw: "virtio-scsi-pci"
+    boot: "c"
+    bootdisk: "scsi0"
+    agent: 1
+    serial:
+      serial0: "socket"  # Define serial devices as a dictionary
+    state: present
   loop: "{{ proxmox_images }}"
   loop_control:
-    label: "{{ item.filename }}"
+    label: "{{ item.name }}"
   when: item.import | default(false)
-  register: create_vm_shell
-  failed_when: create_vm_shell.rc not in [0, 2]  # allow "already exists"
+  register: vm_creation_result
 
-- name: Import image into Proxmox storage
+- name: Import image into Proxmox storage (if VM was just created or needs update)
   ansible.builtin.command:
     cmd: qm importdisk {{ item.vmid }} {{ proxmox_image_dir }}/{{ item.filename }} {{ item.storage }}
   loop: "{{ proxmox_images }}"
   loop_control:
     label: "{{ item.filename }}"
+  when: 
+    - item.import | default(false)
+    - vm_creation_result is changed or (vm_creation_result is not changed and item.force_import | default(false))
+  # Use 'force_import' variable to re-import if needed
+
+- name: Attach imported disk and configure VM
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.vmid }}"
+    scsi:
+      scsi0: "{{ item.storage }}:vm-{{ item.vmid }}-disk-0"
+    boot: "c"
+    bootdisk: "scsi0"
+    ide:
+      ide2: "{{ item.storage }}:cloudinit"
+    state: present
+  loop: "{{ proxmox_images }}"
+  loop_control:
+    label: "{{ item.name }}"
   when: item.import | default(false)
 
-- name: Attach imported disk + add cloud-init + set bootdisk (idempotent)
-  ansible.builtin.shell: |
-    qm set {{ item.vmid }} \
-      --scsi0 {{ item.storage }}:vm-{{ item.vmid }}-disk-0 \
-      --boot c \
-      --bootdisk scsi0 \
-      --ide2 {{ item.storage }}:cloudinit
+- name: Convert VM to template (idempotent)
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ item.vmid }}"
+    template: yes
+    state: present
   loop: "{{ proxmox_images }}"
   loop_control:
-    label: "{{ item.filename }}"
-  register: set_result
-  failed_when: set_result.rc not in [0,5]   # rc=5 = LV exists
-
-- name: Convert VM to template (optional)
-  ansible.builtin.command:
-    cmd: qm template {{ item.vmid }}
-  loop: "{{ proxmox_images }}"
-  loop_control:
-    label: "{{ item.filename }}"
+    label: "{{ item.name }}"
   when: item.template | default(true)
+  # Setting 'template: yes' is idempotent; won't fail if already a template
