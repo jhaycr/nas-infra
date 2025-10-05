@@ -80,7 +80,6 @@ services:
       - {{ nas_download_path }}/usenet:/data/usenet
       - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/Anime/Movies:/data/media/movies/anime
-      - {{ nas_storage_path }}/media/Anime:/data/media/anime
 
   sonarr:
     container_name: sonarr
@@ -109,5 +108,4 @@ services:
       - {{ nas_download_path }}/usenet:/data/usenet
       - {{ nas_download_path }}/torrents:/data/torrents
       - {{ nas_storage_path }}/media/Anime/Series:/data/media/tv/anime
-      - {{ nas_storage_path }}/media/Anime:/data/media/anime
       - {{ nas_download_path }}/torrents:/downloads
