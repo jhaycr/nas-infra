@@ -1,15 +1,23 @@
 ---
 services:
 
- audiobookshelf:
-  container_name: audiobookshelf
-  image: ghcr.io/advplyr/audiobookshelf:2.30.0
-  networks:
-    bridge_proxy_external:
-  ports:
-    - "13378:80"
-  volumes:
-    - {{ nas_storage_path }}/media/audio/audiobooks:/audiobooks
-    - {{ nas_storage_path }}/media/audio/podcasts:/podcasts
-    - {{ docker_appdata_path }}/audiobookshelf:/config
-    - {{ nas_storage_path }}/media/audio/:/metadata1
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:2.30.0
+    networks:
+      bridge_proxy_external:
+    ports:
+      - "13378:80"
+    volumes:
+      - {{ nas_storage_path }}/media/audio/audiobooks:/audiobooks
+      - {{ nas_storage_path }}/media/audio/podcasts:/podcasts
+      - {{ docker_appdata_path }}/audiobookshelf:/config
+      - {{ nas_storage_path }}/media/audio/:/metadata1
+
+  audiobook-request:
+    container_name: audiobook-request
+    image: markbeep/audiobookrequest:1
+    ports:
+      - '8075:8000'
+    volumes:
+      - {{ docker_appdata_path }}/audiobookrequest:/config
