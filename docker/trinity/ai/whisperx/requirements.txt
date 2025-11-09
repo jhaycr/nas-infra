@@ -1,0 +1,11 @@
+# WhisperX service deps
+fastapi
+uvicorn[standard]
+whisperx
+
+# Necessary for form-data handling
+python-multipart
+
+# (Optional) Match the model’s training framework versions
+# torch==1.10.0+cu102         # GPU variant
+# pytorch-lightning==1.5.4    # if you want exact Lightning match
