@@ -1,7 +1,7 @@
 services:
   npm-internal:
     container_name: npm-internal
-    image: 'jc21/nginx-proxy-manager:2.12.6'
+    image: 'jc21/nginx-proxy-manager:2.13.2'
     environment:
       DISABLE_IPV6: 'true'
     ports:
@@ -22,7 +22,7 @@ services:
 
   npm-external:
     container_name: npm-external
-    image: 'jc21/nginx-proxy-manager:2.12.6'
+    image: 'jc21/nginx-proxy-manager:2.13.2'
     environment:
       DISABLE_IPV6: 'true'
     # ports:
