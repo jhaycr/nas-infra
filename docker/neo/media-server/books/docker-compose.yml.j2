@@ -37,6 +37,23 @@ services:
       timeout: 5s
       retries: 10
 
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - CUSTOM_USER=calibre
+      - PASSWORD={{ secret_calibre_password }}
+      - CLI_ARGS= # Optional: Additional Calibre CLI arguments
+    volumes:
+      - {{ docker_appdata_path }}/calibre/config:/config # Path to configuration and library on the host
+      - "{{ nas_storage_path}}/storage/Books/Calibre:/config/Calibre Library"
+    ports:
+      - 8070:8080 # GUI access
+      - 8071:8081 # Calibre Server (optional)
+    restart: unless-stopped
+
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:V3.1.1
     container_name: calibre-web-automated
