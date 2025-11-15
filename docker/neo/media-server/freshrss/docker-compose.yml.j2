@@ -10,6 +10,7 @@ services:
     container_name: freshrss
     image: freshrss/freshrss:1.27.0
     environment:
+      CRON_MIN: "3,43" # https://freshrss.github.io/FreshRSS/en/admins/08_FeedUpdates.html
       OIDC_ENABLED : 1
       OIDC_PROVIDER_METADATA_URL : https://auth.{{ secret_domain }}/application/o/freshrss/.well-known/openid-configuration
       OIDC_CLIENT_ID : {{ secret_freshrss_oidc_client_id }}
