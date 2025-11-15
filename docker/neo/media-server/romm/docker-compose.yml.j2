@@ -29,9 +29,11 @@ services:
       - SCREENSCRAPER_USER={{ secret_screenscraper_user}}
       - SCREENSCRAPER_PASSWORD={{ secret_screenscraper_password }}
       - MOBYGAMES_API_KEY= # https://www.mobygames.com/info/api/
-      - STEAMGRIDDB_API_KEY= # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
+      - STEAMGRIDDB_API_KEY={{ secret_steamgriddb_api_key }} # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
       - HASHEOUS_API_ENABLED=true
       - PLAYMATCH_API_ENABLED=true
+      - LAUNCHBOX_API_ENABLED=true
+      - ENABLE_SCHEDULED_UPDATE_LAUNCHBOX_METADATA=true
       - ENABLE_SCHEDULED_CONVERT_IMAGES_TO_WEBP=true
       - OIDC_ENABLED=true #: Set to true to enable OIDC authentication.
       - OIDC_PROVIDER=authentik # The lowercase name of the provider (authentik).
