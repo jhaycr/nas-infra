@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  dev:
+    image: codercom/code-server:4.105.1-39
+    container_name: code-server
+    restart: always
+    environment:
+      - PASSWORD=replace_with_strong_password_or_disable_for_oidc
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - {{ docker_appdata_path }}/vscode/home:/home/coder       # persistent home
+      - {{ docker_appdata_path }}/vscode/git:/home/coder/project  # optionally host a clone here
+      - {{ docker_appdata_path }}/vscode/ssh:/home/coder/.ssh:ro
+      - {{ docker_appdata_path }}/vscode/sops_keys:/home/coder/.config/sops:ro
+    ports:
+      - "127.0.0.1:8443:8443"  # bind to localhost if you plan to access via Tailscale/SSH tunnel
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - no-new-privileges:true
