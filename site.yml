@@ -36,6 +36,7 @@
     - role: jhaycr-local.plex
       become: yes
     - role: IronicBadger.proxmox_nag_removal
+      become: yes
     - role: jhaycr-local.hetrixtools_agent
       become: yes
 
