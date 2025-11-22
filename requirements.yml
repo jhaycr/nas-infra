@@ -1,7 +1,9 @@
 ---
+# ansible-galaxy install -r requirements.yml --force
+
 collections:
   - name: arillso.system
-    version: 0.0.34
+    version: 0.0.36
   - name: devsec.hardening
     version: 9.0.1
   - name: community.proxmox
@@ -11,13 +13,13 @@ collections:
 
 roles:
   - name: fuzzymistborn.autorestic
-    version: v0.2.3
+    version: v0.3.2
   - name: geerlingguy.docker
-    version: 7.3.0
+    version: 7.4.7
   - name: geerlingguy.nfs
-    version: 2.0.0
+    version: 2.1.0
   - name: geerlingguy.pip
-    version: 3.0.3
+    version: 3.1.0
   - name: grog.package
     version: v1.4.1
   - name: IronicBadger.proxmox_nag_removal
@@ -25,4 +27,4 @@ roles:
   - name: joenyland.plexmediaserver
     version: main
   - name: tigattack.mergerfs
-    version: 1.3.1
+    version: 2.1.0
