@@ -1,42 +1,6 @@
 ---
 services:
 
-  booklore:
-    image: ghcr.io/adityachandelgit/booklore-app:latest
-    container_name: booklore
-    environment:
-      - DATABASE_URL=jdbc:mariadb://booklore-mariadb:3306/booklore   # Only modify this if you're familiar with JDBC and your database setup
-      - DATABASE_USERNAME=booklore                          # Must match MYSQL_USER defined in the mariadb container
-      - DATABASE_PASSWORD=your_secure_password              # Use a strong password; must match MYSQL_PASSWORD defined in the mariadb container 
-      - SWAGGER_ENABLED=false                               # Enable or disable Swagger UI (API docs). Set to 'true' to allow access; 'false' to block access (recommended for production).
-    depends_on:
-      booklore-mariadb:
-        condition: service_healthy
-    ports:
-      - "6060:6060"
-    volumes:
-      - {{ docker_appdata_path }}/booklore/data:/app/data       # Internal app data (settings, metadata, cache)
-      - {{ nas_storage_path}}/storage/Books/Calibre:/books1       # Book library folder — point to one of your collections
-      - {{ docker_appdata_path }}/booklore/bookdrop:/bookdrop   # Bookdrop folder — drop new files here for automatic import into libraries
-    restart: unless-stopped
-
-  booklore-mariadb:
-    image: lscr.io/linuxserver/mariadb:11.4.5
-    container_name: booklore-mariadb
-    environment:
-      - MYSQL_ROOT_PASSWORD=super_secure_password  # Use a strong password for the database's root user, should be different from MYSQL_PASSWORD
-      - MYSQL_DATABASE=booklore
-      - MYSQL_USER=booklore                        # Must match DATABASE_USERNAME defined in the booklore container
-      - MYSQL_PASSWORD=your_secure_password        # Use a strong password; must match DATABASE_PASSWORD defined in the booklore container
-    volumes:
-      - {{ docker_appdata_path }}/booklore-mariadb/config:/config
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   calibre:
     image: lscr.io/linuxserver/calibre:latest
     container_name: calibre
@@ -55,17 +19,17 @@ services:
     restart: unless-stopped
 
   calibre-web-automated:
-    image: crocodilestick/calibre-web-automated:V3.1.1
-    container_name: calibre-web-automated
+    image: crocodilestick/calibre-web-automated:V3.1.4
+    container_name: cwa
     environment:
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
     volumes:
       # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
       - {{ docker_appdata_path }}/calibrewebautomated:/config 
       # This is an ingest dir, NOT a library one. Anything added here will be automatically added to your library according to the settings you have configured in CWA Settings page. All files placed here are REMOVED AFTER PROCESSING
-      - {{ nas_cache_path}}/cwa-book-ingest:/cwa-book-ingest
+      - {{ nas_cache_path}}/cwa-book-ingest/general:/cwa-book-ingest
       # If you don't have an existing library, CWA will automatically create one at the bind provided here
-      - {{ nas_storage_path}}/storage/Books/Calibre:/calibre-library
+      - {{ nas_storage_path}}/books/calibre/general:/calibre-library
     ports:
       # Change the first number to change the port you want to access the Web UI, not the second
       - 8083:8083 
@@ -73,7 +37,7 @@ services:
 
   calibre-web-automated-book-downloader:
     image: ghcr.io/calibrain/calibre-web-automated-book-downloader:latest
-    container_name: calibre-web-automated-downloader
+    container_name: cwa-downloader
     environment:
       FLASK_PORT: 8084
       LOG_LEVEL: info
@@ -89,13 +53,53 @@ services:
     volumes:
       # This is where the books will be downloaded to, usually it would be
       # the same as whatever you gave in "calibre-web-automated"
-      - {{ nas_cache_path}}/cwa-book-ingest:/cwa-book-ingest
+      - {{ nas_cache_path}}/cwa-book-ingest/general:/cwa-book-ingest
       # This is the location of CWA's app.db, which contains authentication
       # details
       - {{ docker_appdata_path }}/calibrewebautomated/app.db:/auth/app.db:ro
 
+  calibre-web-automated-kids:
+    image: crocodilestick/calibre-web-automated:V3.1.4
+    container_name: cwa-kids
+    environment:
+      - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
+    volumes:
+      # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
+      - {{ docker_appdata_path }}/cwa-kids:/config 
+      # This is an ingest dir, NOT a library one. Anything added here will be automatically added to your library according to the settings you have configured in CWA Settings page. All files placed here are REMOVED AFTER PROCESSING
+      - {{ nas_cache_path}}/cwa-book-ingest/kids:/cwa-book-ingest
+      # If you don't have an existing library, CWA will automatically create one at the bind provided here
+      - {{ nas_storage_path}}/books/calibre/kids:/calibre-library
+    ports:
+      # Change the first number to change the port you want to access the Web UI, not the second
+      - 8882:8083 
+    restart: unless-stopped
+
+  calibre-web-automated-book-downloader-kids:
+    image: ghcr.io/calibrain/calibre-web-automated-book-downloader:latest
+    container_name: cwa-downloader-kids
+    environment:
+      FLASK_PORT: 8084
+      LOG_LEVEL: info
+      BOOK_LANGUAGE: en
+      USE_BOOK_TITLE: true
+      TZ: America/New_York
+      APP_ENV: prod
+      CWA_DB_PATH: /auth/app.db
+      AA_DONATOR_KEY: {{ secret_aa_donator_key }}
+    ports:
+      - 8884:8084
+    restart: unless-stopped
+    volumes:
+      # This is where the books will be downloaded to, usually it would be
+      # the same as whatever you gave in "calibre-web-automated"
+      - {{ nas_cache_path}}/cwa-book-ingest/kids:/cwa-book-ingest
+      # This is the location of CWA's app.db, which contains authentication
+      # details
+      - {{ docker_appdata_path }}/cwa-kids/app.db:/auth/app.db:ro
+
   kavita:
-    image: jvmilazz0/kavita:nightly-0.8.7.9  #0.8.7 | nightly-0.8.7.9 | canary-0.8.7.12
+    image: jvmilazz0/kavita:0.8.8
     container_name: kavita
     volumes:
         # - /your/path/to/manga:/manga
