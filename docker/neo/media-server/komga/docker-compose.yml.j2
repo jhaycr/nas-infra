@@ -12,6 +12,19 @@ services:
     - "25600:25600"
   volumes:
     - {{ docker_appdata_path }}/komga:/config
-    - {{ nas_storage_path }}/comics:/data/comics
+    - {{ nas_storage_path }}/comics/general:/data/comics
     - {{ nas_storage_path }}/storage/manga:/data/manga
     - {{ nas_storage_path }}/storage/Books:/data/books
+
+ komga-kids:
+  container_name: komga-kids
+  image: gotson/komga:1.23.5
+  environment:
+    KOMGA_OAUTH2_ACCOUNT_CREATION: "true"
+  networks:
+    bridge_proxy_external:
+  ports:
+    - "25601:25600"
+  volumes:
+    - {{ docker_appdata_path }}/komga-kids:/config
+    - {{ nas_storage_path }}/comics/kids:/data/comics
