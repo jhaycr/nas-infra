@@ -14,19 +14,6 @@ services:
       - {{ docker_appdata_path }}/audiobookshelf:/config
       - {{ nas_storage_path }}/media/audio/:/metadata1
 
-  audiobookshelf-kids:
-    container_name: abs-kids
-    image: ghcr.io/advplyr/audiobookshelf:2.30.0
-    networks:
-      bridge_proxy_external:
-    ports:
-      - "13379:80"
-    volumes:
-      - {{ nas_storage_path }}/media/audio/audiobooks:/audiobooks
-      - {{ nas_storage_path }}/media/audio/podcasts:/podcasts
-      - {{ docker_appdata_path }}/audiobookshelf:/config
-      - {{ nas_storage_path }}/media/audio/:/metadata1
-
   audiobook-request:
     container_name: audiobook-request
     image: markbeep/audiobookrequest:1
