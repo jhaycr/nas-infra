@@ -1,0 +1,10 @@
+---
+symlink_mappings: []
+symlink_create_parents: true
+symlink_parent_mode: "0755"
+symlink_force: true
+symlink_become: true
+symlink_owner: "{{ main_username | default(omit) }}"
+symlink_group: "{{ main_username | default(omit) }}"
+symlink_follow: false
+symlink_default_state: link

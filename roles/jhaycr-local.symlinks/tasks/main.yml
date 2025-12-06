@@ -1,0 +1,42 @@
+---
+- name: Validate symlink mappings
+  ansible.builtin.assert:
+    that:
+      - item.dest is defined
+      - (item.state | default(symlink_default_state)) == 'absent' or item.src is defined
+    fail_msg: "symlink_mappings entries require 'src' and 'dest'. Got: {{ item }}"
+  loop: "{{ symlink_mappings }}"
+  loop_control:
+    label: "{{ item.dest | default(item.src | default('undefined')) }}"
+  when: symlink_mappings | length > 0
+
+- name: Ensure destination parent directories exist
+  ansible.builtin.file:
+    path: "{{ item.dest | dirname }}"
+    state: directory
+    mode: "{{ symlink_parent_mode }}"
+    owner: "{{ symlink_owner | default(omit, true) }}"
+    group: "{{ symlink_group | default(omit, true) }}"
+  loop: "{{ symlink_mappings }}"
+  loop_control:
+    label: "{{ item.dest | dirname }}"
+  when:
+    - symlink_mappings | length > 0
+    - symlink_create_parents | bool
+    - (item.state | default(symlink_default_state)) != 'absent'
+  become: "{{ symlink_become }}"
+
+- name: Manage symlinks
+  ansible.builtin.file:
+    src: "{{ item.src | default(omit, true) }}"
+    path: "{{ item.dest }}"
+    state: "{{ 'absent' if (item.state | default(symlink_default_state)) == 'absent' else 'link' }}"
+    force: "{{ item.force | default(symlink_force) }}"
+    owner: "{{ item.owner | default(symlink_owner, true) | default(omit, true) }}"
+    group: "{{ item.group | default(symlink_group, true) | default(omit, true) }}"
+    follow: "{{ item.follow | default(symlink_follow) }}"
+  loop: "{{ symlink_mappings }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  when: symlink_mappings | length > 0
+  become: "{{ symlink_become }}"

@@ -24,6 +24,9 @@
       become: yes
     - role: jhaycr-local.logrotate
       become: yes
+    - role: jhaycr-local.symlinks
+      become: true
+      tags: symlinks
     - role: jhaycr-local.proxmox_images
       become: yes
       tags: pve
