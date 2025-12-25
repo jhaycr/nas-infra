@@ -4,9 +4,21 @@ services:
  mylar3:
   container_name: mylar3
   image: lscr.io/linuxserver/mylar3:0.8.3
+  environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      # force single-process mode
+      - MYLAR_NOFORK=1
   ports:
     - "8090:8090"
   volumes:
     - {{ docker_appdata_path }}/mylar3:/config
     - {{ nas_download_path }}/usenet:/data/usenet
     - {{ nas_storage_path }}/comics/general:/storage/comics/
+  healthcheck:
+    test: ["CMD-SHELL", "/usr/local/bin/mylar-healthcheck.sh"]
+    interval: 2m
+    timeout: 20s
+    retries: 3
+    start_period: 5m
