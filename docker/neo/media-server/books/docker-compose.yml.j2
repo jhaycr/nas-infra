@@ -1,23 +1,6 @@
 ---
 services:
 
-  calibre:
-    image: lscr.io/linuxserver/calibre:latest
-    container_name: calibre
-    security_opt:
-      - seccomp:unconfined #optional
-    environment:
-      - CUSTOM_USER=calibre
-      - PASSWORD={{ secret_calibre_password }}
-      - CLI_ARGS= # Optional: Additional Calibre CLI arguments
-    volumes:
-      - {{ docker_appdata_path }}/calibre/config:/config # Path to configuration and library on the host
-      - "{{ nas_storage_path}}/storage/Books/Calibre:/config/Calibre Library"
-    ports:
-      - 8070:8080 # GUI access
-      - 8071:8081 # Calibre Server (optional)
-    restart: unless-stopped
-
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:V3.1.4
     container_name: cwa
@@ -74,42 +57,3 @@ services:
       # Change the first number to change the port you want to access the Web UI, not the second
       - 8882:8083 
     restart: unless-stopped
-
-  calibre-web-automated-book-downloader-kids:
-    image: ghcr.io/calibrain/calibre-web-automated-book-downloader:latest
-    container_name: cwa-downloader-kids
-    environment:
-      FLASK_PORT: 8084
-      LOG_LEVEL: info
-      BOOK_LANGUAGE: en
-      USE_BOOK_TITLE: true
-      TZ: America/New_York
-      APP_ENV: prod
-      CWA_DB_PATH: /auth/app.db
-      AA_DONATOR_KEY: {{ secret_aa_donator_key }}
-    ports:
-      - 8884:8084
-    restart: unless-stopped
-    volumes:
-      # This is where the books will be downloaded to, usually it would be
-      # the same as whatever you gave in "calibre-web-automated"
-      - {{ nas_cache_path}}/cwa-book-ingest/kids:/cwa-book-ingest
-      # This is the location of CWA's app.db, which contains authentication
-      # details
-      - {{ docker_appdata_path }}/cwa-kids/app.db:/auth/app.db:ro
-
-  kavita:
-    image: jvmilazz0/kavita:0.8.8
-    container_name: kavita
-    volumes:
-        # - /your/path/to/manga:/manga
-        # - /your/path/to/comics:/comics
-        - {{ nas_storage_path}}/books/calibre/general:/books/general:ro
-        - {{ nas_storage_path }}/comics/general:/comics/general:ro
-        - {{ nas_storage_path}}/books/calibre/kids:/books/kids:ro
-        - {{ nas_storage_path }}/comics/kids:/comics/kids:ro
-        - {{ docker_appdata_path }}/kavita:/kavita/config     # /kavita/config must not be changed
-    ports:
-        - "5001:5000"
-    networks:
-        - bridge_proxy_external
