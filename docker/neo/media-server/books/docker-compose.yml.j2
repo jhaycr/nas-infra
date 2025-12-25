@@ -104,7 +104,10 @@ services:
     volumes:
         # - /your/path/to/manga:/manga
         # - /your/path/to/comics:/comics
-        - {{ nas_storage_path}}/storage/Books/Calibre:/books:ro
+        - {{ nas_storage_path}}/books/calibre/general:/books/general:ro
+        - {{ nas_storage_path }}/comics/general:/comics/general:ro
+        - {{ nas_storage_path}}/books/calibre/kids:/books/kids:ro
+        - {{ nas_storage_path }}/comics/kids:/comics/kids:ro
         - {{ docker_appdata_path }}/kavita:/kavita/config     # /kavita/config must not be changed
     ports:
         - "5001:5000"
