@@ -27,4 +27,5 @@ services:
     - "25601:25600"
   volumes:
     - {{ docker_appdata_path }}/komga-kids:/config
-    - {{ nas_storage_path }}/comics/kids:/data/comics
+    - {{ nas_storage_path }}/books/calibre/kids:/data/books:ro
+    - {{ nas_storage_path }}/comics/kids:/data/comics:ro
