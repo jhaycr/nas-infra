@@ -2,7 +2,7 @@
 services:
 
   calibre-web-automated:
-    image: crocodilestick/calibre-web-automated:V3.1.4
+    image: crocodilestick/calibre-web-automated:V3.1.2
     container_name: cwa
     environment:
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
@@ -42,7 +42,7 @@ services:
       - {{ docker_appdata_path }}/calibrewebautomated/app.db:/auth/app.db:ro
 
   calibre-web-automated-kids:
-    image: crocodilestick/calibre-web-automated:V3.1.4
+    image: crocodilestick/calibre-web-automated:V3.1.2
     container_name: cwa-kids
     environment:
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
@@ -53,6 +53,8 @@ services:
       - {{ nas_cache_path}}/cwa-book-ingest/kids:/cwa-book-ingest
       # If you don't have an existing library, CWA will automatically create one at the bind provided here
       - {{ nas_storage_path}}/books/calibre/kids:/calibre-library
+    networks:
+      - bridge_proxy_external
     ports:
       # Change the first number to change the port you want to access the Web UI, not the second
       - 8882:8083 
