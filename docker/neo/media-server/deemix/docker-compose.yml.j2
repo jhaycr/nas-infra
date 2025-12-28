@@ -1,0 +1,14 @@
+services:
+
+  deemix:
+    image: ghcr.io/bambanah/deemix:latest
+    container_name: deemix
+    restart: unless-stopped
+    networks:
+      - default
+    ports:
+      - "6595:6595" # Deemix web UI
+    volumes:
+      - {{ docker_appdata_path }}/deemix/config:/config
+      - {{ nas_download_path }}/deemix:/downloads
+      - {{ nas_storage_path }}/media/audio/music:/data/media/music
