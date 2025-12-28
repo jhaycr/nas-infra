@@ -9,12 +9,14 @@ docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
 # grog.package
 # -----
 package_list:
+  - name: cabextract
   - name: cheese
   - name: curl
   - name: git
   - name: gnome-tweaks
   - name: gramps
   - name: iperf
+  - name: joystick
   - name: keepassxc
   - name: peazip
   - name: pwgen
@@ -23,6 +25,8 @@ package_list:
   - name: syncthing
   - name: unrar
   - name: veracrypt
+  - name: vim
+  - name: winetricks
   - name: wireguard
 
 snap_list:
