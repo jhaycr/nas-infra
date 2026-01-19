@@ -9,9 +9,12 @@ docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
 # grog.package
 # -----
 package_list:
+  - name: 7zip
   - name: cabextract
+  - name: calibre
   - name: cheese
   - name: curl
+  - name: ffmpeg
   - name: git
   - name: gnome-tweaks
   - name: gramps
