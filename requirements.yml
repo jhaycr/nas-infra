@@ -12,6 +12,8 @@ collections:
     version: 4.7.0
   - name: community.general
     version: 11.2.1
+  - name: ansible.posix
+    version: 1.6.2
 
 roles:
   - name: fuzzymistborn.autorestic
