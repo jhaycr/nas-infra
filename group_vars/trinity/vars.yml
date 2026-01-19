@@ -9,52 +9,124 @@ docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
 # grog.package
 # -----
 package_list:
-  - name: 7zip
-  - name: cabextract
-  - name: calibre
-  - name: cheese
-  - name: curl
-  - name: ffmpeg
-  - name: git
-  - name: gnome-tweaks
-  - name: gramps
-  - name: iperf
-  - name: joystick
-  - name: keepassxc
-  - name: peazip
-  - name: pwgen
-  - name: rpi-imager
-  - name: steam
-  - name: syncthing
-  - name: unrar
-  - name: veracrypt
-  - name: vim
-  - name: winetricks
-  - name: wireguard
+  - name: 7zip  # https://www.7-zip.org/
+  - name: ansible  # https://github.com/ansible/ansible
+  - name: axel  # https://github.com/axel-download-accelerator/axel
+  - name: build-essential  # https://salsa.debian.org/debian/build-essential
+  - name: cabextract  # https://www.cabextract.org.uk/
+  - name: calibre  # https://github.com/kovidgoyal/calibre
+  - name: cheese  # https://gitlab.gnome.org/GNOME/cheese
+  - name: cifs-utils  # https://git.samba.org/?p=cifs-utils.git;a=summary
+  - name: claude-desktop  # https://www.anthropic.com/claude
+  - name: containerd.io  # https://github.com/containerd/containerd
+  - name: curl  # https://github.com/curl/curl
+  - name: default-jdk  # https://openjdk.org/
+  - name: deja-dup  # https://gitlab.gnome.org/World/deja-dup
+  - name: deluge  # https://github.com/deluge-torrent/deluge
+  - name: dnsutils  # https://gitlab.isc.org/isc-projects/bind9
+  - name: docker-buildx-plugin  # https://github.com/docker/buildx
+  - name: docker-ce  # https://github.com/docker/docker-ce
+  - name: docker-ce-cli  # https://github.com/docker/docker-ce
+  - name: docker-compose-plugin  # https://github.com/docker/compose
+  - name: docker-desktop  # https://www.docker.com/products/docker-desktop
+  - name: ffmpeg  # https://ffmpeg.org/
+  - name: font-manager  # https://github.com/FontManager/font-manager
+  - name: fonts-indic  # https://salsa.debian.org/fonts-team/fonts-indic
+  - name: gh  # https://github.com/cli/cli
+  - name: git  # https://github.com/git/git
+  - name: gnome-tweaks  # https://gitlab.gnome.org/GNOME/gnome-tweaks
+  - name: gparted  # https://gitlab.gnome.org/GNOME/gparted
+  - name: gramps  # https://github.com/gramps-project/gramps
+  - name: grsync  # https://sourceforge.net/projects/grsync/
+  - name: handbrake  # https://github.com/HandBrake/HandBrake
+  - name: hplip  # https://developers.hp.com/hp-linux-imaging-and-printing
+  - name: iperf  # https://sourceforge.net/projects/iperf/
+  - name: iperf3  # https://github.com/esnet/iperf
+  - name: joystick  # https://sourceforge.net/projects/joystick/
+  - name: jq  # https://github.com/jqlang/jq
+  - name: keepassxc  # https://github.com/keepassxreboot/keepassxc
+  - name: mcpelauncher-manifest  # https://github.com/minecraft-linux/mcpelauncher-manifest
+  - name: mcpelauncher-ui-manifest  # https://github.com/minecraft-linux/mcpelauncher-ui-manifest
+  - name: minecraft-launcher  # https://www.minecraft.net/en-us/download
+  - name: mkvtoolnix  # https://gitlab.com/mbunkus/mkvtoolnix
+  - name: npm  # https://github.com/npm/cli
+  - name: obs-studio  # https://github.com/obsproject/obs-studio
+  - name: openjdk-17-jre  # https://openjdk.org/projects/jdk/17/
+  - name: openrazer-meta  # https://github.com/openrazer/openrazer
+  - name: peazip  # https://github.com/peazip/PeaZip
+  - name: pipx  # https://github.com/pypa/pipx
+  - name: polychromatic  # https://github.com/polychromatic/polychromatic
+  - name: proton-authenticator  # https://proton.me/authenticator
+  - name: proton-vpn-gnome-desktop  # https://github.com/ProtonVPN/linux-app
+  - name: protonmail-bridge  # https://github.com/ProtonMail/proton-bridge
+  - name: protonvpn-beta-release  # https://github.com/ProtonVPN/linux-app
+  - name: pv  # https://www.ivarch.com/programs/pv.shtml
+  - name: pwgen  # https://sourceforge.net/projects/pwgen/
+  - name: python3-pip  # https://github.com/pypa/pip
+  - name: rclone  # https://github.com/rclone/rclone
+  - name: restic  # https://github.com/restic/restic
+  - name: rpi-imager  # https://github.com/raspberrypi/rpi-imager
+  - name: signal-desktop  # https://github.com/signalapp/Signal-Desktop
+  - name: sshpass  # https://sourceforge.net/projects/sshpass/
+  - name: steam  # https://store.steampowered.com/about/
+  - name: syncthing  # https://github.com/syncthing/syncthing
+  - name: tailscale  # https://github.com/tailscale/tailscale
+  - name: terraform  # https://github.com/hashicorp/terraform
+  - name: tesseract-ocr  # https://github.com/tesseract-ocr/tesseract
+  - name: traceroute  # https://salsa.debian.org/debian/traceroute
+  - name: unrar  # https://www.rarlab.com/
+  - name: vagrant  # https://github.com/hashicorp/vagrant
+  - name: veracrypt  # https://www.veracrypt.fr/
+  - name: virtualbox-dkms  # https://www.virtualbox.org/
+  - name: vim  # https://github.com/vim/vim
+  - name: vlc  # https://github.com/videolan/vlc
+  - name: "wine32:i386"  # https://github.com/wine-mirror/wine
+  - name: wine64  # https://github.com/wine-mirror/wine
+  - name: wireguard  # https://www.wireguard.com/
+  - name: winetricks  # https://github.com/Winetricks/winetricks
+  - name: yacreader  # https://github.com/YACReader/yacreader
+  - name: zoom  # https://explore.zoom.us/en/downloads/
 
 snap_list:
-  - name: audible-for-linux
-  - name: brave
-  - name: cups
-  - name: curl
-  - name: discord
-  - name: everdo
-  - name: ffmpeg
-  - name: firefox
-  - name: jdownloader2
-  - name: joplin-desktop
-  - name: kolourpaint
-  - name: obsidian
+  - name: audible-for-linux  # https://github.com/marcustomlinson/audible-for-linux
+  - name: authy  # https://www.twilio.com/authy
+  - name: brave  # https://github.com/brave/brave-browser
+  - name: code  # https://github.com/microsoft/vscode
+  - name: cups  # https://github.com/OpenPrinting/cups
+  - name: curl  # https://github.com/curl/curl
+  - name: discord  # https://discord.com/download
+  - name: everdo  # https://everdo.net/
+  - name: ffmpeg  # https://ffmpeg.org/
+  - name: firefox  # https://www.mozilla.org/firefox/
+  - name: jdownloader2  # https://jdownloader.org/
+  - name: joplin-desktop  # https://github.com/laurent22/joplin
+  - name: kolourpaint  # https://invent.kde.org/graphics/kolourpaint
+  - name: obsidian  # https://obsidian.md/
     classic: true
-  - name: organize-my-files
-  - name: poddr
-  - name: retroarch
-  - name: slack
-  - name: spotify
-  - name: sublime-text
+  - name: organize-my-files  # https://www.organize-my-files.app/
+  - name: plex-desktop  # https://www.plex.tv/
+  - name: poddr  # https://github.com/Sn8z/Poddr
+  - name: retroarch  # https://github.com/libretro/RetroArch
+  - name: slack  # https://slack.com/downloads
+  - name: spotify  # https://www.spotify.com/
+  - name: standard-notes  # https://github.com/standardnotes/app
+  - name: sublime-text  # https://www.sublimetext.com/
     classic: true
-  - name: ufw 
+  - name: ufw  # https://launchpad.net/ufw
+  - name: xournalpp  # https://github.com/xournalpp/xournalpp
+  - name: yt-dlp  # https://github.com/yt-dlp/yt-dlp
 
 
 flatpak_list:
-  - name: io.github.streetpea.Chiaki4deck
+  - name: com.github.geigi.cozy  # https://github.com/geigi/cozy
+  - name: com.heroicgameslauncher.hgl  # https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher
+  - name: com.usebottles.bottles  # https://github.com/bottlesdevs/Bottles
+  - name: dev.deedles.Trayscale  # https://github.com/deedles/Trayscale
+  - name: info.cemu.Cemu  # https://github.com/cemu-project/Cemu
+  - name: io.github.streetpea.Chiaki4deck  # https://github.com/streetpea/chiaki4deck
+  - name: net.ankiweb.Anki  # https://github.com/ankitects/anki
+  - name: org.citra_emu.citra  # https://github.com/citra-emu/citra
+  - name: org.gimp.GIMP  # https://gitlab.gnome.org/GNOME/gimp
+  - name: org.ppsspp.PPSSPP  # https://github.com/hrydgard/ppsspp
+  - name: org.ryujinx.Ryujinx  # https://github.com/Ryujinx/Ryujinx
+  - name: org.yuzu_emu.yuzu  # https://github.com/yuzu-emu/yuzu
