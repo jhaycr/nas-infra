@@ -1,5 +1,5 @@
 reqs:
-	ansible-galaxy install -r requirements.yml
+	ansible-galaxy collection install -r requirements.yml -p . --force
 
 bootstrap-ssh:
 	@if [ -z "$(LIMIT)" ]; then \
@@ -24,7 +24,7 @@ vault-unlock:
 	find -L ./group_vars -type f -name "vault.yml" -print0 | xargs -0 ansible-vault decrypt
 
 neo:
-	ansible-playbook site.yml --limit neo $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit neo --skip-tags compose $(EXTRA_VARS:%=-e '%')
 
 neo-docker:
 	ansible-playbook site.yml --limit neo --tags compose $(EXTRA_VARS:%=-e '%')
@@ -36,10 +36,10 @@ neo-pve:
 	ansible-playbook site.yml --limit neo --tags pve $(EXTRA_VARS:%=-e '%')
 
 morpheus:
-	ansible-playbook site.yml --limit morpheus $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit morpheus --skip-tags compose $(EXTRA_VARS:%=-e '%')
 
 trinity:
-	ansible-playbook site.yml --limit trinity -K $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit trinity --skip-tags compose -K $(EXTRA_VARS:%=-e '%')
 
 trinity-docker:
 	ansible-playbook site.yml --limit trinity --tags compose -K $(EXTRA_VARS:%=-e '%')
