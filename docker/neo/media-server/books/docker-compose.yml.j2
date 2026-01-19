@@ -59,3 +59,26 @@ services:
       # Change the first number to change the port you want to access the Web UI, not the second
       - 8882:8083 
     restart: unless-stopped
+
+  chaptarr: # 10.0.10.13
+    image: robertlordhood/chaptarr:latest
+    container_name: chaptarr
+    environment:
+      PUID: 2000
+      PGID: 66000
+      TZ: US/Eastern
+      #Chaptarr__Postgres__Host:
+      #Chaptarr__Postgres__Port: #(default: 5432)
+      #Chaptarr__Postgres__User:
+      #Chaptarr__Postgres__Password:
+      #Chaptarr__Postgres__MainDb: #(default: chaptarr-main)
+      #Chaptarr__Postgres__LogDb: #(default: chaptarr-log)
+      #Chaptarr__Postgres__CacheDb: #(default: chaptarr-cache)
+    volumes:
+      - {{ docker_appdata_path }}/chaptarr:/config
+      - {{ nas_storage_path}}/books/test:/books
+      - {{ nas_storage_path}}/audiobooks/test:/audiobooks
+      - {{ nas_download_path }}/chaptarr:/data/usenet
+    ports:
+      - 8789:8789
+    restart: "unless-stopped"
