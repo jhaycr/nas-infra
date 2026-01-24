@@ -63,10 +63,7 @@ services:
   chaptarr: # 10.0.10.13
     image: robertlordhood/chaptarr:latest
     container_name: chaptarr
-    environment:
-      PUID: 2000
-      PGID: 66000
-      TZ: US/Eastern
+    #environment:
       #Chaptarr__Postgres__Host:
       #Chaptarr__Postgres__Port: #(default: 5432)
       #Chaptarr__Postgres__User:
@@ -76,9 +73,10 @@ services:
       #Chaptarr__Postgres__CacheDb: #(default: chaptarr-cache)
     volumes:
       - {{ docker_appdata_path }}/chaptarr:/config
-      - {{ nas_storage_path}}/books/test:/books
-      - {{ nas_storage_path}}/audiobooks/test:/audiobooks
-      - {{ nas_download_path }}/chaptarr:/data/usenet
+      - {{ nas_storage_path}}/books/chaptarr:/books
+      - {{ nas_storage_path }}/media/audio/audiobooks-chaptarr:/audiobooks
+      - {{ nas_download_path }}/usenet/completed/books:/data/usenet/completed/books
+      - {{ nas_download_path }}/usenet/completed/audiobooks:/data/usenet/completed/audiobooks
     ports:
       - 8789:8789
     restart: "unless-stopped"
