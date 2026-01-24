@@ -1,0 +1,41 @@
+version: "3.3"
+
+networks:
+  loki:
+
+services:
+  loki:
+    image: grafana/loki:2.9.3
+    user: "10001"
+    ports:
+      - "3100:3100"
+    volumes:
+      - {{ docker_appdata_path }}/metrics/data/loki:/loki
+      - {{ docker_appdata_path }}/metrics/config/loki-config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+
+  promtail:
+    image: grafana/promtail:2.9.3
+    volumes:
+      - {{ docker_appdata_path }}/metrics/config/promtail.yml:/etc/promtail/docker-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/docker-config.yaml
+    networks:
+      - loki
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    user: "472"
+    volumes:
+      - {{ docker_appdata_path }}/metrics/config/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - {{ docker_appdata_path }}/metrics/data/grafana:/var/lib/grafana
+    environment:
+      - GF_DEFAULT_APP_MODE=development
+      - GF_LOG_LEVEL=debug
+    ports:
+      - "3000:3000"
+    networks:
+      - loki

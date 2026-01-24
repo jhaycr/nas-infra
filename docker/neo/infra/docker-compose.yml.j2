@@ -5,7 +5,7 @@ name: infra
 include:
   - path: gitea/docker-compose.yml
     env_file: gitea/.env
-  - path: grafana/docker-compose.yml
+  - path: metrics/docker-compose.yml
   - path: vscode/docker-compose.yml
 
 networks:
