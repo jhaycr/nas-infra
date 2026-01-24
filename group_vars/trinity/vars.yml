@@ -45,8 +45,6 @@ package_list:
   - name: joystick  # https://sourceforge.net/projects/joystick/
   - name: jq  # https://github.com/jqlang/jq
   - name: keepassxc  # https://github.com/keepassxreboot/keepassxc
-  - name: mcpelauncher-manifest  # https://github.com/minecraft-linux/mcpelauncher-manifest
-  - name: mcpelauncher-ui-manifest  # https://github.com/minecraft-linux/mcpelauncher-ui-manifest
   - name: minecraft-launcher  # https://www.minecraft.net/en-us/download
   - name: mkvtoolnix  # https://gitlab.com/mbunkus/mkvtoolnix
   - name: npm  # https://github.com/npm/cli
