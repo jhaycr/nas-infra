@@ -153,6 +153,6 @@
       ansible.builtin.lineinfile:
         path: /etc/hosts
         regexp: '^{{ internal_ip_neo }}\s+neo\b'
-        line: "{{ internal_ip_neo }} neo"
+        line: "{{ internal_ip_neo }} neo.lan"
         state: present
 
