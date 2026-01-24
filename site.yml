@@ -148,3 +148,11 @@
         value: '10'
         state: present
 
+    - name: Ensure local hosts entry for neo
+      become: yes
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^{{ internal_ip_neo }}\s+neo\b'
+        line: "{{ internal_ip_neo }} neo"
+        state: present
+
