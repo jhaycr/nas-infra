@@ -31,6 +31,10 @@
   ansible.builtin.set_fact:
     services: "{{ services | unique | sort }}"
 
+- name: Track whether this stack has services
+  ansible.builtin.set_fact:
+    stack_has_services: "{{ (services | length) > 0 }}"
+
 - name: Debug gathered services
   ansible.builtin.debug:
     var: services
@@ -43,3 +47,4 @@
     mode: "0644"
   vars:
     services: "{{ services }}"
+  when: stack_has_services | bool
