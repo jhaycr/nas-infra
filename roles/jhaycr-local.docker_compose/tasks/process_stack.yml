@@ -7,3 +7,6 @@
 
 - name: Start docker for each stack
   include_tasks: 3_docker.yml
+  when:
+    - docker_compose_start_stack | bool
+    - stack_has_services | default(false)
