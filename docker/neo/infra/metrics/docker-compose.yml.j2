@@ -9,6 +9,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
+     - {{ docker_appdata_path }}/metrics/data/loki:/loki
      - {{ docker_appdata_path }}/metrics/config/loki-config.yml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
 
@@ -28,6 +29,8 @@ services:
      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
      - GF_AUTH_ANONYMOUS_ENABLED=true
      - GF_AUTH_BASIC_ENABLED=false
+   volumes:
+     - {{ docker_appdata_path }}/metrics/data/grafana:/var/lib/grafana
    networks:
      - loki
    ports:
