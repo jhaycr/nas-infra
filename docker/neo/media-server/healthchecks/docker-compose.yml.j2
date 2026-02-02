@@ -2,7 +2,7 @@
 services:
 
   healthchecks:
-    image: lscr.io/linuxserver/healthchecks:4.0.20260126
+    image: lscr.io/linuxserver/healthchecks:4.0.20260202
     container_name: healthchecks
     environment:
       - SITE_ROOT="https://healthchecks.lab.{{ secret_domain }}"
