@@ -10,7 +10,7 @@ motd = "<#09add3>{{secret_minecraft_server_name}} (Velocity/Paper)"
 
 # What should we display for the maximum number of players? (Velocity does not support a cap
 # on the number of players online.)
-show-max-players = 32
+show-max-players = 12
 
 # Should we authenticate players with Mojang? By default, this is on.
 online-mode = true
@@ -72,13 +72,15 @@ enable-player-address-logging = true
 [servers]
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.
-lobby = "minecraft-1:25565"
+lobby = "minecraft-lobby:25565"
 survival = "minecraft-1:25565"
 pvp = "minecraft-2:25565"
 
 # In what order we should try servers when a player logs in or is kicked from a server.
 try = [
-    "lobby"
+    "lobby",
+    "survival",
+    "pvp"
 ]
 
 [forced-hosts]
