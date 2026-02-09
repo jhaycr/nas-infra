@@ -1,0 +1,15 @@
+# Auto-run ServerGUI on join
+# Runs a player-executed command after a short delay so Bedrock/Java see the menu.
+# Adjust the command if your ServerGUI command differs (e.g., servers, servergui open).
+
+disable-player-data: false  # keep false if using first-join-only
+
+proxy-join-commands:
+  open-servergui:
+    permission: ""           # empty = everyone
+    first-join-only: false    # set true to show only the first time a player joins
+    delay: 2                  # seconds after join before running (allows Floodgate/Geyser init)
+    command-list:
+      - "[PLAYER]server"     # Built-in Velocity server list (text) until a GUI selector is chosen
+
+debug-mode: false
