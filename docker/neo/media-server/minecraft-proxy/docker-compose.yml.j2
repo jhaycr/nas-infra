@@ -20,7 +20,6 @@ services:
       PLUGINS: |
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
-        https://ci.exceptionflug.de/job/Protocolize2/lastSuccessfulBuild/artifact/protocolize-velocity/target/protocolize-velocity.jar
     volumes:
       - {{ docker_appdata_path }}/minecraft-proxy:/server
       #- {{ docker_appdata_path }}/minecraft-proxy/velocity-data/velocity.toml:/server/velocity.toml
