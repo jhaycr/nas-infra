@@ -23,6 +23,7 @@ services:
       MEMORY: "384M"
       VIEW_DISTANCE: "4"
       SIMULATION_DISTANCE: "4"
+      SEED: "4859979374641661651"
       PLUGINS: |
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spigot
@@ -34,7 +35,6 @@ services:
     volumes:
       - {{ docker_appdata_path }}/minecraft-lobby:/data
     restart: unless-stopped
-    # seed - 4859979374641661651
 
   minecraft-1:
     container_name: minecraft-1
