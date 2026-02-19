@@ -31,7 +31,7 @@ services:
       - "19132:19132/udp"
 
   tailscale-minecraft:
-    image: tailscale/tailscale:v1.92.5
+    image: tailscale/tailscale:v1.94.2
     network_mode: "service:minecraft-proxy"
     depends_on:
       - minecraft-proxy
