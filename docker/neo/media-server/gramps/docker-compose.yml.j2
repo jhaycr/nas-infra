@@ -10,6 +10,16 @@ services:
       GRAMPSWEB_CELERY_CONFIG__broker_url: "redis://grampsweb_redis:6379/0"
       GRAMPSWEB_CELERY_CONFIG__result_backend: "redis://grampsweb_redis:6379/0"
       GRAMPSWEB_RATELIMIT_STORAGE_URI: redis://grampsweb_redis:6379/1
+      # Custom OIDC Configuration
+      OIDC_ENABLED: True
+      OIDC_ISSUER: "https://auth.{{ secret_domain }}/application/o/gramps/.well-known/openid-configuration"
+      OIDC_CLIENT_ID: {{ secret_gramps_oidc_client_id }}
+      OIDC_CLIENT_SECRET: {{ secret_gramps_oidc_client_secret }}
+      OIDC_NAME: "OIDC"
+      OIDC_SCOPES: "openid email profile"
+      OIDC_AUTO_REDIRECT: True  # Optional: automatically redirect to SSO login
+      OIDC_DISABLE_LOCAL_AUTH: True  # Optional: disable username/password login
+
     depends_on:
       - grampsweb_redis
     volumes:
