@@ -5,6 +5,7 @@ services:
     image: crocodilestick/calibre-web-automated:v4.0.6
     container_name: cwa
     environment:
+      - NETWORK_SHARE_MODE=true
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
     volumes:
       # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
@@ -45,6 +46,7 @@ services:
     image: crocodilestick/calibre-web-automated:v4.0.6
     container_name: cwa-kids
     environment:
+      - NETWORK_SHARE_MODE=true
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
     volumes:
       # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
