@@ -36,8 +36,8 @@ services:
       - {{ docker_appdata_path }}/minecraft-lobby:/data
     restart: unless-stopped
 
-  minecraft-1:
-    container_name: minecraft-1
+  minecraft-survival:
+    container_name: minecraft-survival
     image: itzg/minecraft-server:2026.2.1
     environment:
       EULA: "true"
@@ -60,8 +60,8 @@ services:
       - {{ docker_appdata_path }}/minecraft-1:/data
     restart: unless-stopped
 
-  minecraft-2:
-    container_name: minecraft-2
+  minecraft-pvp:
+    container_name: minecraft-pvp
     image: itzg/minecraft-server:2026.2.1
     environment:
       EULA: "true"
@@ -83,6 +83,8 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.6.0/PAPER/ViaVersion-5.6.0.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/5.6.0/PAPER/ViaBackwards-5.6.0.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/4.0.12/PAPER/ViaRewind-4.0.12.jar
+        https://www.spigotmc.org/resources/luckperms.28140/
+        https://www.spigotmc.org/resources/kitpvp.27107/
     networks:
       - minecraft
     volumes:
