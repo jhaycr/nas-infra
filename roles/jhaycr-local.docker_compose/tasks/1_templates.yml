@@ -48,7 +48,7 @@
         msg: |
           Found appdata files:
           {% for item in (found_appdata_files | unique) %}
-          {{ item.src }} -> {{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}
+          {{ item.src }} -> {{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | regex_replace('\\.j2$', '') }}
           {% endfor %}
       when: docker_compose_debug_print | bool
 
@@ -90,7 +90,7 @@
 
     - name: Create appdata directories
       ansible.builtin.file:
-        path: "{{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | dirname }}"
+        path: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | dirname }}"
         state: directory
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"
@@ -102,7 +102,7 @@
     - name: Template appdata files
       ansible.builtin.template:
         src: "{{ item.src }}"
-        dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('/appdata/', '/') | regex_replace('\\.j2$', '') }}"
+        dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | regex_replace('\\.j2$', '') }}"
         force: yes
         owner: "{{ appdata_owner | default('1000') }}"
         group: "{{ appdata_group | default('1000') }}"

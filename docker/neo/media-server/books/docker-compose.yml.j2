@@ -2,7 +2,7 @@
 services:
 
   calibre-web-automated:
-    image: crocodilestick/calibre-web-automated:V3.1.2
+    image: crocodilestick/calibre-web-automated:v4.0.6
     container_name: cwa
     environment:
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
@@ -42,7 +42,7 @@ services:
       - {{ docker_appdata_path }}/calibrewebautomated/app.db:/auth/app.db:ro
 
   calibre-web-automated-kids:
-    image: crocodilestick/calibre-web-automated:V3.1.2
+    image: crocodilestick/calibre-web-automated:v4.0.6
     container_name: cwa-kids
     environment:
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
