@@ -1,0 +1,53 @@
+---
+###############################################################
+#                   Authelia configuration                    #
+###############################################################
+
+server:
+  address: 'tcp://:9091'
+
+log:
+  level: 'info'
+
+totp:
+  issuer: '{{ secret_domain }}'
+
+identity_validation:
+  reset_password:
+    jwt_secret: '{{ secret_authelia_jwt_secret }}'
+
+authentication_backend:
+  file:
+    path: '/config/users_database.yml'
+
+access_control:
+  default_policy: 'deny'
+  rules:
+    - domain: '*.{{ secret_domain }}'
+      policy: 'two_factor'
+
+session:
+  secret: '{{ secret_authelia_session_secret }}'
+  cookies:
+    - name: 'authelia_session'
+      domain: '{{ secret_domain }}'
+      authelia_url: 'https://authelia.{{ secret_domain }}'
+      expiration: '1 hour'
+      inactivity: '5 minutes'
+  redis:
+    host: 'authelia-redis'
+    port: 6379
+
+regulation:
+  max_retries: 3
+  find_time: '2 minutes'
+  ban_time: '5 minutes'
+
+storage:
+  encryption_key: '{{ secret_authelia_storage_encryption_key }}'
+  local:
+    path: '/config/db.sqlite3'
+
+notifier:
+  filesystem:
+    filename: '/config/notification.txt'
