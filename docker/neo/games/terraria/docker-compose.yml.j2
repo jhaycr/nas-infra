@@ -1,0 +1,22 @@
+---
+
+# https://hub.docker.com/r/ryshe/terraria
+# First run - create a world:
+#   docker exec -it terraria bash
+#   Start the server interactively and create a world, then it will be at /root/.local/share/Terraria/Worlds/
+# Subsequent runs - set WORLD_FILENAME to the .wld filename
+
+services:
+
+  terraria:
+    container_name: terraria
+    image: ryshe/terraria:vanilla-latest
+    ports:
+      - "7777:7777"
+    volumes:
+      - {{ docker_appdata_path }}/terraria/worlds:/root/.local/share/Terraria/Worlds
+    environment:
+      WORLD_FILENAME: "world.wld"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
