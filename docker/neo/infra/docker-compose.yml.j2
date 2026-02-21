@@ -3,6 +3,7 @@ name: infra
 # https://nickcunningh.am/blog/how-to-automate-version-updates-for-your-self-hosted-docker-containers-with-gitea-renovate-and-komodo
 
 include:
+  - path: authelia/docker-compose.yml
   - path: gitea/docker-compose.yml
     env_file: gitea/.env
   - path: metrics/docker-compose.yml

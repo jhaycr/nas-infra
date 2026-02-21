@@ -1,0 +1,18 @@
+---
+###############################################################
+#                         Users Database                      #
+###############################################################
+
+# This file can be used if you do not have an LDAP set up.
+
+# List of users
+users:
+  {{ main_username }}:
+    disabled: false
+    displayname: '{{ main_username }}'
+    # Generate hash: docker run --rm authelia/authelia:latest authelia crypto hash generate argon2 --password 'yourpassword'
+    password: '{{ secret_authelia_user_password_hash }}'
+    email: '{{ secret_authelia_user_email }}'
+    groups:
+      - 'admins'
+      - 'dev'
