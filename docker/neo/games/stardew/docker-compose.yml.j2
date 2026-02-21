@@ -1,0 +1,75 @@
+---
+
+# https://github.com/stardew-valley-dedicated-server/server
+
+networks:
+  stardew:
+    driver: bridge
+
+services:
+
+  stardew-server:
+    container_name: stardew-server
+    image: sdvd/server:latest
+    stdin_open: true
+    tty: true
+    ports:
+      - "5800:5800"        # VNC web UI
+      - "8082:8080"        # REST API
+      - "24642:24642/udp"  # Steam relay
+      - "27015:27015/udp"  # Steam query
+    cap_add:
+      - SYS_TIME
+    volumes:
+      - {{ docker_appdata_path }}/stardew/game-data:/data/game
+      - {{ docker_appdata_path }}/stardew/saves:/config/xdg/config/StardewValley
+      - {{ docker_appdata_path }}/stardew/settings:/data/settings
+    environment:
+      STEAM_AUTH_URL: "http://stardew-steam-auth:3001"
+      VNC_PASSWORD: "${VNC_PASSWORD:-}"
+      DISABLE_RENDERING: "true"
+      SETTINGS_PATH: "/data/settings/server-settings.json"
+      API_ENABLED: "true"
+      API_PORT: "8080"
+      API_KEY: "${API_KEY:-}"
+      SERVER_PASSWORD: "${SERVER_PASSWORD:-}"
+    networks:
+      - stardew
+    depends_on:
+      stardew-steam-auth:
+        condition: service_healthy
+    restart: unless-stopped
+
+  stardew-steam-auth:
+    container_name: stardew-steam-auth
+    image: sdvd/steam-service:latest
+    stdin_open: true
+    tty: true
+    expose:
+      - "3001"
+    volumes:
+      - {{ docker_appdata_path }}/stardew/steam-session:/data/steam-session
+      - {{ docker_appdata_path }}/stardew/game-data:/data/game
+    environment:
+      PORT: "3001"
+      GAME_DIR: "/data/game"
+      SESSION_DIR: "/data/steam-session"
+      STEAM_USERNAME: "${STEAM_USERNAME}"
+      STEAM_PASSWORD: "${STEAM_PASSWORD}"
+    networks:
+      - stardew
+    restart: unless-stopped
+
+  stardew-discord-bot:
+    container_name: stardew-discord-bot
+    image: sdvd/discord-bot:latest
+    environment:
+      DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN:-}"
+      API_URL: "http://stardew-server:8080"
+      UPDATE_INTERVAL_MS: "30000"
+      API_KEY: "${API_KEY:-}"
+    networks:
+      - stardew
+    depends_on:
+      - stardew-server
+    restart: on-failure
