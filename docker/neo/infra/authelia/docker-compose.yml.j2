@@ -15,7 +15,7 @@ services:
 
   authelia-redis:
     container_name: authelia-redis
-    image: docker.io/redis:7-alpine
+    image: docker.io/redis:8-alpine
     restart: unless-stopped
     networks:
       - authelia
