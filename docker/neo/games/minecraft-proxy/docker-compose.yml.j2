@@ -20,6 +20,13 @@ services:
       PLUGINS: |
         https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
         https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
+    # Explicit DNS servers so the container can resolve external hostnames.
+    # Without this, the custom bridge network (minecraft) can fail to resolve
+    # public DNS (e.g. api.geysermc.org) causing Geyser FloodgateSkinUploader
+    # to log "Temporary failure in name resolution" and crash with Invalid JSON errors.
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     volumes:
       - {{ docker_appdata_path }}/minecraft-proxy:/server
       #- {{ docker_appdata_path }}/minecraft-proxy/velocity-data/velocity.toml:/server/velocity.toml
