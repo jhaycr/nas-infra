@@ -10,3 +10,7 @@
   when:
     - docker_compose_start_stack | bool
     - stack_has_services | default(false)
+
+- name: Collect port registry entries for this stack
+  include_tasks: 4_port_registry.yml
+  when: docker_compose_generate_port_registry | bool

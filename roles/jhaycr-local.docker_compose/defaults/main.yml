@@ -18,3 +18,9 @@ docker_compose_restart: "{{ DOCKER_COMPOSE_RESTART | default('never') }}"  # val
 # Debug mode
 docker_compose_debug_print: "{{ DOCKER_COMPOSE_DEBUG_PRINT | default('false') }}"
 docker_compose_debug_halt: "{{ DOCKER_COMPOSE_DEBUG_HALT | default('false') }}"
+
+# Port registry generation
+# Writes docs/ports-<host>.md on the Ansible controller after every deploy.
+# The file can be committed to track port changes alongside compose edits.
+# Disable with: EXTRA_VARS="docker_compose_generate_port_registry=false"
+docker_compose_generate_port_registry: "{{ DOCKER_COMPOSE_GENERATE_PORT_REGISTRY | default('true') | bool }}"
