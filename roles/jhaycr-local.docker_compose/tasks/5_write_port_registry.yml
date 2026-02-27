@@ -1,0 +1,25 @@
+---
+# Renders the accumulated port registry for this host and writes it to
+# docs/ports-<inventory_hostname>.md on the Ansible controller.
+#
+# Called once from main.yml after all stacks for this host have been
+# processed. The all_port_registry fact must have been populated by
+# 4_port_registry.yml during the stack processing loop.
+
+- name: "Port registry: ensure docs/ directory exists on controller"
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/docs"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  become: false
+
+- name: "Port registry: write docs/ports-{{ inventory_hostname }}.md"
+  ansible.builtin.template:
+    src: port_registry.md.j2
+    dest: "{{ playbook_dir }}/docs/ports-{{ inventory_hostname }}.md"
+    mode: "0644"
+  delegate_to: localhost
+  become: false
+  vars:
+    all_port_registry: "{{ all_port_registry | default([]) }}"

@@ -9,3 +9,7 @@
   loop: "{{ group_names }}"
   loop_control:
     loop_var: inventory_group_name
+
+- name: Write port registry document for this host
+  include_tasks: 5_write_port_registry.yml
+  when: docker_compose_generate_port_registry | bool

@@ -1,0 +1,47 @@
+---
+# Collects host-port mappings from every active service in the current stack.
+#
+# Runs once per stack (called from process_stack.yml), after 2_overrides.yml
+# has already computed include_paths. Appends structured entries to the
+# host-scoped fact `all_port_registry`, which persists across all stack
+# iterations within the play. The final write step (5_write_port_registry.yml)
+# is called once from main.yml after all stacks are processed.
+#
+# Each entry in all_port_registry has the shape:
+#   { host: str, stack: str, service: str, ports: list[str] }
+#
+# Services that declare no `ports:` key, declare `ports: []`, or use
+# network_mode (host/container:X) are naturally absent — they have nothing
+# to include.
+
+- name: "Port registry: initialize accumulator if not yet set"
+  ansible.builtin.set_fact:
+    all_port_registry: "{{ all_port_registry | default([]) }}"
+  delegate_to: localhost
+  become: false
+
+- name: "Port registry: collect entries from {{ inventory_hostname }}/{{ current_stack_name }}"
+  ansible.builtin.set_fact:
+    all_port_registry: >-
+      {%- set entries = all_port_registry | default([]) | list -%}
+      {%- for path in include_paths -%}
+        {%- set parsed = lookup('ansible.builtin.template', path) | from_yaml -%}
+        {%- if parsed.services is defined and parsed.services is mapping -%}
+          {%- for svc_name, svc in parsed.services.items() -%}
+            {%- if svc is mapping
+                  and svc.ports is defined
+                  and svc.ports is not none
+                  and svc.ports | length > 0 -%}
+              {%- set _ = entries.append({
+                    'host':    inventory_hostname,
+                    'stack':   current_stack_name,
+                    'service': svc_name,
+                    'ports':   svc.ports | list
+                  }) -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ entries }}
+  delegate_to: localhost
+  become: false
