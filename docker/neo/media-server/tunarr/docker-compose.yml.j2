@@ -5,5 +5,8 @@ services:
     image: ghcr.io/chrisbenincasa/tunarr:latest
     ports:
       - "8265:8000"
+    devices:
+      - /dev/dri:/dev/dri
     volumes:
       - {{ docker_appdata_path }}/tunarr:/config
+      - {{ nas_storage_path }}/media/TV:/data/media/TV
