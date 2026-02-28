@@ -17,8 +17,6 @@
 - name: "Port registry: initialize accumulator if not yet set"
   ansible.builtin.set_fact:
     all_port_registry: "{{ all_port_registry | default([]) }}"
-  delegate_to: localhost
-  become: false
 
 - name: "Port registry: collect entries from {{ inventory_hostname }}/{{ current_stack_name }}"
   ansible.builtin.set_fact:
@@ -27,21 +25,68 @@
       {%- for path in include_paths -%}
         {%- set parsed = lookup('ansible.builtin.template', path) | from_yaml -%}
         {%- if parsed.services is defined and parsed.services is mapping -%}
+
+          {# Build env dict from .env.j2 files so ${VAR:-default} refs in port specs
+             are resolved against actual configured values, not just the inline default.
+             Stack-level .env.j2 is loaded first; service-level .env.j2 overrides it. #}
+          {%- set svc_dir   = path | dirname -%}
+          {%- set stack_dir = svc_dir | dirname -%}
+          {%- set env_dict  = {} -%}
+          {%- for env_path in [stack_dir ~ '/.env.j2', svc_dir ~ '/.env.j2'] -%}
+            {%- if lookup('ansible.builtin.fileglob', env_path, wantlist=True) | length > 0 -%}
+              {%- for line in lookup('ansible.builtin.template', env_path).splitlines() -%}
+                {%- set stripped = line | trim -%}
+                {%- if stripped and not stripped.startswith('#') and '=' in stripped -%}
+                  {%- set kv = stripped.split('=', 1) -%}
+                  {%- set _ = env_dict.update({kv[0] | trim: kv[1] | trim}) -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+
           {%- for svc_name, svc in parsed.services.items() -%}
             {%- if svc is mapping
                   and svc.ports is defined
                   and svc.ports is not none
                   and svc.ports | length > 0 -%}
+
+              {# Resolve ${VAR:-default} and ${VAR} in each port spec against env_dict.
+                 Split on '${', then for each fragment that contains '}' extract the
+                 variable name (and optional default), look it up in env_dict, and
+                 reassemble. Fragments with no '${' are passed through unchanged. #}
+              {%- set resolved_ports = [] -%}
+              {%- for port_spec in svc.ports -%}
+                {%- set fragments = (port_spec | string).split('${') -%}
+                {%- set out = [fragments[0]] -%}
+                {%- for frag in fragments[1:] -%}
+                  {%- if '}' in frag -%}
+                    {%- set brace  = frag.index('}') -%}
+                    {%- set inner  = frag[:brace] -%}
+                    {%- set after  = frag[brace + 1:] -%}
+                    {%- if ':-' in inner -%}
+                      {%- set var_name    = inner.split(':-', 1)[0] -%}
+                      {%- set default_val = inner.split(':-', 1)[1] -%}
+                    {%- else -%}
+                      {%- set var_name    = inner -%}
+                      {%- set default_val = '' -%}
+                    {%- endif -%}
+                    {%- set _ = out.append(env_dict.get(var_name, default_val) ~ after) -%}
+                  {%- else -%}
+                    {%- set _ = out.append('${' ~ frag) -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- set _ = resolved_ports.append(out | join('')) -%}
+              {%- endfor -%}
+
               {%- set _ = entries.append({
                     'host':    inventory_hostname,
                     'stack':   current_stack_name,
                     'service': svc_name,
-                    'ports':   svc.ports | list
+                    'ports':   resolved_ports
                   }) -%}
             {%- endif -%}
           {%- endfor -%}
         {%- endif -%}
       {%- endfor -%}
       {{ entries }}
-  delegate_to: localhost
-  become: false
+
