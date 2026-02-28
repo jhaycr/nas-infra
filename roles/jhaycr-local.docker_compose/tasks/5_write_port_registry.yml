@@ -1,10 +1,10 @@
 ---
-# Renders the accumulated port registry for this host and writes it to
-# docs/ports-<inventory_hostname>.md on the Ansible controller.
+# Renders the accumulated port registry for all play hosts and writes it to
+# docs/ports.md on the Ansible controller.
 #
 # Called once from main.yml after all stacks for this host have been
-# processed. The all_port_registry fact must have been populated by
-# 4_port_registry.yml during the stack processing loop.
+# processed. Runs with run_once so it only executes once per play, collecting
+# all_port_registry facts from every host in ansible_play_hosts via hostvars.
 
 - name: "Port registry: ensure docs/ directory exists on controller"
   ansible.builtin.file:
@@ -13,13 +13,22 @@
     mode: "0755"
   delegate_to: localhost
   become: false
+  run_once: true
 
-- name: "Port registry: write docs/ports-{{ inventory_hostname }}.md"
+- name: "Port registry: write docs/ports.md"
   ansible.builtin.template:
     src: port_registry.md.j2
-    dest: "{{ playbook_dir }}/docs/ports-{{ inventory_hostname }}.md"
+    dest: "{{ playbook_dir }}/docs/ports.md"
     mode: "0644"
   delegate_to: localhost
   become: false
+  run_once: true
   vars:
-    all_port_registry: "{{ all_port_registry | default([]) }}"
+    all_port_registry: >-
+      {{
+        ansible_play_hosts
+        | map('extract', hostvars)
+        | selectattr('all_port_registry', 'defined')
+        | map(attribute='all_port_registry')
+        | flatten
+      }}
