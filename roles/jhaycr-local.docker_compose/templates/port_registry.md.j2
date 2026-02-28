@@ -29,3 +29,15 @@ gateway (e.g. gluetun) are listed under the gateway service, not the proxied ser
 | {{ entry.host }} | {{ entry.stack }} | {{ entry.service }} | `{{ host_port }}` | `{{ container_part }}` |
 {% endfor %}
 {% endfor %}
+{% if vpn_gateway_registry | default([]) | length > 0 %}
+
+## VPN Gateway Services
+
+Services running inside a VPN gateway's network namespace (ports are owned by the gateway above):
+
+| Host | Stack | Gateway | Service |
+|------|-------|---------|---------|
+{% for entry in vpn_gateway_registry | sort(attribute='host,stack,gateway,service') %}
+| {{ entry.host }} | {{ entry.stack }} | {{ entry.gateway }} | {{ entry.service }} |
+{% endfor %}
+{% endif %}
