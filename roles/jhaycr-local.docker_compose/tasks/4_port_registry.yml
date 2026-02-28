@@ -90,3 +90,26 @@
       {%- endfor -%}
       {{ entries }}
 
+- name: "Port registry: collect VPN-proxied services from {{ inventory_hostname }}/{{ current_stack_name }}"
+  ansible.builtin.set_fact:
+    vpn_gateway_registry: >-
+      {%- set entries = vpn_gateway_registry | default([]) | list -%}
+      {%- for path in include_paths -%}
+        {%- set parsed = lookup('ansible.builtin.template', path) | from_yaml -%}
+        {%- if parsed.services is defined and parsed.services is mapping -%}
+          {%- for svc_name, svc in parsed.services.items() -%}
+            {%- if svc is mapping and svc.network_mode is defined -%}
+              {%- set nm = svc.network_mode | string | trim -%}
+              {%- if nm.startswith('container:') -%}
+                {%- set _ = entries.append({
+                      'host':    inventory_hostname,
+                      'stack':   current_stack_name,
+                      'gateway': nm[10:],
+                      'service': svc_name
+                    }) -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ entries }}

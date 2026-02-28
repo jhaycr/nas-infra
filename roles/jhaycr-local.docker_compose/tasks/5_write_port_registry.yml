@@ -32,3 +32,11 @@
         | map(attribute='all_port_registry')
         | flatten
       }}
+    vpn_gateway_registry: >-
+      {{
+        ansible_play_hosts
+        | map('extract', hostvars)
+        | selectattr('vpn_gateway_registry', 'defined')
+        | map(attribute='vpn_gateway_registry')
+        | flatten
+      }}
