@@ -1,0 +1,5 @@
+---
+# Symlink mappings for neo (used by jhaycr-local.symlinks)
+# Used for Plex and other host-level symlink needs
+# Add src/dest pairs as needed; leave empty to disable.
+symlink_mappings: []
