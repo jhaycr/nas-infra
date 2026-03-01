@@ -1,0 +1,24 @@
+---
+services:
+  semaphore:
+    build:
+      context: .
+    container_name: semaphore
+    restart: unless-stopped
+    ports:
+      - "3030:3000"
+    environment:
+      - SEMAPHORE_DB_DIALECT=bolt
+      - SEMAPHORE_ADMIN=admin
+      - SEMAPHORE_ADMIN_PASSWORD=${SEMAPHORE_ADMIN_PASSWORD}
+      - SEMAPHORE_ADMIN_NAME=Admin
+      - SEMAPHORE_ADMIN_EMAIL=admin@local.home
+      - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEMAPHORE_ACCESS_KEY_ENCRYPTION}
+      - TZ={{ ntp_timezone }}
+    env_file:
+      - .env
+    volumes:
+      - {{ docker_appdata_path }}/semaphore:/home/semaphore/.semaphore
+      - /home/{{ main_username }}/ansible/nas-infra:/home/{{ main_username }}/nas-infra:ro
+      - /home/{{ main_username }}/.ansible-vault.key:/run/secrets/vault.key:ro
+      - /home/{{ main_username }}/.ansible/roles:/root/.ansible/roles
