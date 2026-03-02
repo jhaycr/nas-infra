@@ -1,5 +1,6 @@
 reqs:
 	ansible-galaxy collection install -r requirements.yml -p . --force
+	ansible-galaxy role install -r requirements.yml --roles-path ./roles --force
 
 bootstrap-ssh:
 	@if [ -z "$(LIMIT)" ]; then \
