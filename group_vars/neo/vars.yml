@@ -10,6 +10,13 @@ docker_compose_start_stack: true
 docker_compose_show_status: true
 docker_compose_restart: never
 
+docker_stack_order:
+  neo:
+    - infra
+    - media-server
+    - games
+    - ai
+
 # Services to expose via Traefik. Key = Docker Compose service name.
 # To add a new service: one entry here + bridge_proxy_external in its compose networks.
 #
@@ -22,6 +29,7 @@ docker_compose_restart: never
 traefik_services:
   # audiobookshelf: labels defined directly in its compose file (3 hostname aliases)
   authentik:     { port: 9000, auth: none,    subdomain: auth }
+  grampsweb:     { port: 5000, auth: oidc,    subdomain: gramps }
   freshrss:      { port: 80,   auth: oidc,    subdomain: rss }
   immich-server: { port: 2283, auth: oidc,    subdomain: photos }
   komga:         { port: 25600, auth: oidc,   subdomain: comics }
