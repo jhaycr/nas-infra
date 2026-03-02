@@ -13,9 +13,21 @@
     var: found_stacks
   when: docker_compose_debug_print | bool
 
+- name: Build ordered stack list
+  ansible.builtin.set_fact:
+    ordered_stack_names: >-
+      {{ (docker_stack_order[inventory_group_name] | default([]) | intersect(found_stack_names)) +
+         (found_stack_names | difference(docker_stack_order[inventory_group_name] | default([]))) }}
+  vars:
+    found_stack_names: "{{ found_stacks.files | map(attribute='path') | map('basename') | list }}"
+
+- debug:
+    var: ordered_stack_names
+  when: docker_compose_debug_print | bool
+
 - name: Process stacks
   include_tasks: process_stack.yml
-  loop: "{{ found_stacks.files | map(attribute='path') | map('basename') }}"
+  loop: "{{ ordered_stack_names }}"
   loop_control:
     loop_var: current_stack_name
   vars:

@@ -24,3 +24,15 @@ docker_compose_debug_halt: "{{ DOCKER_COMPOSE_DEBUG_HALT | default('false') }}"
 # The file can be committed to track port changes alongside compose edits.
 # Disable with: EXTRA_VARS="docker_compose_generate_port_registry=false"
 docker_compose_generate_port_registry: "{{ DOCKER_COMPOSE_GENERATE_PORT_REGISTRY | default('true') | bool }}"
+
+# Stack deployment order (per inventory group name)
+# Stacks listed here deploy first, in the given order.
+# Stacks not listed follow in filesystem order afterward.
+# Example:
+#   docker_stack_order:
+#     neo:
+#       - infra
+#       - media-server
+#       - games
+#       - ai
+docker_stack_order: {}
