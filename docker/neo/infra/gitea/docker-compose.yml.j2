@@ -13,9 +13,12 @@ services:
       - GITEA__database__NAME=gitea
       - GITEA__database__USER=gitea
       - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
+      - GITEA__mirror__MIN_INTERVAL=1m
+      - GITEA__mirror__DEFAULT_INTERVAL=1m
+      - GITEA__repository__ROOT=/repos
     volumes:
-      # replace the left-hand side from the ':' with your own path
       - {{ docker_appdata_path }}/gitea:/data
+      - /home/{{ main_username }}/code/gitea-repos:/repos
     ports:
       - 3105:3000
       - 222:22

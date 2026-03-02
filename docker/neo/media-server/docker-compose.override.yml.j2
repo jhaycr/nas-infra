@@ -21,5 +21,18 @@ services:
     pull_policy: missing
     environment:
       <<: *common-env
+{% if service in (traefik_services | default({})) %}
+{% set svc = traefik_services[service] %}
+{% set auth = svc.auth | default('forward') %}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.{{ service }}.rule=Host(`{{ svc.subdomain | default(service) }}.{{ secret_domain }}`)"
+      - "traefik.http.routers.{{ service }}.entrypoints=websecure"
+      - "traefik.http.routers.{{ service }}.tls.certresolver=cloudflare"
+      - "traefik.http.services.{{ service }}.loadbalancer.server.port={{ svc.port }}"
+{% if auth == 'forward' %}
+      - "traefik.http.routers.{{ service }}.middlewares=authentik@file"
+{% endif %}
+{% endif %}
 {% endfor %}
 {% endif %}

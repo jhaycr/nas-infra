@@ -50,7 +50,7 @@ services:
       - HARDCOVER_TOKEN={{ secret_hardcover_token }}  # Optional, but needed for some features
     volumes:
       # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
-      - {{ docker_appdata_path }}/cwa-kids:/config 
+      - {{ docker_appdata_path }}/cwa-kids:/config
       # This is an ingest dir, NOT a library one. Anything added here will be automatically added to your library according to the settings you have configured in CWA Settings page. All files placed here are REMOVED AFTER PROCESSING
       - {{ nas_cache_path}}/cwa-book-ingest/kids:/cwa-book-ingest
       # If you don't have an existing library, CWA will automatically create one at the bind provided here
@@ -59,7 +59,19 @@ services:
       - bridge_proxy_external
     ports:
       # Change the first number to change the port you want to access the Web UI, not the second
-      - 8882:8083 
+      - 8882:8083
+    labels:
+      - "traefik.enable=true"
+      # Root intentionally returns 404 — only /kobo and /opds are exposed
+      - "traefik.http.routers.cwa-kids-kobo.rule=Host(`kids-books.{{ secret_domain }}`) && PathPrefix(`/kobo`)"
+      - "traefik.http.routers.cwa-kids-kobo.entrypoints=websecure"
+      - "traefik.http.routers.cwa-kids-kobo.tls.certresolver=cloudflare"
+      - "traefik.http.routers.cwa-kids-kobo.service=cwa-kids"
+      - "traefik.http.routers.cwa-kids-opds.rule=Host(`kids-books.{{ secret_domain }}`) && PathPrefix(`/opds`)"
+      - "traefik.http.routers.cwa-kids-opds.entrypoints=websecure"
+      - "traefik.http.routers.cwa-kids-opds.tls.certresolver=cloudflare"
+      - "traefik.http.routers.cwa-kids-opds.service=cwa-kids"
+      - "traefik.http.services.cwa-kids.loadbalancer.server.port=8083"
     restart: unless-stopped
 
   chaptarr: # 10.0.10.13

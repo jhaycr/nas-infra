@@ -19,6 +19,5 @@ services:
       - .env
     volumes:
       - {{ docker_appdata_path }}/semaphore:/home/semaphore/.semaphore
-      - /home/{{ main_username }}/ansible/nas-infra:/home/{{ main_username }}/nas-infra:ro
-      - /home/{{ main_username }}/.ansible-vault.key:/run/secrets/vault.key:ro
-      - /home/{{ main_username }}/.ansible/roles:/root/.ansible/roles
+      - /home/{{ main_username }}/code/gitea-working-clones/nas-infra:/home/{{ main_username }}/code/gitea-working-clones/nas-infra
+      - /home/{{ main_username }}/.secrets/.ansible-vault.key:/run/secrets/vault.key:ro
