@@ -3,6 +3,8 @@ services:
     image: ghcr.io/gramps-project/grampsweb:latest
     container_name: gramps
     restart: always
+    networks:
+      - bridge_proxy_external
     ports:
       - "5002:5000"  # host:docker
     environment:

@@ -1,0 +1,31 @@
+---
+networks:
+  vlan_proxy_external:
+    external: true
+  bridge_proxy_external:
+    external: true
+
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:v3.3
+    networks:
+      vlan_proxy_external:
+        ipv4_address: 192.168.1.10
+      bridge_proxy_external:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ docker_appdata_path }}/traefik/config:/config
+    environment:
+      CF_API_EMAIL: "{{ secret_cloudflare_email }}"
+      CF_API_KEY: "{{ secret_cloudflare_api_key }}"
+    command:
+      - "--configFile=/config/traefik.yml"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.{{ secret_domain }}`)"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-dashboard.middlewares=authentik@file"
+      - "traefik.http.routers.traefik-dashboard.priority=1000"
