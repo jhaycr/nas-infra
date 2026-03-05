@@ -36,3 +36,7 @@ docker_compose_generate_port_registry: "{{ DOCKER_COMPOSE_GENERATE_PORT_REGISTRY
 #       - games
 #       - ai
 docker_stack_order: {}
+
+# Optional: limit deployment to a single named stack (e.g. "infra", "media-server")
+# Set via: make neo-docker-infra  (passes -e docker_compose_stack_filter=infra)
+docker_compose_stack_filter: ''
