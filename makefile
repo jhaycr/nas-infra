@@ -27,8 +27,13 @@ vault-unlock:
 neo:
 	ansible-playbook site.yml --limit neo --skip-tags compose $(EXTRA_VARS:%=-e '%')
 
+_NEO_DOCKER_STACK := $(if $(filter neo-docker,$(MAKECMDGOALS)),$(filter-out neo-docker,$(MAKECMDGOALS)))
+$(if $(_NEO_DOCKER_STACK),$(eval $(_NEO_DOCKER_STACK):;@:))
+
 neo-docker:
-	ansible-playbook site.yml --limit neo --tags compose $(EXTRA_VARS:%=-e '%')
+	ansible-playbook site.yml --limit neo --tags compose \
+	  $(if $(_NEO_DOCKER_STACK),-e docker_compose_stack_filter=$(_NEO_DOCKER_STACK)) \
+	  $(EXTRA_VARS:%=-e '%')
 
 neo-disks:
 	ansible-playbook site.yml --limit neo --tags disks $(EXTRA_VARS:%=-e '%')

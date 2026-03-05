@@ -65,48 +65,51 @@
         group: "{{ appdata_group | default('1000') }}"
         mode: '0755'
 
-    - name: Ensure application-specific directories exist
-      ansible.builtin.file:
-        path: "{{ docker_compose_path }}/{{ current_stack_name }}/{{ item.path | regex_replace('.*/' + inventory_group_name + '/' + current_stack_name + '/?', '') | dirname }}"
-        state: directory
-        owner: "{{ appdata_owner | default('1000') }}"
-        group: "{{ appdata_group | default('1000') }}"
-        mode: '0755'
-      loop: "{{ found_compose_files.files }}"
-      loop_control:
-        label: "{{ item.path }}"
+    - name: Template and create files
+      when: docker_compose_copy_templates | bool
+      block:
+        - name: Ensure application-specific directories exist
+          ansible.builtin.file:
+            path: "{{ docker_compose_path }}/{{ current_stack_name }}/{{ item.path | regex_replace('.*/' + inventory_group_name + '/' + current_stack_name + '/?', '') | dirname }}"
+            state: directory
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: '0755'
+          loop: "{{ found_compose_files.files }}"
+          loop_control:
+            label: "{{ item.path }}"
 
-    - name: Template compose files
-      ansible.builtin.template:
-        src: "{{ item.path }}"
-        dest: "{{ docker_compose_path }}/{{ current_stack_name }}/{{ item.path | regex_replace('.*/' + inventory_group_name + '/' + current_stack_name + '/?', '') | regex_replace('\\.j2$', '') }}"
-        force: yes
-        owner: "{{ appdata_owner | default('1000') }}"
-        group: "{{ appdata_group | default('1000') }}"
-        mode: '0644'
-      loop: "{{ found_compose_files.files }}"
-      loop_control:
-        label: "{{ item.path }}"
+        - name: Template compose files
+          ansible.builtin.template:
+            src: "{{ item.path }}"
+            dest: "{{ docker_compose_path }}/{{ current_stack_name }}/{{ item.path | regex_replace('.*/' + inventory_group_name + '/' + current_stack_name + '/?', '') | regex_replace('\\.j2$', '') }}"
+            force: yes
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: '0644'
+          loop: "{{ found_compose_files.files }}"
+          loop_control:
+            label: "{{ item.path }}"
 
-    - name: Create appdata directories
-      ansible.builtin.file:
-        path: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | dirname }}"
-        state: directory
-        owner: "{{ appdata_owner | default('1000') }}"
-        group: "{{ appdata_group | default('1000') }}"
-        mode: "0755"
-      loop: "{{ found_appdata_files }}"
-      loop_control:
-        label: "{{ item.path }}"
+        - name: Create appdata directories
+          ansible.builtin.file:
+            path: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | dirname }}"
+            state: directory
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: "0755"
+          loop: "{{ found_appdata_files }}"
+          loop_control:
+            label: "{{ item.path }}"
 
-    - name: Template appdata files
-      ansible.builtin.template:
-        src: "{{ item.src }}"
-        dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | regex_replace('\\.j2$', '') }}"
-        force: yes
-        owner: "{{ appdata_owner | default('1000') }}"
-        group: "{{ appdata_group | default('1000') }}"
-        mode: "0644"
-      loop: "{{ found_appdata_files }}"
-      loop_control:
-        label: "{{ item.path }}"
+        - name: Template appdata files
+          ansible.builtin.template:
+            src: "{{ item.src }}"
+            dest: "{{ docker_appdata_path }}/{{ item.path | regex_replace('^.*/appdata/', '') | regex_replace('\\.j2$', '') }}"
+            force: yes
+            owner: "{{ appdata_owner | default('1000') }}"
+            group: "{{ appdata_group | default('1000') }}"
+            mode: "0644"
+          loop: "{{ found_appdata_files }}"
+          loop_control:
+            label: "{{ item.path }}"

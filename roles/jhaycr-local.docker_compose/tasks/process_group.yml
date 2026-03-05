@@ -25,6 +25,11 @@
     var: ordered_stack_names
   when: docker_compose_debug_print | bool
 
+- name: Filter stacks by name
+  ansible.builtin.set_fact:
+    ordered_stack_names: "{{ ordered_stack_names | select('equalto', docker_compose_stack_filter) | list }}"
+  when: docker_compose_stack_filter != ''
+
 - name: Process stacks
   include_tasks: process_stack.yml
   loop: "{{ ordered_stack_names }}"
