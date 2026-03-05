@@ -71,7 +71,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://paperless-tika:9998
 
   paperless-gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.25
+    image: docker.io/gotenberg/gotenberg:8.27
     restart: unless-stopped
 
     # The gotenberg chromium route is used to convert .eml files. We do not
