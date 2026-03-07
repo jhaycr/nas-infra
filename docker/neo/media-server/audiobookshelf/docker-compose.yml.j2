@@ -8,13 +8,6 @@ services:
       bridge_proxy_external:
     ports:
       - "13378:80"
-    labels:
-      - "traefik.enable=true"
-      # Three hostname aliases matching NPM config
-      - "traefik.http.routers.audiobookshelf.rule=Host(`audiobooks.{{ secret_domain }}`) || Host(`audiobookshelf.{{ secret_domain }}`) || Host(`podcasts.{{ secret_domain }}`)"
-      - "traefik.http.routers.audiobookshelf.entrypoints=websecure"
-      - "traefik.http.routers.audiobookshelf.tls.certresolver=cloudflare"
-      - "traefik.http.services.audiobookshelf.loadbalancer.server.port=80"
     volumes:
       - {{ nas_storage_path }}/media/audio/audiobooks:/audiobooks
       - {{ nas_storage_path }}/media/audio/podcasts:/podcasts

@@ -20,21 +20,19 @@ docker_stack_order:
 # Services to expose via Traefik. Key = Docker Compose service name.
 # To add a new service: one entry here + bridge_proxy_external in its compose networks.
 #
-# subdomain: defaults to the service name if omitted
+# subdomains: list of subdomains routed to this service
 # auth:
-#   (omitted)  → DEFAULT: Authentik forward auth applied automatically
-#   forward    → Authentik forward auth (explicit, same as default)
 #   oidc       → App handles SSO natively via Authentik OIDC — no Traefik middleware
 #   none       → No authentication (intentional — public/provider/device endpoints only)
 traefik_services:
-  # audiobookshelf: labels defined directly in its compose file (3 hostname aliases)
-  authentik:     { port: 9000, auth: none,    subdomain: auth }
-  grampsweb:     { port: 5000, auth: oidc,    subdomain: gramps }
-  freshrss:      { port: 80,   auth: oidc,    subdomain: rss }
-  immich-server: { port: 2283, auth: oidc,    subdomain: photos }
-  komga:         { port: 25600, auth: oidc,   subdomain: comics }
-  overseerr:     { port: 5055, auth: forward, subdomain: requests }
-  romm:          { port: 8080, auth: oidc }
+  audiobookshelf: { port: 80,    auth: oidc,    subdomains: [audiobooks, audiobookshelf, podcasts] }
+  authentik:      { port: 9000,  auth: none,    subdomains: [auth] }
+  grampsweb:      { port: 5000,  auth: oidc,    subdomains: [gramps] }
+  freshrss:       { port: 80,    auth: oidc,    subdomains: [rss] }
+  immich-server:  { port: 2283,  auth: oidc,    subdomains: [photos] }
+  komga:          { port: 25600, auth: oidc,    subdomains: [comics] }
+  overseerr:      { port: 5055,  auth: forward, subdomains: [requests] }
+  romm:           { port: 8080,  auth: oidc,    subdomains: [romm] }
 
 nas_cache_path: '/mnt/cache1'
 nas_download_path: '{{ nas_cache_path }}/downloads'
