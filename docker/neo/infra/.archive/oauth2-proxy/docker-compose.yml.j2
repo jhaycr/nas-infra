@@ -1,0 +1,13 @@
+services:
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:latest
+    container_name: oauth2-proxy
+    env_file: .env
+    networks:
+      - bridge_proxy_external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.oauth2-proxy.rule=Host(`oauth2.{{ secret_domain }}`)"
+      - "traefik.http.routers.oauth2-proxy.entrypoints=websecure"
+      - "traefik.http.routers.oauth2-proxy.tls.certresolver=cloudflare"
+      - "traefik.http.services.oauth2-proxy.loadbalancer.server.port=4180"
