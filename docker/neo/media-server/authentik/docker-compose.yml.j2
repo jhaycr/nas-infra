@@ -16,11 +16,15 @@ services:
     volumes:
       - {{ docker_appdata_path }}/authentik/media:/media
       - {{ docker_appdata_path }}/authentik/custom-templates:/templates
+      - {{ docker_appdata_path }}/authentik/blueprints:/blueprints/custom
     env_file:
       - .env
     networks:
       - app_authentik
       - bridge_proxy_external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
     ports:
       - "${COMPOSE_PORT_HTTP:-9090}:9000"
       - "${COMPOSE_PORT_HTTPS:-9443}:9443"
@@ -30,7 +34,7 @@ services:
 
   authentik-postgresql:
     container_name: authentik-postgresql
-    image: docker.io/library/postgres:18-alpine3.21
+    image: docker.io/library/postgres:16-alpine3.21
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
@@ -90,6 +94,7 @@ services:
       - {{ docker_appdata_path }}/authentik/media:/media
       - {{ docker_appdata_path }}/authentik/certs:/certs
       - {{ docker_appdata_path }}/authentik/custom-templates:/templates
+      - {{ docker_appdata_path }}/authentik/blueprints:/blueprints/custom
     env_file:
       - .env
     depends_on:

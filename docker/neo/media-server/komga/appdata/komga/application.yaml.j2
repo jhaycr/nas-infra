@@ -6,14 +6,14 @@ spring:
     oauth2:
       client:
         registration:
-          authentik:
+          zitadel:
             client-id: {{ secret_komga_oidc_client_id }}
             client-secret: {{ secret_komga_oidc_client_secret }}
             client-name: Authentik SSO
             scope: openid,profile,email
             authorization-grant-type: authorization_code
-            redirect-uri: "https://comics.{{ secret_domain }}/login/oauth2/code/authentik"
+            redirect-uri: "https://comics.{{ secret_domain }}/login/oauth2/code/zitadel"
         provider:
-          authentik:
-            issuer-uri: https://auth.{{ secret_domain }}/application/o/komga/
+          zitadel:
+            issuer-uri: https://auth.{{ secret_domain }}
             user-name-attribute: preferred_username

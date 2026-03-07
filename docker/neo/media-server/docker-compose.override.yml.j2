@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.{{ service }}.tls.certresolver=cloudflare"
       - "traefik.http.services.{{ service }}.loadbalancer.server.port={{ svc.port }}"
 {% if auth == 'forward' %}
-      - "traefik.http.routers.{{ service }}.middlewares=authentik@file"
+      - "traefik.http.routers.{{ service }}.middlewares=auth@file,auth-errors@file"
 {% endif %}
 {% endif %}
 {% endfor %}
