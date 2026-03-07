@@ -22,15 +22,17 @@ services:
       <<: *common-env
 {% if service in (traefik_services | default({})) %}
 {% set svc = traefik_services[service] %}
-{% set auth = svc.auth | default('forward') %}
+{% if svc.auth is defined and svc.auth in ['oidc', 'forward', 'none'] %}
+{% set subdomains = svc.subdomains %}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.{{ service }}.rule=Host(`{{ svc.subdomain | default(service) }}.{{ secret_domain }}`)"
+      - "traefik.http.routers.{{ service }}.rule={% for sd in subdomains %}Host(`{{ sd }}.{{ secret_domain }}`){% if not loop.last %} || {% endif %}{% endfor %}"
       - "traefik.http.routers.{{ service }}.entrypoints=websecure"
       - "traefik.http.routers.{{ service }}.tls.certresolver=cloudflare"
       - "traefik.http.services.{{ service }}.loadbalancer.server.port={{ svc.port }}"
-{% if auth == 'forward' %}
+{% if svc.auth == 'forward' %}
       - "traefik.http.routers.{{ service }}.middlewares=authentik@file"
+{% endif %}
 {% endif %}
 {% endif %}
 {% endfor %}
