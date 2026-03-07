@@ -1,0 +1,65 @@
+networks:
+  zitadel:
+  bridge_proxy_external:
+    external: true
+
+services:
+  zitadel:
+    container_name: zitadel
+    image: ghcr.io/zitadel/zitadel:v3.4.7
+    restart: unless-stopped
+    networks:
+      - zitadel
+      - bridge_proxy_external
+    depends_on:
+      zitadel-db:
+        condition: service_healthy
+    command: start-from-init --masterkeyFromEnv
+    environment:
+      ZITADEL_MASTERKEY: "${ZITADEL_MASTERKEY}"
+      ZITADEL_DATABASE_POSTGRES_HOST: zitadel-db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: "${ZITADEL_DB_PASSWORD}"
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: zitadel_admin
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: "${ZITADEL_DB_ADMIN_PASSWORD}"
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      ZITADEL_EXTERNALDOMAIN: "auth.{{ secret_domain }}"
+      ZITADEL_EXTERNALPORT: 443
+      ZITADEL_EXTERNALSECURE: "true"
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: "${ZITADEL_ADMIN_USERNAME}"
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: "${ZITADEL_ADMIN_PASSWORD}"
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: "false"
+      ZITADEL_TLS_ENABLED: "false"
+    ports:
+      - "8088:8080"
+    volumes:
+      - {{ docker_appdata_path }}/zitadel/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zitadel.rule=Host(`auth.{{ secret_domain }}`) || Host(`zitadel.{{ secret_domain }}`)"
+      - "traefik.http.routers.zitadel.entrypoints=websecure"
+      - "traefik.http.routers.zitadel.tls.certresolver=cloudflare"
+      - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
+      - "traefik.http.services.zitadel.loadbalancer.server.scheme=http"
+
+  zitadel-db:
+    container_name: zitadel-db
+    image: postgres:17-alpine
+    restart: unless-stopped
+    networks:
+      - zitadel
+    environment:
+      POSTGRES_DB: zitadel
+      POSTGRES_USER: zitadel_admin
+      POSTGRES_PASSWORD: "${ZITADEL_DB_ADMIN_PASSWORD}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zitadel_admin -d zitadel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - {{ docker_appdata_path }}/zitadel/database:/var/lib/postgresql/data
