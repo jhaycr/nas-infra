@@ -27,5 +27,5 @@ services:
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
       - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
       - "traefik.http.routers.traefik-dashboard.tls.certresolver=cloudflare"
-      - "traefik.http.routers.traefik-dashboard.middlewares=authentik@file"
+      - "traefik.http.routers.traefik-dashboard.middlewares=auth@file,auth-errors@file"
       - "traefik.http.routers.traefik-dashboard.priority=1000"

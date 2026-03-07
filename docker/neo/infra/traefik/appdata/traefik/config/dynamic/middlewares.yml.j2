@@ -8,9 +8,9 @@ http:
         stsPreload: true
         stsIncludeSubdomains: false
 
-    # Authentik forward auth — reference with middlewares: ["authentik@file"] in traefik_services
+    # Authentik forward auth — reference with middlewares: ["auth@file,auth-errors@file"] in traefik_services
     # Requires authentik container to be reachable on bridge_proxy_external
-    authentik:
+    auth:
       forwardAuth:
         address: "http://authentik:9000/outpost.goauthentik.io/auth/traefik"
         trustForwardHeader: true
@@ -26,3 +26,10 @@ http:
           - X-authentik-meta-provider
           - X-authentik-meta-app
           - X-authentik-meta-version
+
+    # Redirects 401/403 responses to the Authentik sign-in page
+    auth-errors:
+      errors:
+        status: ["401-403"]
+        service: authentik@docker
+        query: "/outpost.goauthentik.io/start?rd={url}"

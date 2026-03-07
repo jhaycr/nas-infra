@@ -1,0 +1,55 @@
+version: 1
+metadata:
+  name: Groups
+
+entries:
+  - model: authentik_core.group
+    state: present
+    identifiers:
+      name: Apps - Internal/Personal
+    attrs:
+      name: Apps - Internal/Personal
+      users:
+{% for member in secret_authentik_group_personal_members %}
+        - !Find [authentik_core.user, [username, "{{ member }}"]]
+{% endfor %}
+
+  - model: authentik_core.group
+    state: present
+    identifiers:
+      name: Apps - Internal/Family
+    attrs:
+      name: Apps - Internal/Family
+      users:
+{% for member in secret_authentik_group_family_members %}
+        - !Find [authentik_core.user, [username, "{{ member }}"]]
+{% endfor %}
+
+  - model: authentik_core.group
+    state: present
+    identifiers:
+      name: Apps - Shared/Core
+    attrs:
+      name: Apps - Shared/Core
+      users:
+{% for member in secret_authentik_group_core_members %}
+        - !Find [authentik_core.user, [username, "{{ member }}"]]
+{% endfor %}
+
+  - model: authentik_core.group
+    state: present
+    identifiers:
+      name: freshrss-users
+    attrs:
+      name: freshrss-users
+
+  - model: authentik_core.group
+    state: present
+    identifiers:
+      name: overseerr-users
+    attrs:
+      name: overseerr-users
+      users:
+{% for member in secret_authentik_group_overseerr_members %}
+        - !Find [authentik_core.user, [username, "{{ member }}"]]
+{% endfor %}
