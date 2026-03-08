@@ -25,14 +25,31 @@ services:
 {% set svc = traefik_services[service] %}
 {% if svc.auth is defined and svc.auth in ['oidc', 'forward', 'none'] %}
 {% set subdomains = svc.subdomains %}
+{% set middlewares = [] %}
+{% if svc.sablier is defined and svc.sablier %}
+{% set _ = middlewares.append('sablier-' + service + '@docker') %}
+{% endif %}
+{% if svc.auth == 'forward' %}
+{% set _ = middlewares.append('auth@file') %}
+{% set _ = middlewares.append('auth-errors@file') %}
+{% endif %}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.{{ service }}.rule={% for sd in subdomains %}Host(`{{ sd }}.{{ secret_domain }}`){% if not loop.last %} || {% endif %}{% endfor %}"
       - "traefik.http.routers.{{ service }}.entrypoints=websecure"
       - "traefik.http.routers.{{ service }}.tls.certresolver=cloudflare"
       - "traefik.http.services.{{ service }}.loadbalancer.server.port={{ svc.port }}"
-{% if svc.auth == 'forward' %}
-      - "traefik.http.routers.{{ service }}.middlewares=auth@file,auth-errors@file"
+{% if middlewares %}
+      - "traefik.http.routers.{{ service }}.middlewares={{ middlewares | join(',') }}"
+{% endif %}
+{% if svc.sablier is defined and svc.sablier %}
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.names={{ service }}"
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.sablierUrl=http://sablier:10000"
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.sessionDuration=1h"
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.displayName={{ service | capitalize }}"
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.refreshFrequency=5s"
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.defaultTimeout=60s"
+      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.showDetails=true"
 {% endif %}
 {% endif %}
 {% endif %}
