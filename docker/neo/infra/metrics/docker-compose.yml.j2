@@ -71,9 +71,26 @@ services:
         EOF
         /run.sh
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_VERSION:-v0.52.1}
+    networks:
+      - loki
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    command:
+      - --docker_only=true
+      - --disable_metrics=advtcp,cpuLoad,hugetlb,memory_numa,oom_event,perf_event,referenced_memory,resctrl,sched,tcp,udp
+
   alloy:
    image: grafana/alloy:${GRAFANA_ALLOY_VERSION:-v1.10.0}
-   privileged: true
+   environment:
+     - GOMEMLIMIT=512MiB
    networks:
      - loki
    ports:
