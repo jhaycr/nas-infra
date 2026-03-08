@@ -37,6 +37,8 @@ services:
   minecraft-survival:
     container_name: minecraft-survival
     image: itzg/minecraft-server:2026.2.1
+    # lazymc wraps /start: holds port 25565, starts JVM on connection, stops after idle
+    entrypoint: ["/lazymc-bin/lazymc", "run", "--", "/start"]
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -56,11 +58,18 @@ services:
       - minecraft
     volumes:
       - {{ docker_appdata_path }}/minecraft-1:/data
+      - lazymc_bin:/lazymc-bin:ro
+      - {{ docker_appdata_path }}/minecraft/lazymc-survival.toml:/lazymc.toml:ro
+    depends_on:
+      lazymc-init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   minecraft-pvp:
     container_name: minecraft-pvp
     image: itzg/minecraft-server:2026.2.1
+    # lazymc wraps /start: holds port 25565, starts JVM on connection, stops after idle
+    entrypoint: ["/lazymc-bin/lazymc", "run", "--", "/start"]
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -87,4 +96,9 @@ services:
       - minecraft
     volumes:
       - {{ docker_appdata_path }}/minecraft-2:/data
+      - lazymc_bin:/lazymc-bin:ro
+      - {{ docker_appdata_path }}/minecraft/lazymc-pvp.toml:/lazymc.toml:ro
+    depends_on:
+      lazymc-init:
+        condition: service_completed_successfully
     restart: unless-stopped

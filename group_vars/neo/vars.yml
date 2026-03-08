@@ -32,7 +32,7 @@ traefik_services:
   immich-server:  { port: 2283,  auth: oidc,    subdomains: [photos] }
   komga:          { port: 25600, auth: oidc,    subdomains: [comics] }
   deemix:         { port: 6595,  auth: forward, subdomains: [deemix] }
-  overseerr:      { port: 5055,  auth: forward, subdomains: [requests] }
+  overseerr:      { port: 5055,  auth: forward, subdomains: [requests], sablier: true }
   romm:           { port: 8080,  auth: oidc,    subdomains: [romm] }
 
 nas_cache_path: '/mnt/cache1'

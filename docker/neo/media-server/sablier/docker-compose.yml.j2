@@ -1,0 +1,13 @@
+---
+services:
+
+  sablier:
+    image: acouvreur/sablier:1.8.0
+    container_name: sablier
+    command: start --provider.name=docker
+    volumes:
+      # Needs direct socket access (not dockerproxy) for container lifecycle management
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - default
+      - bridge_proxy_external

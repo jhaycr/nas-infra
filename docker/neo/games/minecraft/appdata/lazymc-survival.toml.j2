@@ -1,0 +1,18 @@
+# lazymc config for minecraft-survival
+# Docs: https://github.com/timvisee/lazymc
+
+[server]
+# itzg/minecraft-server uses /data as working dir and /start as its entrypoint
+directory = "/data"
+start_command = "/start"
+address = "0.0.0.0:25565"
+
+[time]
+# Stop the JVM after 10 minutes with no players
+sleep_after = 600
+# Give the server up to 3 minutes to start before timing out
+startup_timeout = 180
+
+[rcon]
+# Disable RCON; lazymc will use SIGTERM for graceful shutdown instead
+enabled = false

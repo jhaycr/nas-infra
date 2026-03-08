@@ -1,0 +1,17 @@
+---
+# Init container that injects the lazymc binary into a shared volume.
+# minecraft-survival and minecraft-pvp mount lazymc_bin and use it as their entrypoint.
+# Verify the binary path inside the image at: https://github.com/timvisee/lazymc
+
+volumes:
+  lazymc_bin:
+
+services:
+
+  lazymc-init:
+    image: timvisee/lazymc:0.2.9
+    container_name: lazymc-init
+    command: ["sh", "-c", "cp /lazymc /lazymc-bin/lazymc && chmod +x /lazymc-bin/lazymc"]
+    volumes:
+      - lazymc_bin:/lazymc-bin
+    restart: "no"
