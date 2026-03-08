@@ -32,12 +32,21 @@ services:
     ports:
       - "25565:25565"
       - "19132:19132/udp"
+    healthcheck:
+      # Wait for Velocity to finish downloading and bind port 25565 before Tailscale
+      # starts and takes over the network namespace (which breaks outbound UDP routing)
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/25565' 2>/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 120s
 
   tailscale-minecraft:
     image: tailscale/tailscale:v1.94.2
     network_mode: "service:minecraft-proxy"
     depends_on:
-      - minecraft-proxy
+      minecraft-proxy:
+        condition: service_healthy
     environment:
       - TS_AUTHKEY={{ secret_tailscale_auth_key_minecraft}}
       - TS_EXTRA_ARGS=--advertise-tags=tag:minecraft-server
