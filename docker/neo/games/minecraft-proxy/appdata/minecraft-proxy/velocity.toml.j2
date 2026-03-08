@@ -73,12 +73,14 @@ enable-player-address-logging = true
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.
 lobby = "minecraft-lobby:25565"
-survival = "lazymc-survival:25565"
-pvp = "lazymc-pvp:25565"
+survival = "minecraft-survival:25565"
+pvp = "minecraft-pvp:25565"
 
 # In what order we should try servers when a player logs in or is kicked from a server.
 try = [
-    "lobby"
+    "lobby",
+    "survival",
+    "pvp"
 ]
 
 [forced-hosts]
@@ -101,11 +103,10 @@ compression-level = -1
 login-ratelimit = 3000
 
 # Specify a custom timeout for connection timeouts here. The default is five seconds.
-connection-timeout = 60000
+connection-timeout = 5000
 
 # Specify a read timeout for connections here. The default is 30 seconds.
-# Increased to 120s to allow lazymc to wake hibernated backend servers (~30-40s startup).
-read-timeout = 120000
+read-timeout = 30000
 
 # Enables compatibility with HAProxy's PROXY protocol. If you don't know what this is for, then
 # don't enable it.
