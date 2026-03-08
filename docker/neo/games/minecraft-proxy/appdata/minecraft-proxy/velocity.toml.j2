@@ -78,9 +78,7 @@ pvp = "lazymc-pvp:25565"
 
 # In what order we should try servers when a player logs in or is kicked from a server.
 try = [
-    "lobby",
-    "survival",
-    "pvp"
+    "lobby"
 ]
 
 [forced-hosts]
@@ -103,10 +101,11 @@ compression-level = -1
 login-ratelimit = 3000
 
 # Specify a custom timeout for connection timeouts here. The default is five seconds.
-connection-timeout = 5000
+connection-timeout = 60000
 
 # Specify a read timeout for connections here. The default is 30 seconds.
-read-timeout = 30000
+# Increased to 120s to allow lazymc to wake hibernated backend servers (~30-40s startup).
+read-timeout = 120000
 
 # Enables compatibility with HAProxy's PROXY protocol. If you don't know what this is for, then
 # don't enable it.
