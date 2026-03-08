@@ -31,6 +31,8 @@ services:
      - GF_AUTH_BASIC_ENABLED=false
    volumes:
      - {{ docker_appdata_path }}/metrics/data/grafana:/var/lib/grafana
+     - {{ docker_appdata_path }}/metrics/config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+     - {{ docker_appdata_path }}/metrics/config/dashboards:/etc/grafana/dashboards:ro
    networks:
      - loki
    ports:
@@ -40,6 +42,8 @@ services:
       - -euc
       - |
         mkdir -p /etc/grafana/provisioning/datasources
+        mkdir -p /etc/grafana/provisioning/dashboards
+        mkdir -p /etc/grafana/dashboards
         cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
         apiVersion: 1
         datasources:
