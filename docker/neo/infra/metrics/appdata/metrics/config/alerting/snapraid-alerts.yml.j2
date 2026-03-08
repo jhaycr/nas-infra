@@ -1,0 +1,57 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: Discord
+    receivers:
+      - uid: discord-homelab
+        type: discord
+        settings:
+          url: "https://discord.com/api/webhooks/{{ secret_scrutiny_discord_webhook_id }}/{{ secret_scrutiny_discord_webhook_token }}"
+          message: |
+            🚨 **SnapRAID Run Failed**
+
+            SnapRAID reported a failure during sync/scrub. Check the logs for `[OUTERR]` warnings — these often indicate files modified during sync (e.g. Calibre DB).
+
+            📋 **Disk Health Dashboard (logs panel):**
+            http://neo.lan:3000/d/neo-disk-health-001/disk-health
+
+            Filter the SnapRAID Logs panel by `[OUTERR]` or `[ERROR ]` to see what went wrong.
+        disableResolveMessage: true
+
+policies:
+  - orgId: 1
+    receiver: Discord
+    group_by: [alertname]
+    group_wait: 0s
+    group_interval: 5m
+    repeat_interval: 12h
+
+groups:
+  - orgId: 1
+    name: SnapRAID
+    folder: Alerts
+    interval: 5m
+    rules:
+      - uid: snapraid-run-failed
+        title: SnapRAID Run Failed
+        condition: A
+        data:
+          - refId: A
+            queryType: range
+            relativeTimeRange:
+              from: 7200
+              to: 0
+            datasourceUid: loki
+            model:
+              expr: 'count_over_time({job="snapraid"} |= "Run failed" [2h])'
+              instant: true
+              refId: A
+        noDataState: OK
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: SnapRAID run failed
+          description: "SnapRAID logged 'Run failed'. Check [OUTERR] warnings in the Disk Health dashboard logs panel."
+        labels:
+          severity: critical

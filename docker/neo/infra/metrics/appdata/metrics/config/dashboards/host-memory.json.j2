@@ -24,12 +24,6 @@
       "id": "timeseries",
       "name": "Time series",
       "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "bargauge",
-      "name": "Bar gauge",
-      "version": ""
     }
   ],
   "annotations": {
@@ -45,13 +39,104 @@
       }
     ]
   },
-  "description": "Docker container memory usage on neo — powered by cAdvisor metrics via Grafana Alloy",
+  "description": "Host memory usage on neo — powered by node_exporter-style metrics via Grafana Alloy unix exporter",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
   "id": null,
   "links": [],
   "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "node_memory_MemTotal_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}",
+          "instant": true,
+          "legendFormat": "Total RAM",
+          "refId": "A"
+        }
+      ],
+      "title": "Total RAM",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 4294967296 },
+              { "color": "orange", "value": 2147483648 },
+              { "color": "red", "value": 1073741824 }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "node_memory_MemAvailable_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}",
+          "instant": true,
+          "legendFormat": "Available RAM",
+          "refId": "A"
+        }
+      ],
+      "title": "Available RAM",
+      "type": "stat"
+    },
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "fieldConfig": {
@@ -73,8 +158,8 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
-      "id": 1,
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -92,13 +177,13 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"}) / scalar(machine_memory_bytes) * 100",
+          "expr": "(1 - node_memory_MemAvailable_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} / node_memory_MemTotal_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}) * 100",
           "instant": true,
-          "legendFormat": "Docker memory %",
+          "legendFormat": "Used RAM %",
           "refId": "A"
         }
       ],
-      "title": "Total Docker Memory Usage",
+      "title": "Used RAM %",
       "type": "stat"
     },
     {
@@ -111,65 +196,21 @@
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "yellow", "value": 4294967296 },
-              { "color": "orange", "value": 8589934592 },
-              { "color": "red", "value": 17179869184 }
+              { "color": "yellow", "value": 20 },
+              { "color": "orange", "value": 40 },
+              { "color": "red", "value": 60 }
             ]
           },
-          "unit": "bytes"
+          "unit": "percent",
+          "min": 0,
+          "max": 100
         },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
-      "id": 2,
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"})",
-          "instant": true,
-          "legendFormat": "Total",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Docker Memory (Bytes)",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1073741824 },
-              { "color": "red", "value": 2147483648 }
-            ]
-          },
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
-      "id": 3,
-      "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
@@ -185,13 +226,13 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "machine_memory_bytes{instance=~\"$instance\"}",
+          "expr": "((node_memory_MemTotal_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - node_memory_MemAvailable_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}) - sum(container_memory_working_set_bytes{name!=\"\", id=~\"/docker/.*\"})) / node_memory_MemTotal_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} * 100",
           "instant": true,
-          "legendFormat": "Host RAM",
+          "legendFormat": "Non-Docker Used %",
           "refId": "A"
         }
       ],
-      "title": "Host Total RAM",
+      "title": "Non-Docker Used RAM %",
       "type": "stat"
     },
     {
@@ -208,7 +249,7 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 60,
+            "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": { "legend": false, "tooltip": false, "viz": false },
             "insertNulls": false,
@@ -232,8 +273,8 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 6 },
-      "id": 4,
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 4 },
+      "id": 5,
       "options": {
         "legend": {
           "calcs": ["lastNotNull", "max"],
@@ -247,12 +288,36 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"}",
-          "legendFormat": "{{ name }}",
+          "expr": "sum(container_memory_working_set_bytes{name!=\"\", id=~\"/docker/.*\", job=\"integrations/docker\"})",
+          "legendFormat": "Docker",
           "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "node_memory_Buffers_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}",
+          "legendFormat": "Buffers",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "node_memory_Cached_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - node_memory_Shmem_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}",
+          "legendFormat": "Cached",
+          "refId": "C"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "node_memory_MemFree_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}",
+          "legendFormat": "Free",
+          "refId": "D"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "node_memory_MemTotal_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - node_memory_MemAvailable_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - sum(container_memory_working_set_bytes{name!=\"\", id=~\"/docker/.*\", job=\"integrations/docker\"}) - node_memory_Buffers_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - (node_memory_Cached_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - node_memory_Shmem_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"})",
+          "legendFormat": "Other (non-Docker processes)",
+          "refId": "E"
         }
       ],
-      "title": "Container Memory Usage (Stacked)",
+      "title": "Memory Breakdown",
       "type": "timeseries"
     },
     {
@@ -280,26 +345,24 @@
             "showPoints": "never",
             "spanNulls": false,
             "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "line+area" }
+            "thresholdsStyle": { "mode": "off" }
           },
           "mappings": [],
-          "max": 100,
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "orange", "value": 75 },
-              { "color": "red", "value": 90 }
+              { "color": "yellow", "value": 536870912 },
+              { "color": "orange", "value": 1073741824 },
+              { "color": "red", "value": 2147483648 }
             ]
           },
-          "unit": "percent"
+          "unit": "bytes"
         },
         "overrides": []
       },
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 18 },
-      "id": 5,
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 18 },
+      "id": 6,
       "options": {
         "legend": {
           "calcs": ["lastNotNull", "max"],
@@ -313,94 +376,18 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"}) / scalar(machine_memory_bytes) * 100",
-          "legendFormat": "Docker total % of host RAM",
+          "expr": "node_memory_SwapTotal_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"} - node_memory_SwapFree_bytes{job=\"integrations/node_exporter\", instance=~\"$instance\"}",
+          "legendFormat": "Swap Used",
           "refId": "A"
         }
       ],
-      "title": "Total Docker Memory as % of Host RAM",
+      "title": "Swap Usage",
       "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 536870912 },
-              { "color": "orange", "value": 1073741824 },
-              { "color": "red", "value": 2147483648 }
-            ]
-          },
-          "unit": "bytes"
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "% of RAM" },
-            "properties": [
-              { "id": "unit", "value": "percent" },
-              { "id": "thresholds", "value": {
-                "mode": "absolute",
-                "steps": [
-                  { "color": "green", "value": null },
-                  { "color": "yellow", "value": 5 },
-                  { "color": "orange", "value": 10 },
-                  { "color": "red", "value": 20 }
-                ]
-              }}
-            ]
-          }
-        ]
-      },
-      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 28 },
-      "id": 6,
-      "options": {
-        "displayMode": "gradient",
-        "maxVizHeight": 300,
-        "minVizHeight": 16,
-        "minVizWidth": 8,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
-      },
-      "pluginVersion": "12.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sort_desc(container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"})",
-          "instant": true,
-          "legendFormat": "{{ name }}",
-          "refId": "A"
-        }
-      ],
-      "title": "Top Containers by Memory (Current)",
-      "transformations": [
-        {
-          "id": "sortBy",
-          "options": {
-            "fields": [
-              { "desc": true, "displayName": "Value" }
-            ]
-          }
-        }
-      ],
-      "type": "bargauge"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 41,
-  "tags": ["docker", "memory", "containers"],
+  "tags": ["host", "memory", "node_exporter"],
   "templating": {
     "list": [
       {
@@ -418,7 +405,7 @@
       {
         "current": {},
         "datasource": { "type": "prometheus", "uid": "${datasource}" },
-        "definition": "label_values(machine_memory_bytes, instance)",
+        "definition": "label_values(node_memory_MemTotal_bytes, instance)",
         "hide": 0,
         "includeAll": true,
         "label": "Instance",
@@ -426,26 +413,7 @@
         "name": "instance",
         "options": [],
         "query": {
-          "query": "label_values(machine_memory_bytes, instance)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 2,
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "prometheus", "uid": "${datasource}" },
-        "definition": "label_values(container_memory_working_set_bytes{job=\"integrations/docker\", id=~\"/docker/.*\"}, name)",
-        "hide": 0,
-        "includeAll": true,
-        "allValue": ".*",
-        "label": "Container",
-        "multi": true,
-        "name": "container",
-        "options": [],
-        "query": {
-          "query": "label_values(container_memory_working_set_bytes{job=\"integrations/docker\", id=~\"/docker/.*\"}, name)",
+          "query": "label_values(node_memory_MemTotal_bytes, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
@@ -457,8 +425,8 @@
   "time": { "from": "now-3h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Docker Container Memory",
-  "uid": "neo-docker-memory-001",
+  "title": "Host Memory",
+  "uid": "neo-host-memory-001",
   "version": 1,
   "weekStart": ""
 }{% endraw %}

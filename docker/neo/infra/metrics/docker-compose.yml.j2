@@ -33,6 +33,7 @@ services:
      - {{ docker_appdata_path }}/metrics/data/grafana:/var/lib/grafana
      - {{ docker_appdata_path }}/metrics/config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
      - {{ docker_appdata_path }}/metrics/config/dashboards:/etc/grafana/dashboards:ro
+     - {{ docker_appdata_path }}/metrics/config/alerting:/etc/grafana/provisioning/alerting:ro
    networks:
      - loki
    ports:
@@ -43,12 +44,14 @@ services:
       - |
         mkdir -p /etc/grafana/provisioning/datasources
         mkdir -p /etc/grafana/provisioning/dashboards
+        mkdir -p /etc/grafana/provisioning/alerting
         mkdir -p /etc/grafana/dashboards
         cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
         apiVersion: 1
         datasources:
         - name: Loki
           type: loki
+          uid: loki
           access: proxy
           orgId: 1
           url: http://loki:3100
@@ -58,6 +61,7 @@ services:
           editable: false
         - name: Prometheus
           type: prometheus
+          uid: prometheus
           orgId: 1
           url: http://prometheus:9090
           basicAuth: false
