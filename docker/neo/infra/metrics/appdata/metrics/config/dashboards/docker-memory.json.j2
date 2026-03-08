@@ -247,7 +247,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"}",
+          "expr": "sum by (name) (container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"})",
           "legendFormat": "{{ name }}",
           "refId": "A"
         }
@@ -325,6 +325,70 @@
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "fieldConfig": {
         "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 4294967296 },
+              { "color": "orange", "value": 8589934592 },
+              { "color": "red", "value": 17179869184 }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 28 },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull", "max"],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"})",
+          "legendFormat": "Total Docker memory",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Docker Memory (Bytes) over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
           "color": { "mode": "thresholds" },
           "mappings": [],
           "thresholds": {
@@ -356,7 +420,7 @@
           }
         ]
       },
-      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 28 },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 38 },
       "id": 6,
       "options": {
         "displayMode": "gradient",
@@ -378,7 +442,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sort_desc(container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"})",
+          "expr": "sort_desc(sum by (name) (container_memory_working_set_bytes{name!=\"\", name=~\"$container\", job=\"integrations/docker\", instance=~\"$instance\"}))",
           "instant": true,
           "legendFormat": "{{ name }}",
           "refId": "A"

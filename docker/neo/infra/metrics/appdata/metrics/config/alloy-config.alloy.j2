@@ -2,32 +2,15 @@
 // #### Metrics Configuration ####
 // ###############################
 
-// Host Cadvisor on the Docker socket to expose container metrics.
-prometheus.exporter.cadvisor "example" {
-  docker_only = true
-}
-
-discovery.relabel "example" {
-    targets = prometheus.exporter.cadvisor.example.targets
-
-    rule {
-        target_label = "job"
-        replacement  = "integrations/docker"
-    }
-
-    rule {
-        target_label = "instance"
-        replacement  = constants.hostname
-    }
-}
-
-// Configure a prometheus.scrape component to collect cadvisor metrics.
-prometheus.scrape "scraper" {
-  targets    = discovery.relabel.example.output
-  forward_to = [ prometheus.remote_write.demo.receiver ]
-
-
-  scrape_interval = "10s"
+// Scrape cAdvisor running as a standalone container.
+prometheus.scrape "cadvisor" {
+  targets = [{
+    __address__ = "cadvisor:8080",
+    job         = "integrations/docker",
+    instance    = constants.hostname,
+  }]
+  forward_to      = [prometheus.remote_write.demo.receiver]
+  scrape_interval = "30s"
 }
 
 // Configure a prometheus.remote_write component to send metrics to a Prometheus server.
@@ -65,7 +48,7 @@ discovery.relabel "host_metrics" {
 prometheus.scrape "host_metrics" {
   targets         = discovery.relabel.host_metrics.output
   forward_to      = [prometheus.remote_write.demo.receiver]
-  scrape_interval = "15s"
+  scrape_interval = "30s"
 }
 
 // ###############################
