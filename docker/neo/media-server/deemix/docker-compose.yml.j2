@@ -6,9 +6,10 @@ services:
     restart: unless-stopped
     networks:
       - default
+      - bridge_proxy_external
     ports:
       - "6595:6595" # Deemix web UI
     volumes:
-      - {{ docker_appdata_path }}/deemix/config:/config
+      - {{ docker_appdata_path }}/lidarr_deemix/config_deemix:/config
       - {{ nas_download_path }}/deemix:/downloads
       - {{ nas_storage_path }}/media/audio/music:/data/media/music
