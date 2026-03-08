@@ -1,17 +1,25 @@
 ---
-# Init container that injects the lazymc binary into a shared volume.
-# minecraft-survival and minecraft-pvp mount lazymc_bin and use it as their entrypoint.
-# Verify the binary path inside the image at: https://github.com/timvisee/lazymc
-
-volumes:
-  lazymc_bin:
+# lazymc-docker-proxy: sidecar TCP proxies that hibernate Minecraft server containers.
+# Each proxy listens on port 25565 and manages one server via Docker labels.
+# Velocity must point to lazymc-survival/lazymc-pvp instead of the real servers.
+# Docs: https://github.com/joesturge/lazymc-docker-proxy
 
 services:
 
-  lazymc-init:
-    image: timvisee/lazymc:0.2.9
-    container_name: lazymc-init
-    command: ["sh", "-c", "cp /lazymc /lazymc-bin/lazymc && chmod +x /lazymc-bin/lazymc"]
+  lazymc-survival:
+    image: ghcr.io/joesturge/lazymc-docker-proxy:latest
+    container_name: lazymc-survival
     volumes:
-      - lazymc_bin:/lazymc-bin
-    restart: "no"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - minecraft
+    restart: unless-stopped
+
+  lazymc-pvp:
+    image: ghcr.io/joesturge/lazymc-docker-proxy:latest
+    container_name: lazymc-pvp
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - minecraft
+    restart: unless-stopped
