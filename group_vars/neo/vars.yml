@@ -31,6 +31,7 @@ traefik_services:
   freshrss:       { port: 80,    auth: oidc,    subdomains: [rss] }
   immich-server:  { port: 2283,  auth: oidc,    subdomains: [photos] }
   komga:          { port: 25600, auth: oidc,    subdomains: [comics] }
+  deemix:         { port: 6595,  auth: forward, subdomains: [deemix] }
   overseerr:      { port: 5055,  auth: forward, subdomains: [requests] }
   romm:           { port: 8080,  auth: oidc,    subdomains: [romm] }
 
@@ -45,6 +46,14 @@ docker_appdata_folders_to_own:
 - jellyfin
 - maintainerr
 - recyclarr
+
+# -----
+# jhaycr-local.semaphore
+# -----
+semaphore_url: "http://localhost:3030"
+semaphore_admin_user: "admin"
+semaphore_project_name: "nas-infra"
+semaphore_repo_path: "/home/{{ main_username }}/code/gitea-working-clones/nas-infra"
 
 # -----
 # fuzzymistborn.autorestic
