@@ -37,8 +37,6 @@ services:
   minecraft-survival:
     container_name: minecraft-survival
     image: itzg/minecraft-server:2026.2.1
-    # lazymc wraps /start: holds port 25565, starts JVM on connection, stops after idle
-    entrypoint: ["/lazymc-bin/lazymc", "run", "--", "/start"]
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -55,21 +53,19 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/5.6.0/PAPER/ViaBackwards-5.6.0.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/4.0.12/PAPER/ViaRewind-4.0.12.jar
     networks:
-      - minecraft
+      minecraft:
+        ipv4_address: 172.25.0.11
     volumes:
       - {{ docker_appdata_path }}/minecraft-1:/data
-      - lazymc_bin:/lazymc-bin:ro
-      - {{ docker_appdata_path }}/minecraft/lazymc-survival.toml:/lazymc.toml:ro
-    depends_on:
-      lazymc-init:
-        condition: service_completed_successfully
+    labels:
+      - "lazymc.enabled=true"
+      - "lazymc.group=survival"
+      - "lazymc.server.address=172.25.0.11:25565"
     restart: unless-stopped
 
   minecraft-pvp:
     container_name: minecraft-pvp
     image: itzg/minecraft-server:2026.2.1
-    # lazymc wraps /start: holds port 25565, starts JVM on connection, stops after idle
-    entrypoint: ["/lazymc-bin/lazymc", "run", "--", "/start"]
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -93,12 +89,12 @@ services:
         https://www.spigotmc.org/resources/luckperms.28140/
         https://www.spigotmc.org/resources/kitpvp.27107/
     networks:
-      - minecraft
+      minecraft:
+        ipv4_address: 172.25.0.12
     volumes:
       - {{ docker_appdata_path }}/minecraft-2:/data
-      - lazymc_bin:/lazymc-bin:ro
-      - {{ docker_appdata_path }}/minecraft/lazymc-pvp.toml:/lazymc.toml:ro
-    depends_on:
-      lazymc-init:
-        condition: service_completed_successfully
+    labels:
+      - "lazymc.enabled=true"
+      - "lazymc.group=pvp"
+      - "lazymc.server.address=172.25.0.12:25565"
     restart: unless-stopped
