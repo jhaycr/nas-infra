@@ -26,9 +26,6 @@ services:
 {% if svc.auth is defined and svc.auth in ['oidc', 'forward', 'none'] %}
 {% set subdomains = svc.subdomains %}
 {% set middlewares = [] %}
-{% if svc.sablier is defined and svc.sablier %}
-{% set _ = middlewares.append('sablier-' + service + '@docker') %}
-{% endif %}
 {% if svc.auth == 'forward' %}
 {% set _ = middlewares.append('auth@file') %}
 {% set _ = middlewares.append('auth-errors@file') %}
@@ -41,15 +38,6 @@ services:
       - "traefik.http.services.{{ service }}.loadbalancer.server.port={{ svc.port }}"
 {% if middlewares %}
       - "traefik.http.routers.{{ service }}.middlewares={{ middlewares | join(',') }}"
-{% endif %}
-{% if svc.sablier is defined and svc.sablier %}
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.names={{ service }}"
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.sablierUrl=http://sablier:10000"
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.sessionDuration=1h"
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.displayName={{ service | capitalize }}"
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.refreshFrequency=5s"
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.defaultTimeout=60s"
-      - "traefik.http.middlewares.sablier-{{ service }}.plugin.sablier.dynamic.showDetails=true"
 {% endif %}
 {% endif %}
 {% endif %}
