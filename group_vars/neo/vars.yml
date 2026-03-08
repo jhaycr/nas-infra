@@ -27,13 +27,13 @@ docker_stack_order:
 traefik_services:
   audiobookshelf: { port: 80,    auth: oidc,    subdomains: [audiobooks, audiobookshelf, podcasts] }
   authentik:      { port: 9000,  auth: none,    subdomains: [auth] }
-  grampsweb:      { port: 5000,  auth: oidc,    subdomains: [gramps] }
+  grampsweb:      { port: 5000,  auth: oidc,    subdomains: [gramps],   sablier: true }
   freshrss:       { port: 80,    auth: oidc,    subdomains: [rss] }
   immich-server:  { port: 2283,  auth: oidc,    subdomains: [photos] }
   komga:          { port: 25600, auth: oidc,    subdomains: [comics] }
   deemix:         { port: 6595,  auth: forward, subdomains: [deemix] }
   overseerr:      { port: 5055,  auth: forward, subdomains: [requests], sablier: true }
-  romm:           { port: 8080,  auth: oidc,    subdomains: [romm] }
+  romm:           { port: 8080,  auth: oidc,    subdomains: [romm]    , sablier: true }
 
 nas_cache_path: '/mnt/cache1'
 nas_download_path: '{{ nas_cache_path }}/downloads'
