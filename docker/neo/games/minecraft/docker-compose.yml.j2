@@ -9,6 +9,9 @@ services:
   minecraft-lobby:
     container_name: minecraft-lobby
     image: itzg/minecraft-server:2026.2.1
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -37,6 +40,9 @@ services:
   minecraft-survival:
     container_name: minecraft-survival
     image: itzg/minecraft-server:2026.2.1
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -53,19 +59,21 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/5.6.0/PAPER/ViaBackwards-5.6.0.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/4.0.12/PAPER/ViaRewind-4.0.12.jar
     networks:
-      minecraft:
-        ipv4_address: 172.25.0.11
+      - minecraft
     volumes:
       - {{ docker_appdata_path }}/minecraft-1:/data
     labels:
       - "lazymc.enabled=true"
       - "lazymc.group=survival"
-      - "lazymc.server.address=172.25.0.11:25565"
+      - "lazymc.server.address=minecraft-survival:25565"
     restart: unless-stopped
 
   minecraft-pvp:
     container_name: minecraft-pvp
     image: itzg/minecraft-server:2026.2.1
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     environment:
       EULA: "true"
       TYPE: "PAPER"
@@ -89,12 +97,11 @@ services:
         https://www.spigotmc.org/resources/luckperms.28140/
         https://www.spigotmc.org/resources/kitpvp.27107/
     networks:
-      minecraft:
-        ipv4_address: 172.25.0.12
+      - minecraft
     volumes:
       - {{ docker_appdata_path }}/minecraft-2:/data
     labels:
       - "lazymc.enabled=true"
       - "lazymc.group=pvp"
-      - "lazymc.server.address=172.25.0.12:25565"
+      - "lazymc.server.address=minecraft-pvp:25565"
     restart: unless-stopped
