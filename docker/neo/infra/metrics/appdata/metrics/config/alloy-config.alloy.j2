@@ -38,6 +38,37 @@ prometheus.remote_write "demo" {
 }
 
 // ###############################
+// #### Host Metrics (node_exporter-style via unix exporter) ####
+// ###############################
+
+// Collect host metrics using the unix exporter. The host root is mounted at /rootfs.
+prometheus.exporter.unix "host" {
+  rootfs_path = "/rootfs"
+  procfs_path = "/rootfs/proc"
+  sysfs_path  = "/rootfs/sys"
+}
+
+discovery.relabel "host_metrics" {
+  targets = prometheus.exporter.unix.host.targets
+
+  rule {
+    target_label = "job"
+    replacement  = "integrations/node_exporter"
+  }
+
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
+}
+
+prometheus.scrape "host_metrics" {
+  targets         = discovery.relabel.host_metrics.output
+  forward_to      = [prometheus.remote_write.demo.receiver]
+  scrape_interval = "15s"
+}
+
+// ###############################
 // #### Logging Configuration ####
 // ###############################
 
@@ -76,4 +107,23 @@ loki.write "local" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"
   }
+}
+
+// ###############################
+// #### SnapRAID Log Collection ####
+// ###############################
+
+// Collect SnapRAID runner logs from the host filesystem.
+// The host root is mounted at /rootfs, so the log path is prefixed accordingly.
+local.file_match "snapraid_logs" {
+  path_targets = [{
+    __path__ = "/rootfs/var/log/snapraid.log",
+    job      = "snapraid",
+    instance = constants.hostname,
+  }]
+}
+
+loki.source.file "snapraid_logs" {
+  targets    = local.file_match.snapraid_logs.targets
+  forward_to = [loki.write.local.receiver]
 }
