@@ -1,0 +1,45 @@
+
+services:
+
+  sablier:
+    container_name: traefik-sablier
+    image: acouvreur/sablier:1.8.0
+    command:
+        - start
+        - --provider.name=docker
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+        - default
+        - bridge_proxy_external
+
+  whoami:
+    container_name: traefik-whoami
+    image: traefik/whoami:latest
+    networks:
+        - bridge_proxy_external
+        - default
+    ports:
+        - "8094:80"
+    labels:
+        # Enable Sablier for this container
+        - sablier.enable=true
+        - sablier.group=whoami
+
+        # Configure the Sablier middleware
+        - traefik.http.middlewares.whoami-sablier.plugin.sablier.group=whoami
+        - traefik.http.middlewares.whoami-sablier.plugin.sablier.sablierUrl=http://sablier:10000
+        - traefik.http.middlewares.whoami-sablier.plugin.sablier.sessionDuration=1m
+        - traefik.http.middlewares.whoami-sablier.plugin.sablier.dynamic.displayName=Whoami Service
+
+        # Allow Traefik to route to non-running containers
+        - traefik.docker.allownonrunning=true
+        
+        # Define Traefik routing
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.rule=Host(`whoami.{{ secret_domain }}`)"
+        - "traefik.http.routers.whoami.service=whoami"
+        - "traefik.http.routers.whoami.entrypoints=websecure"
+        - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
+        - "traefik.http.routers.whoami.middlewares=auth@file,auth-errors@file,whoami-sablier"
+        - "traefik.http.services.whoami.loadbalancer.server.port=80"
