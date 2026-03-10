@@ -1,0 +1,15 @@
+version: 1
+metadata:
+  name: Outpost - Embedded
+
+entries:
+  - model: authentik_outposts.outpost
+    state: present
+    identifiers:
+      name: authentik Embedded Outpost
+    attrs:
+      providers:
+        - !Find [authentik_providers_proxy.proxyprovider, [name, traefik]]
+        - !Find [authentik_providers_proxy.proxyprovider, [name, deemix]]
+        - !Find [authentik_providers_proxy.proxyprovider, [name, whoami]]
+        - !Find [authentik_providers_proxy.proxyprovider, [name, overseerr]]
