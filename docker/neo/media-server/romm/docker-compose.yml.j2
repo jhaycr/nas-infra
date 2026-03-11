@@ -52,6 +52,15 @@ services:
       - {{ docker_appdata_path }}/romm/config:/romm/config # Path where config.yml is stored
     ports:
       - 3011:8080
+    labels:
+      - sablier.enable=true
+      - sablier.group=romm
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/health', timeout=5).status < 400 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     depends_on:
       romm-db:
         condition: service_healthy
@@ -68,6 +77,9 @@ services:
       - MARIADB_PASSWORD={{ secret_romm_db_root_pass }}
     networks:
       - app_romm
+    labels:
+      - sablier.enable=true
+      - sablier.group=romm
     volumes:
       - {{ docker_appdata_path }}/romm-db:/var/lib/mysql
     healthcheck:

@@ -8,11 +8,20 @@ services:
     image: ghcr.io/gramps-project/grampsweb:latest
     container_name: gramps
     restart: always
+    labels:
+      - sablier.enable=true
+      - sablier.group=grampsweb
     networks:
       - bridge_proxy_external
       - app_gramps
     ports:
       - "5002:5000"  # host:docker
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     environment:
       GRAMPSWEB_TREE: "Gramps Web"  # will create a new tree if not exists
       GRAMPSWEB_CELERY_CONFIG__broker_url: "redis://grampsweb_redis:6379/0"
@@ -28,6 +37,7 @@ services:
       GRAMPSWEB_OIDC_SCOPES: "openid email profile"
       GRAMPSWEB_OIDC_AUTO_REDIRECT: True
       GRAMPSWEB_OIDC_DISABLE_LOCAL_AUTH: True
+      GRAMPSWEB_GUNICORN_NUM_WORKERS: 2
 
     depends_on:
       - grampsweb_redis
@@ -47,6 +57,11 @@ services:
     container_name: grampsweb_celery
     networks:
       - app_gramps
+    labels:
+      - sablier.enable=true
+      - sablier.group=grampsweb
+    healthcheck:
+      disable: true
     depends_on:
       - grampsweb
       - grampsweb_redis
@@ -57,6 +72,9 @@ services:
     container_name: grampsweb_redis
     networks:
       - app_gramps
+    labels:
+      - sablier.enable=true
+      - sablier.group=grampsweb
     restart: always
 
 volumes:
