@@ -1,0 +1,48 @@
+{% set sablier_svcs = [] %}
+{% for name, svc in traefik_services.items() %}
+{% if svc.sablier | default(false) %}
+{% set _ = sablier_svcs.append({'name': name, 'svc': svc}) %}
+{% endif %}
+{% endfor %}
+{% if sablier_svcs %}
+http:
+  routers:
+{% for item in sablier_svcs %}
+{% set name = item.name %}
+{% set svc = item.svc %}
+    {{ name }}:
+      rule: "{% for sd in svc.subdomains %}Host(`{{ sd }}.{{ secret_domain }}`){% if not loop.last %} || {% endif %}{% endfor %}"
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: cloudflare
+      middlewares:
+        - {{ name }}-sablier
+      service: {{ name }}
+{% endfor %}
+
+  middlewares:
+{% for item in sablier_svcs %}
+{% set name = item.name %}
+    {{ name }}-sablier:
+      plugin:
+        sablier:
+          sablierUrl: http://sablier:10000
+          group: {{ name }}
+          sessionDuration: 1h
+          dynamic:
+            displayName: {{ name | capitalize }}
+            theme: hacker-terminal
+            refreshFrequency: 5s
+{% endfor %}
+
+  services:
+{% for item in sablier_svcs %}
+{% set name = item.name %}
+{% set svc = item.svc %}
+    {{ name }}:
+      loadBalancer:
+        servers:
+          - url: "http://{{ name }}:{{ svc.port }}"
+{% endfor %}
+{% endif %}

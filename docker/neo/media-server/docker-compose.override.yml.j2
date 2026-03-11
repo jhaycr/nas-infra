@@ -23,7 +23,9 @@ services:
       <<: *common-env
 {% if service in (traefik_services | default({})) %}
 {% set svc = traefik_services[service] %}
-{% if svc.auth is defined and svc.auth in ['oidc', 'forward', 'none'] %}
+{% if svc.sablier | default(false) %}
+    restart: "no"
+{% elif svc.auth is defined and svc.auth in ['oidc', 'forward', 'none'] %}
 {% set subdomains = svc.subdomains %}
 {% set middlewares = [] %}
 {% if svc.auth == 'forward' %}

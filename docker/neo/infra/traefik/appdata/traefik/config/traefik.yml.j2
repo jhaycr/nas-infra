@@ -48,9 +48,16 @@ providers:
   docker:
     exposedByDefault: false
     network: bridge_proxy_external
+    allowEmptyServices: true
   file:
     directory: /config/dynamic
     watch: true
+
+experimental:
+  plugins:
+    sablier:
+      moduleName: "github.com/sablierapp/sablier-traefik-plugin"
+      version: "v1.1.0"
 
 log:
   level: INFO

@@ -3,6 +3,20 @@ metadata:
   name: App - RomM OIDC
 
 entries:
+  - model: authentik_providers_oauth2.scopemapping
+    id: romm-email-scope
+    state: present
+    identifiers:
+      name: romm email
+    attrs:
+      name: romm email
+      scope_name: email
+      expression: |
+        return {
+            "email": request.user.email,
+            "email_verified": True
+        }
+
   - model: authentik_providers_oauth2.oauth2provider
     id: romm-provider
     state: present
@@ -21,7 +35,7 @@ entries:
       signing_key: !Find [authentik_crypto.certificatekeypair, [name, "authentik Self-signed Certificate"]]
       property_mappings:
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
-        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
+        - !KeyOf romm-email-scope
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
 
   - model: authentik_core.application
