@@ -6,9 +6,10 @@ include:
   - path: gitea/docker-compose.yml
     env_file: gitea/.env
   - path: metrics/docker-compose.yml
-  - path: semaphore/docker-compose.yml
-    env_file: semaphore/.env
+  #- path: semaphore/docker-compose.yml
+  #  env_file: semaphore/.env
   - path: traefik/docker-compose.yml
+  - path: cloudflared/docker-compose.yml
   - path: sablier/docker-compose.yml
 
 networks:
