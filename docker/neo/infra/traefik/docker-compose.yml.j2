@@ -13,6 +13,8 @@ services:
       vlan_proxy_external:
         ipv4_address: 192.168.1.10
       bridge_proxy_external:
+        aliases:
+          - "auth.{{ secret_domain }}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - {{ docker_appdata_path }}/traefik/config:/config
