@@ -15,6 +15,9 @@
     - role: jhaycr.snapraid
       become: yes
       tags: disks
+    - role: jhaycr-local.snapraid
+      become: yes
+      tags: [disks, snapraid]
     - role: tigattack.mergerfs
       tags: disks
     - role: jhaycr-local.safe_shutdown
@@ -33,9 +36,16 @@
     #- role: jhaycr-local.proxmox_vm
     #  become: yes
     #  tags: pve
+    - role: jhaycr-local.infra_bootstrap
+      tags: bootstrap
+      become: yes
     - role: jhaycr-local.docker_compose
       tags: compose
       become: yes
+    - role: jhaycr-local.gitea_mirrors
+      tags: gitea
+    - role: jhaycr-local.semaphore
+      tags: semaphore
     - role: jhaycr-local.plex
       become: yes
     - role: IronicBadger.proxmox_nag_removal
