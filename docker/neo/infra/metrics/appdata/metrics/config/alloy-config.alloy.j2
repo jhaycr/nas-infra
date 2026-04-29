@@ -13,6 +13,17 @@ prometheus.scrape "cadvisor" {
   scrape_interval = "30s"
 }
 
+// Scrape SMART disk health metrics from the smartctl-exporter container.
+prometheus.scrape "smartctl" {
+  targets = [{
+    __address__ = "smartctl-exporter:9633",
+    job         = "smartctl",
+    instance    = constants.hostname,
+  }]
+  forward_to      = [prometheus.remote_write.demo.receiver]
+  scrape_interval = "60s"
+}
+
 // Configure a prometheus.remote_write component to send metrics to a Prometheus server.
 prometheus.remote_write "demo" {
   endpoint {

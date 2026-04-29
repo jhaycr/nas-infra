@@ -87,7 +87,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
       "id": 1,
       "options": {
         "displayMode": "gradient",
@@ -153,7 +153,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 8 },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 4 },
       "id": 2,
       "options": {
         "colorMode": "background",
@@ -248,7 +248,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
       "id": 3,
       "options": {
         "legend": {
@@ -272,13 +272,182 @@
       "type": "timeseries"
     },
     {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Overall SMART health assessment per drive. FAILED means the drive is reporting imminent failure — replace immediately.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            {
+              "options": {
+                "0": { "color": "red",   "index": 0, "text": "FAILED" },
+                "1": { "color": "green", "index": 1, "text": "PASSED" }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "No Data",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red",   "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "smartctl_device_smart_status{instance=~\"$instance\", job=\"smartctl\"}",
+          "instant": true,
+          "legendFormat": "{{ device }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Drive SMART Health Status",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Current drive temperature. Thresholds: yellow=45°C, red=55°C.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 45 },
+              { "color": "red",    "value": 55 }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 24 },
+      "id": 8,
+      "options": {
+        "displayMode": "gradient",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "smartctl_device_temperature_celsius{instance=~\"$instance\", job=\"smartctl\"}",
+          "instant": true,
+          "legendFormat": "{{ device }}",
+          "refId": "A"
+        }
+      ],
+      "title": "Drive Temperatures",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "description": "Critical SMART error counters — all should be 0. Any non-zero value means sectors are failing or have failed.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            {
+              "options": { "0": { "color": "green", "index": 0, "text": "OK" } },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red",   "value": 1 }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 24 },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "smartctl_device_attribute_raw_value{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Reallocated_Sector_Ct\"}",
+          "instant": true,
+          "legendFormat": "{{ device }} Reallocated",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "smartctl_device_attribute_raw_value{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Current_Pending_Sector\"}",
+          "instant": true,
+          "legendFormat": "{{ device }} Pending",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "smartctl_device_attribute_raw_value{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Offline_Uncorrectable\"}",
+          "instant": true,
+          "legendFormat": "{{ device }} Uncorrectable",
+          "refId": "C"
+        }
+      ],
+      "title": "Critical SMART Attributes",
+      "type": "stat"
+    },
+    {
       "datasource": { "type": "loki", "uid": "${loki_datasource}" },
       "description": "All SnapRAID runner log output. Use the search bar to filter by keyword (e.g. Completed, error, sync, scrub). Logs are collected from /var/log/snapraid.log on the host.",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
       },
-      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 20 },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 40 },
       "id": 4,
       "options": {
         "dedupStrategy": "none",
@@ -349,7 +518,7 @@
           }
         ]
       },
-      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 34 },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 30 },
       "id": 5,
       "options": {
         "alignValue": "center",
@@ -399,7 +568,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 40 },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 36 },
       "id": 6,
       "options": {
         "colorMode": "background",

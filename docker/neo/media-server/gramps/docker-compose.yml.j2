@@ -30,7 +30,7 @@ services:
       # OIDC via Zitadel — all vars require GRAMPSWEB_ prefix
       # Redirect URI to register in Zitadel: https://gramps.{{ secret_domain }}/api/oidc/callback/*
       GRAMPSWEB_OIDC_ENABLED: True
-      GRAMPSWEB_OIDC_ISSUER: "https://auth.{{ secret_domain }}"
+      GRAMPSWEB_OIDC_ISSUER: "https://auth.{{ secret_domain }}/application/o/gramps/"
       GRAMPSWEB_OIDC_CLIENT_ID: "{{ secret_gramps_oidc_client_id }}"
       GRAMPSWEB_OIDC_CLIENT_SECRET: "{{ secret_gramps_oidc_client_secret }}"
       GRAMPSWEB_OIDC_NAME: "Zitadel"
@@ -38,6 +38,7 @@ services:
       GRAMPSWEB_OIDC_AUTO_REDIRECT: True
       GRAMPSWEB_OIDC_DISABLE_LOCAL_AUTH: True
       GRAMPSWEB_GUNICORN_NUM_WORKERS: 2
+      GDK_BACKEND: offscreen
 
     depends_on:
       - grampsweb_redis
