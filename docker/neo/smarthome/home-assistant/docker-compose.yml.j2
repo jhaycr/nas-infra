@@ -1,0 +1,15 @@
+---
+
+services:
+
+  home-assistant:
+    container_name: home-assistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - {{ docker_appdata_path }}/home-assistant:/config
+    # devices:
+    #   - /dev/ttyUSB0:/dev/ttyUSB0  # example: Zigbee/Z-Wave USB stick

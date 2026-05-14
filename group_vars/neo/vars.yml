@@ -14,8 +14,9 @@ docker_stack_order:
   neo:
     - infra
     - media-server
-    - games
+    - smarthome
     - ai
+    - games
 
 # Services to expose via Traefik. Key = Docker Compose service name.
 # To add a new service: one entry here + bridge_proxy_external in its compose networks.
