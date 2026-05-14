@@ -1,0 +1,12 @@
+---
+
+services:
+
+  matter-server:
+    container_name: matter-server
+    image: ghcr.io/home-assistant/python-matter-server:stable
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - {{ docker_appdata_path }}/matter-server:/data
