@@ -1,0 +1,13 @@
+---
+
+services:
+
+  ring-mqtt:
+    container_name: ring-mqtt
+    image: tsightler/ring-mqtt:latest
+    volumes:
+      - {{ docker_appdata_path }}/ring-mqtt:/data
+    ports:
+      - "55123:55123"
+    networks:
+      - default
