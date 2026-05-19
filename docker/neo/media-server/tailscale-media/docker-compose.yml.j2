@@ -4,7 +4,7 @@ services:
 
   tailscale-media:
     container_name: tailscale-media
-    image: tailscale/tailscale:v1.94.2
+    image: tailscale/tailscale:v1.96.5
     hostname: media
     # Host networking is required: both Plex (bare-metal systemd service on :32400)
     # and Jellyfin (network_mode: host container on :8096) are only reachable via
