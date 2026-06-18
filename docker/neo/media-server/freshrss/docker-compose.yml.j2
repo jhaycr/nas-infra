@@ -27,7 +27,7 @@ services:
       - {{ docker_appdata_path }}/freshrss:/config
 
   freshrss-db:
-    image: mariadb:11.8.6
+    image: mariadb:11.8.8
     container_name: freshrss-db
     restart: unless-stopped
     environment:
