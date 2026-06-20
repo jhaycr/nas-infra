@@ -1,0 +1,8 @@
+---
+# Source dir (relative to the playbook/repo root) holding the NixOS config.
+nixos_config_src: "nix/osiris"
+# Destination on the target host.
+nixos_config_dest: /etc/nixos
+# Build via flake (`nixos-rebuild switch --flake <dest>#<host>`) vs. legacy.
+nixos_use_flake: true
+nixos_flake_host: "{{ inventory_hostname }}"

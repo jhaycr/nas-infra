@@ -1,0 +1,31 @@
+---
+# oracle = Home Assistant Green (Home Assistant OS) at homeassistant.local
+# Managed via the bellackn.hass_control Galaxy role: file transfer over the
+# Terminal & SSH addon, restart over the HA REST API with a long-lived token.
+
+# --- Connection (overrides global ansible_ssh_user: ansible from all.yml) ---
+ansible_user: root                      # the Terminal & SSH addon logs in as root
+ansible_ssh_user: root                  # override the ansible_ssh_user alias set in all.yml
+ansible_port: 22                        # Terminal & SSH addon (8099 is the Web Terminal, not SSH)
+ansible_ssh_private_key_file: "~/.ssh/ansible"
+ansible_python_interpreter: /usr/bin/python3   # python3 in the addon container
+
+# --- bellackn.hass_control ---
+# Run in `get` mode by default (safe, non-destructive pull of current config
+# into files/home_assistant/). Override with -e hass_control_mode=set to push.
+hass_control_mode: get
+hass_control_home_assistant_base_url: "http://192.168.1.152:8123"
+hass_control_home_assistant_auth_token: "{{ secret_oracle_ha_token }}"
+hass_control_config_remote_root: /config
+
+# Files to manage (basenames WITHOUT .yaml - the role appends it). The role
+# skips 'secrets' on get to avoid pulling unencrypted secrets.
+hass_control_config_files:
+  - automations
+  - scripts
+  - scenes
+  - configuration
+  - climate-dashboard
+
+# Jinja2-templated files (e.g. secrets.yaml) rendered from templates/home_assistant/
+hass_control_config_templates: []

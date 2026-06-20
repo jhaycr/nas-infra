@@ -44,6 +44,18 @@ neo-pve:
 morpheus:
 	ansible-playbook site.yml --limit morpheus --skip-tags compose $(EXTRA_VARS:%=-e '%')
 
+oracle:
+	ansible-playbook site.yml --limit oracle $(EXTRA_VARS:%=-e '%')
+
+oracle-pull:
+	ansible-playbook site.yml --limit oracle -e hass_control_mode=get $(EXTRA_VARS:%=-e '%')
+
+oracle-push:
+	ansible-playbook site.yml --limit oracle -e hass_control_mode=set $(EXTRA_VARS:%=-e '%')
+
+osiris:
+	ansible-playbook site.yml --limit osiris $(EXTRA_VARS:%=-e '%')
+
 trinity:
 	ansible-playbook site.yml --limit trinity --skip-tags compose -K $(EXTRA_VARS:%=-e '%')
 
