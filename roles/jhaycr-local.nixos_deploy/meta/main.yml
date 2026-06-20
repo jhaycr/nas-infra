@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: jhaycr
+  description: Copies a NixOS configuration to a host and runs nixos-rebuild switch
+  license: MIT
+  min_ansible_version: "2.12"
+dependencies: []

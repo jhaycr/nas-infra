@@ -1,0 +1,176 @@
+- id: '1778768012289'
+  alias: Kids Morning
+  description: ''
+  triggers:
+  - trigger: time
+    at: 07:30:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  conditions: []
+  actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id: light.kids_lights
+    data: {}
+  mode: single
+- id: '1780293287170'
+  alias: Bedtime Kids (School Night)
+  description: ''
+  triggers:
+  - trigger: time
+    at: '21:30:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - sun
+  conditions:
+  - condition: zone
+    entity_id: person.josh
+    zone: zone.home
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      area_id:
+      - living_room
+      - dining_room
+      - den
+      - library
+      - kids_room
+      - kitchen
+    data:
+      flash: short
+  - device_id: 2f5f748dfaac8e1e1054891f16555008
+    domain: cover
+    entity_id: 69fb17d886f3836f3f758a7b1bb75007
+    type: close
+  mode: single
+- id: '1780293391053'
+  alias: Bedtime (Parents)
+  description: ''
+  triggers: []
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      area_id: bedroom
+    data: {}
+  mode: single
+- id: '1780892354210'
+  alias: Bedtime Kids (Weekend)
+  description: ''
+  triggers:
+  - trigger: time
+    at: '21:30:00'
+    weekday:
+    - fri
+    - sat
+  conditions:
+  - condition: zone
+    entity_id: person.josh
+    zone: zone.home
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    target:
+      area_id:
+      - living_room
+      - dining_room
+      - den
+      - library
+      - kids_room
+      - kitchen
+    data:
+      flash: short
+  - device_id: 2f5f748dfaac8e1e1054891f16555008
+    domain: cover
+    entity_id: 69fb17d886f3836f3f758a7b1bb75007
+    type: close
+  mode: single
+- id: '1781244824064'
+  alias: Temperature
+  description: ''
+  triggers:
+  - type: temperature
+    device_id: ab0c2615e2403a5092cd212f883936c6
+    entity_id: 5e731fc2c6da712298b122065c1da3c5
+    domain: sensor
+    trigger: device
+    above: 75
+  conditions: []
+  actions: []
+  mode: single
+- id: '1781326995203'
+  alias: Ethan Fan Button
+  description: ''
+  triggers:
+  - device_id: 051b64f2769da627fd8ed44ea2b63e2b
+    domain: zha
+    type: remote_button_short_press
+    subtype: button
+    trigger: device
+  conditions: []
+  actions:
+  - type: toggle
+    device_id: a1fc01e794a487a87c00605fdbb094b3
+    entity_id: 0fbbe29eb6e7632e03220cbf2a70e00c
+    domain: switch
+  mode: single
+- id: '1781330335018'
+  alias: Motion Lights - Entry
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light.yaml
+    input:
+      motion_entity: binary_sensor.motion_detector_1
+      light_target:
+        entity_id: light.entry_lights
+      no_motion_wait: 10
+- id: '1781936829000'
+  alias: Upstairs T10 - Auto Heat/Cool by Room Temp
+  description: '>=75F sets Cool; <70F sets Heat (Honeywell Upstairs T10 Plus)'
+  triggers:
+  - trigger: numeric_state
+    entity_id: climate.upstairs_t10_plus_thermostat
+    attribute: current_temperature
+    above: 74.9
+    for:
+      minutes: 5
+    id: too_hot
+  - trigger: numeric_state
+    entity_id: climate.upstairs_t10_plus_thermostat
+    attribute: current_temperature
+    below: 70
+    for:
+      minutes: 5
+    id: too_cold
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: too_hot
+      sequence:
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: climate.upstairs_t10_plus_thermostat
+        data:
+          hvac_mode: cool
+    - conditions:
+      - condition: trigger
+        id: too_cold
+      sequence:
+      - action: climate.set_hvac_mode
+        target:
+          entity_id: climate.upstairs_t10_plus_thermostat
+        data:
+          hvac_mode: heat
+  mode: single

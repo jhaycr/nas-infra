@@ -1,0 +1,30 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Friendly-name overrides
+homeassistant:
+  customize:
+    water_heater.heat_pump_water_heater:
+      friendly_name: Tank 1
+    water_heater.heat_pump_water_heater_2:
+      friendly_name: Tank 2
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# YAML-mode dashboards (the default dashboard stays in storage/UI mode)
+lovelace:
+  mode: storage
+  dashboards:
+    climate-dashboard:
+      mode: yaml
+      title: Climate
+      icon: mdi:thermometer
+      show_in_sidebar: true
+      filename: climate-dashboard.yaml

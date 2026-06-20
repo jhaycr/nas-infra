@@ -166,3 +166,20 @@
         line: "{{ internal_ip_neo }} neo.lan"
         state: present
 
+# oracle = Home Assistant Green (HAOS). Config managed via bellackn.hass_control
+# over the Terminal & SSH addon. Default `make oracle` pulls (get); `make
+# oracle-push` pushes (set). See group_vars/oracle/vars.yml.
+- hosts: oracle
+  gather_facts: no
+  roles:
+    - role: bellackn.hass_control
+      tags: [ha, homeassistant]
+
+# osiris = future NixOS/ZFS box. SCAFFOLD - only runs when targeted with
+# --limit osiris (no host in inventory until hardware is online).
+- hosts: osiris
+  gather_facts: no
+  roles:
+    - role: jhaycr-local.nixos_deploy
+      tags: [nixos]
+

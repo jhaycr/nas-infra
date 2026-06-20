@@ -1,5 +1,5 @@
 [oracle]
-192.168.1.1
+192.168.1.152        # Home Assistant Green (homeassistant.local)
 
 [morpheus]
 192.168.1.2
@@ -9,6 +9,9 @@
 
 [trinity]
 localhost ansible_connection=local
+
+[osiris]
+# 192.168.1.NNN      # NixOS/ZFS box - hardware not online yet; set IP when provisioned
 
 [deck]
 192.168.1.122

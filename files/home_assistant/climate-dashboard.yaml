@@ -1,0 +1,127 @@
+title: Climate
+views:
+  - title: Climate
+    path: climate
+    icon: mdi:thermostat
+    cards:
+      # --- Thermostats ---
+      - type: thermostat
+        entity: climate.upstairs_t10_plus_thermostat
+        name: Upstairs
+      - type: thermostat
+        entity: climate.honeywell_downstairs_t10_plus_thermostat
+        name: Downstairs
+
+      # --- Room temperatures ---
+      - type: entities
+        title: Room Temperatures
+        state_color: true
+        entities:
+          - entity: sensor.upstairs_t10_plus_thermostat_current_temperature
+            name: Upstairs (Mom's Room)
+          - entity: sensor.honeywell_downstairs_t10_plus_thermostat_current_temperature
+            name: Downstairs (Living Room)
+          - entity: sensor.kitchen_echo_temperature
+            name: Kitchen
+          - entity: sensor.temp_sensor_kids_temperature
+            name: Kids' Room
+          - entity: sensor.temp_shed_temperature
+            name: Shed
+
+      - type: history-graph
+        title: Room Temperature History
+        hours_to_show: 24
+        entities:
+          - sensor.upstairs_t10_plus_thermostat_current_temperature
+          - sensor.honeywell_downstairs_t10_plus_thermostat_current_temperature
+          - sensor.kitchen_echo_temperature
+          - sensor.temp_sensor_kids_temperature
+          - sensor.temp_shed_temperature
+
+  - title: Water
+    path: water
+    icon: mdi:water-boiler
+    cards:
+      # --- Hot water remaining gauges ---
+      - type: gauge
+        entity: sensor.heat_pump_water_heater_heat_pump_water_heater_available_hot_water
+        name: Tank 1 - Hot Water Remaining
+        min: 0
+        max: 100
+        needle: true
+        severity:
+          red: 0
+          yellow: 25
+          green: 50
+      - type: gauge
+        entity: sensor.heat_pump_water_heater_heat_pump_water_heater_available_hot_water_2
+        name: Tank 2 - Hot Water Remaining
+        min: 0
+        max: 100
+        needle: true
+        severity:
+          red: 0
+          yellow: 25
+          green: 50
+
+      # --- Controls (target temp + operation mode / "type") ---
+      - type: tile
+        entity: water_heater.heat_pump_water_heater
+        name: Tank 1
+        features:
+          - type: target-temperature
+          - type: water-heater-operation-modes
+      - type: tile
+        entity: water_heater.heat_pump_water_heater_2
+        name: Tank 2
+        features:
+          - type: target-temperature
+          - type: water-heater-operation-modes
+
+      # --- Availability history (diagnose run-outs) ---
+      - type: history-graph
+        title: Hot Water Available - Last 24h
+        hours_to_show: 24
+        entities:
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_available_hot_water
+            name: Tank 1
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_available_hot_water_2
+            name: Tank 2
+      - type: history-graph
+        title: Heater Activity - Last 24h
+        hours_to_show: 24
+        entities:
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_running_state
+            name: Tank 1 State
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_running_state_2
+            name: Tank 2 State
+
+      # --- Per-tank details ---
+      - type: entities
+        title: Tank 1 Details
+        state_color: true
+        entities:
+          - entity: binary_sensor.heat_pump_water_heater_heat_pump_water_heater_running
+            name: Running
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_running_state
+            name: Running State
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_tank_health
+            name: Tank Health
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_water_usage_today
+            name: Water Usage Today
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_power_usage_today
+            name: Power Usage Today
+      - type: entities
+        title: Tank 2 Details
+        state_color: true
+        entities:
+          - entity: binary_sensor.heat_pump_water_heater_heat_pump_water_heater_running_2
+            name: Running
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_running_state_2
+            name: Running State
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_tank_health_2
+            name: Tank Health
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_water_usage_today_2
+            name: Water Usage Today
+          - entity: sensor.heat_pump_water_heater_heat_pump_water_heater_power_usage_today_2
+            name: Power Usage Today

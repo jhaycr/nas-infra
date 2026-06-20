@@ -1,0 +1,38 @@
+- name: Den Theater Low
+  id: den_theater_low
+  icon: mdi:movie-open
+  entities:
+    # Four Hue bulbs in the two freestanding lamps. Brightness only (no color)
+    # so each lamp keeps its current color when the scene is activated.
+    # TODO: capture and set explicit color once the HA API token works.
+    light.den_lamp_1:
+      state: "on"
+      brightness: 26          # ~10%
+    light.den_lamp_2:
+      state: "on"
+      brightness: 26
+    light.den_lamp_3:
+      state: "on"
+      brightness: 26
+    light.den_lamp_4:
+      state: "on"
+      brightness: 26
+    cover.72_82tvs_3:         # "Den Curtains"
+      state: closed
+- name: Den Theater Dark
+  id: den_theater_dark
+  icon: mdi:movie-open-off
+  entities:
+    light.den_lights:
+      state: "off"
+    cover.72_82tvs_3:
+      state: closed
+- name: Den Office
+  id: den_office
+  icon: mdi:desk
+  entities:
+    light.den_lights:
+      state: "on"
+      brightness: 255         # 100%
+    cover.72_82tvs_3:
+      state: closed

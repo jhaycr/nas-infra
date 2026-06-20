@@ -1,0 +1,28 @@
+---
+# Thin wrapper: copy the repo's NixOS config to the host, then rebuild.
+# SCAFFOLD - exercised once osiris hardware is online.
+
+- name: Copy NixOS configuration to host
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/{{ nixos_config_src }}/"
+    dest: "{{ nixos_config_dest }}/"
+    delete: true
+    rsync_opts:
+      - "--exclude=README.md"
+  become: true
+
+- name: Rebuild NixOS (flake)
+  ansible.builtin.command:
+    cmd: "nixos-rebuild switch --flake {{ nixos_config_dest }}#{{ nixos_flake_host }}"
+  become: true
+  when: nixos_use_flake | bool
+  register: nixos_rebuild_flake
+  changed_when: "'building the system configuration' in nixos_rebuild_flake.stderr or nixos_rebuild_flake.rc == 0"
+
+- name: Rebuild NixOS (legacy)
+  ansible.builtin.command:
+    cmd: "nixos-rebuild switch"
+  become: true
+  when: not (nixos_use_flake | bool)
+  register: nixos_rebuild_legacy
+  changed_when: nixos_rebuild_legacy.rc == 0
