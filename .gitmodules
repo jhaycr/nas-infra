@@ -7,3 +7,6 @@
 [submodule "roles/jhaycr.snapraid"]
 	path = roles/jhaycr.snapraid
 	url = https://github.com/jhaycr/ansible-role-snapraid
+[submodule "files/home_assistant"]
+	path = files/home_assistant
+	url = git@github.com:jhaycr/home-assistant-config.git
