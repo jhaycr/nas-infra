@@ -1,0 +1,28 @@
+---
+
+services:
+
+  hermes-josh:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes-josh
+    command: gateway run
+    init: true
+    mem_limit: 2g
+    cpus: "1.5"
+    shm_size: "1g"
+    pids_limit: 512
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    environment:
+      HERMES_DASHBOARD: "1"
+    volumes:
+      - {{ docker_appdata_path }}/hermes/profiles/josh:/opt/data
+    ports:
+      - "127.0.0.1:8642:8642"
+      - "127.0.0.1:9119:9119"
+    networks:
+      - default
