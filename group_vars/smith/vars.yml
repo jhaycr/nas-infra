@@ -1,0 +1,16 @@
+---
+# smith = dedicated NixOS VM running the Hermes agent (nousresearch/hermes-agent,
+# josh profile). Replaces the archived docker/neo/ai/.archive/hermes-josh/
+# Docker container. VM created manually in Proxmox (see nix/smith/README.md);
+# Ansible acts as a thin wrapper that copies the Nix config to the host and
+# runs `nixos-rebuild switch`.
+
+# --- Connection ---
+ansible_user: ansible
+ansible_python_interpreter: /run/current-system/sw/bin/python3   # NixOS python path
+
+# --- jhaycr-local.nixos_deploy ---
+nixos_config_src: "nix/smith"           # source dir in this repo
+nixos_config_dest: /etc/nixos           # destination on the host
+nixos_use_flake: true                   # build via `nixos-rebuild switch --flake`
+nixos_flake_host: smith                 # flake output name (.#smith)

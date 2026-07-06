@@ -1,0 +1,38 @@
+// ###############################
+// #### Logging Configuration ####
+// ###############################
+//
+// smith has no Docker daemon (podman via virtualisation.oci-containers, see
+// configuration.nix), so unlike docker/neo/infra/metrics/appdata/metrics/config/alloy-config.alloy.j2
+// (which discovers containers via discovery.docker + loki.source.docker),
+// this scrapes the systemd journal instead - podman-managed containers log
+// there by default (unit "podman-hermes-josh.service"), alongside sshd and
+// everything else on the host.
+
+discovery.relabel "journal" {
+  targets = []
+
+  // Surface the systemd unit name as its own label, mirroring the
+  // container_name label pattern used on neo's Docker-based Alloy config.
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    target_label = "instance"
+    replacement  = "smith"
+  }
+}
+
+loki.source.journal "smith" {
+  forward_to    = [loki.write.neo.receiver]
+  relabel_rules = discovery.relabel.journal.rules
+}
+
+// Ship to neo's Loki over the LAN (see http://192.168.1.3:3100).
+loki.write "neo" {
+  endpoint {
+    url = "http://192.168.1.3:3100/loki/api/v1/push"
+  }
+}

@@ -56,6 +56,9 @@ oracle-push:
 osiris:
 	ansible-playbook site.yml --limit osiris $(EXTRA_VARS:%=-e '%')
 
+smith:
+	ansible-playbook site.yml --limit smith $(EXTRA_VARS:%=-e '%')
+
 trinity:
 	ansible-playbook site.yml --limit trinity --skip-tags compose -K $(EXTRA_VARS:%=-e '%')
 

@@ -13,6 +13,9 @@ localhost ansible_connection=local
 [osiris]
 # 192.168.1.NNN      # NixOS/ZFS box - hardware not online yet; set IP when provisioned
 
+[smith]
+192.168.1.61         # NixOS VM - Hermes agent (see nix/smith/README.md)
+
 [deck]
 192.168.1.122
 

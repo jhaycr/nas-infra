@@ -183,3 +183,12 @@
     - role: jhaycr-local.nixos_deploy
       tags: [nixos]
 
+# smith = dedicated NixOS VM running the Hermes agent. SCAFFOLD - only runs
+# when targeted with --limit smith (no host in inventory until the VM is
+# manually created, see nix/smith/README.md).
+- hosts: smith
+  gather_facts: no
+  roles:
+    - role: jhaycr-local.nixos_deploy
+      tags: [nixos]
+
