@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Managed by Ansible — do not edit manually.
+# Pauses *Arr download clients, runs snapraid-runner, then re-enables them.
+
+set -uo pipefail
+
+APPDATA="{{ docker_appdata_path }}"
+
+declare -A SERVICES=(
+  [sonarr]=8989
+  [sonarr-anime]=9989
+  [radarr]=7878
+  [radarr-anime]=8878
+)
+
+get_api_key() {
+  local service="$1"
+  local config_file="$APPDATA/$service/config.xml"
+  if [[ ! -f "$config_file" ]]; then
+    echo ""
+    return
+  fi
+  grep -oP '(?<=<ApiKey>)[^<]+' "$config_file"
+}
+
+toggle_download_clients() {
+  local enable="$1"  # true or false
+
+  for service in "${!SERVICES[@]}"; do
+    local port="${SERVICES[$service]}"
+    local api_key
+    api_key="$(get_api_key "$service")"
+
+    if [[ -z "$api_key" ]]; then
+      echo "WARNING: Could not read API key for $service — skipping" >&2
+      continue
+    fi
+
+    local base_url="http://localhost:${port}"
+    local clients_json
+    clients_json="$(curl -sf \
+      -H "X-Api-Key: ${api_key}" \
+      "${base_url}/api/v3/downloadclient")" || {
+      echo "WARNING: Failed to GET download clients for $service — skipping" >&2
+      continue
+    }
+
+    local count
+    count="$(echo "$clients_json" | jq 'length')"
+
+    for i in $(seq 0 $((count - 1))); do
+      local client_id
+      client_id="$(echo "$clients_json" | jq -r ".[$i].id")"
+      local updated_client
+      updated_client="$(echo "$clients_json" | jq ".[$i] | .enable = $enable")"
+
+      curl -sf -X PUT \
+        -H "X-Api-Key: ${api_key}" \
+        -H "Content-Type: application/json" \
+        -d "$updated_client" \
+        "${base_url}/api/v3/downloadclient/${client_id}" > /dev/null || {
+        echo "WARNING: Failed to PUT download client id=${client_id} for $service" >&2
+      }
+    done
+
+    echo "$(date -Iseconds) $service: download clients set to enable=$enable"
+  done
+}
+
+cleanup() {
+  echo "$(date -Iseconds) Re-enabling download clients (cleanup trap)"
+  toggle_download_clients true
+}
+
+trap cleanup EXIT
+
+echo "$(date -Iseconds) Disabling download clients before snapraid run"
+toggle_download_clients false
+
+echo "$(date -Iseconds) Starting snapraid-runner"
+python3 {{ snapraid_runner_bin }} -c {{ snapraid_runner_conf }}
+SNAPRAID_EXIT=$?
+
+echo "$(date -Iseconds) snapraid-runner exited with code $SNAPRAID_EXIT"
+
+{% if snapraid_runner_healthcheck_io_uuid %}
+if [[ $SNAPRAID_EXIT -eq 0 ]]; then
+  curl -fsS -m 10 --retry 5 -o /dev/null \
+    "{{ snapraid_healthcheck_io_host }}/{{ snapraid_runner_healthcheck_io_uuid }}" \
+    && echo "$(date -Iseconds) Healthcheck ping sent"
+fi
+{% endif %}
+
+exit $SNAPRAID_EXIT
