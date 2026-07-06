@@ -32,8 +32,11 @@ nixos_secret_files:
       OPENROUTER_API_KEY={{ secret_hermes_josh_openrouter_api_key | default('') }}
       API_SERVER_KEY={{ secret_hermes_josh_api_server_key | default('') }}
       API_SERVER_ENABLED=true
-      # Loopback-only: container runs with host networking; access via SSH tunnel.
-      API_SERVER_HOST=127.0.0.1
+      # LAN-exposed (host networking + NixOS firewall opens 8642/9119).
+      # API is protected by API_SERVER_KEY bearer auth; dashboard by basic auth.
+      API_SERVER_HOST=0.0.0.0
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME=josh
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD_HASH={{ secret_hermes_josh_dashboard_password_hash | default('') }}
 
   # Auto-sourced in interactive shells (environment.interactiveShellInit) for
   # e.g. opencode - same keys, no API_SERVER_KEY, restricted to the ansible user.

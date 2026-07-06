@@ -21,6 +21,9 @@
   networking.defaultGateway = "192.168.1.1";
   networking.nameservers = [ "192.168.1.1" ];
 
+  # Hermes API (bearer-auth) + dashboard (basic-auth) exposed to the LAN.
+  networking.firewall.allowedTCPPorts = [ 8642 9119 ];
+
   # --- Users ---
   # 'ansible' deploy user so this repo's nixos_deploy role can connect.
   users.users.ansible = {
@@ -74,9 +77,9 @@
     environmentFiles = [ "/etc/hermes/hermes-josh.env" ];
     environment = {
       HERMES_DASHBOARD = "1";
-      # The image defaults the dashboard bind to 0.0.0.0 (for port publishing),
-      # which triggers a mandatory auth gate. Loopback bind + SSH tunnel instead.
-      HERMES_DASHBOARD_HOST = "127.0.0.1";
+      # LAN-exposed on 0.0.0.0 (image default): the mandatory auth gate is
+      # satisfied by the basic-auth provider configured via
+      # HERMES_DASHBOARD_BASIC_AUTH_* in /etc/hermes/hermes-josh.env.
     };
     volumes = [
       "/var/lib/hermes-josh:/opt/data"
