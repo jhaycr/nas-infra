@@ -117,6 +117,17 @@
     git
     python3            # required for Ansible modules
     opencode           # interactive use - picks up llm.env via interactiveShellInit
+
+    # `hermes` from any shell: wraps `podman exec` into the hermes-josh
+    # container. Rootful podman needs root, so this leans on the wheel group's
+    # passwordless sudo rather than exposing the podman socket. -t only when
+    # attached to a terminal so one-shot use (`hermes -z ...` over plain ssh)
+    # works too.
+    (writeShellScriptBin "hermes" ''
+      tty_flag=""
+      [ -t 0 ] && tty_flag="-t"
+      exec sudo podman exec -i $tty_flag hermes-josh hermes "$@"
+    '')
   ];
 
   system.stateVersion = "26.05";   # matches the installed NixOS release (confirmed during bring-up)
