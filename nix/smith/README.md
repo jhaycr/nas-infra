@@ -6,7 +6,13 @@ container on neo: `docker/neo/ai/.archive/hermes-josh/{docker-compose.yml.j2,.en
 
 **Status: bring-up complete.** The VM is installed and reachable at
 `192.168.1.61`. `hardware-configuration.nix` and `ansible.pub` are committed.
-`secrets.yaml` is still intentionally not committed - see section 2.
+Secrets are managed via this repo's standard `ansible-vault` workflow, not
+committed to this directory at all - see section 2.
+
+(An earlier iteration used sops-nix for secrets; superseded in favor of the
+repo's standard `ansible-vault` workflow. The admin age keypair generated for
+that at `~/.config/sops/age/keys.txt` on trinity is now unused and can be
+removed if you're not using sops-nix elsewhere.)
 
 ## 1. Manual bring-up (do this by hand in Proxmox)
 
@@ -40,48 +46,48 @@ container on neo: `docker/neo/ai/.archive/hermes-josh/{docker-compose.yml.j2,.en
    Nix config).
 10. Uncomment the real IP in the root `inventory` file's `[smith]` group.
 
-## 2. Secrets (sops-nix)
+## 2. Secrets (ansible-vault - NOT sops-nix)
+
+smith's secrets live in this repo's standard `ansible-vault` workflow, same
+as every other host - nothing secret-related lives in `nix/smith/` at all.
 
 Four secrets are needed: an Anthropic API key, an OpenAI API key, an
 OpenRouter API key (routes MiniMax/Qwen models through OpenRouter - no direct
-MiniMax/DashScope secrets are held here), and an `API_SERVER_KEY`
-(e.g. `openssl rand -hex 32`).
+MiniMax/DashScope secrets are held), and an `API_SERVER_KEY`
+(e.g. `openssl rand -hex 32`). They live in `group_vars/smith/vault.yml` as:
 
-`sops`, `ssh-to-age`, and `age` are installed to `~/.local/bin` on trinity.
-`.sops.yaml` in this directory has both age recipients filled in already
-(smith's host key + the admin age key at `~/.config/sops/age/keys.txt`).
-
-To create the encrypted secrets file:
-```
-sops nix/smith/secrets.yaml
-```
-This opens `$EDITOR` on an empty/decrypted buffer - populate it with:
 ```yaml
-hermes_anthropic_api_key: <value>
-hermes_openai_api_key: <value>
-hermes_openrouter_api_key: <value>
-hermes_api_server_key: <value>
+secret_hermes_josh_anthropic_api_key: "<value>"
+secret_hermes_josh_openai_api_key: "<value>"
+secret_hermes_josh_openrouter_api_key: "<value>"
+secret_hermes_josh_api_server_key: "<value>"
 ```
-Save - sops encrypts on write using the recipients from `.sops.yaml`. Then
-commit the encrypted `secrets.yaml`. This is a separate mechanism from this
-repo's `ansible-vault` files - `secrets.yaml` is safe to commit as-is (values
-are individually encrypted) and is **not** covered by
-`make vault-lock`/`vault-unlock` or the vault pre-commit hook.
 
-`configuration.nix` decrypts these at NixOS activation via the host's own SSH
-host key (auto-converted to age by sops-nix) plus the admin age key, and
-renders two env files from them:
+Workflow:
+```
+make vault-unlock          # decrypts all group_vars/*/vault.yml, incl. smith's
+# edit group_vars/smith/vault.yml, fill in the secret_* values above
+make vault-lock            # re-encrypts before committing
+```
 
-- `hermes-josh.env` - fed to the `hermes-josh` container via
-  `environmentFiles` (functionally identical to the old `.env.j2`, plus the
-  new `OPENROUTER_API_KEY`).
-- `llm.env` - a second template (owner `ansible`, mode `0400`) holding the
-  same three API keys (no `API_SERVER_KEY`) for interactive use. It's
-  auto-sourced in interactive shells via `environment.interactiveShellInit`
-  (guarded so shells that can't read the 0400 file just skip it), so
-  `opencode` (installed declaratively via `environment.systemPackages`) picks
-  up `OPENROUTER_API_KEY`/`ANTHROPIC_API_KEY`/`OPENAI_API_KEY` automatically
-  in any interactive `ansible@smith` shell.
+These `secret_*` vars are rendered into two plain env files **on the host**
+by `jhaycr-local.nixos_deploy`'s `nixos_secret_files` var (defined in
+`group_vars/smith/vars.yml`), written before every `nixos-rebuild switch`:
+
+- `/etc/hermes/hermes-josh.env` (root:root, `0600`) - fed to the `hermes-josh`
+  container via `environmentFiles` (functionally identical to the old
+  archived `.env.j2`, plus the new `OPENROUTER_API_KEY`).
+- `/etc/hermes/llm.env` (ansible:users, `0400`) - the same three API keys (no
+  `API_SERVER_KEY`), for interactive use. Auto-sourced in interactive shells
+  via `environment.interactiveShellInit` (guarded so shells that can't read
+  the `0400` file just skip it), so `opencode` (installed declaratively via
+  `environment.systemPackages`) picks up
+  `OPENROUTER_API_KEY`/`ANTHROPIC_API_KEY`/`OPENAI_API_KEY` automatically in
+  any interactive `ansible@smith` shell.
+
+`nix/smith/configuration.nix` itself has no knowledge of secrets - it just
+expects both files above to already exist on disk, which the Ansible role
+guarantees by writing them before the rsync + rebuild steps.
 
 ## 3. Deploy
 

@@ -43,51 +43,24 @@
   virtualisation.podman.enable = true;
   virtualisation.oci-containers.backend = "podman";
 
-  # --- Secrets (sops-nix) ---
-  # Encrypted file: ./secrets.yaml (created during bring-up, see README.md).
-  # Decrypted via the host's own SSH host key (auto-converted to age) plus an
-  # admin age key, so secrets can be edited from trinity too.
-  sops.defaultSopsFile = ./secrets.yaml;
-  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  sops.secrets.hermes_anthropic_api_key = { };
-  sops.secrets.hermes_openai_api_key = { };
-  sops.secrets.hermes_api_server_key = { };
-  # OpenRouter key: Hermes natively reads OPENROUTER_API_KEY. Used to route
-  # MiniMax/Qwen models through OpenRouter - no direct MiniMax/DashScope
-  # secrets are held here.
-  sops.secrets.hermes_openrouter_api_key = { };
-
-  # Rendered env file matching the old hermes-josh/.env.j2 shape, plus
-  # OPENROUTER_API_KEY (new).
-  sops.templates."hermes-josh.env".content = ''
-    ANTHROPIC_API_KEY=${config.sops.placeholder.hermes_anthropic_api_key}
-    OPENAI_API_KEY=${config.sops.placeholder.hermes_openai_api_key}
-    OPENROUTER_API_KEY=${config.sops.placeholder.hermes_openrouter_api_key}
-    API_SERVER_KEY=${config.sops.placeholder.hermes_api_server_key}
-    API_SERVER_ENABLED=true
-    API_SERVER_HOST=0.0.0.0
-  '';
-
-  # Shared env file for interactive use (e.g. OpenCode at the shell), reusing
-  # the same underlying secrets - not tied to the hermes-josh container.
-  # owner/mode restrict it to the ansible user only.
-  sops.templates."llm.env" = {
-    owner = "ansible";
-    mode = "0400";
-    content = ''
-      OPENROUTER_API_KEY=${config.sops.placeholder.hermes_openrouter_api_key}
-      ANTHROPIC_API_KEY=${config.sops.placeholder.hermes_anthropic_api_key}
-      OPENAI_API_KEY=${config.sops.placeholder.hermes_openai_api_key}
-    '';
-  };
+  # --- Secrets ---
+  # Delivered out-of-band by Ansible (ansible-vault group_vars/smith/vault.yml
+  # -> jhaycr-local.nixos_deploy's nixos_secret_files, defined in
+  # group_vars/smith/vars.yml), NOT sops-nix. This Nix config just expects
+  # both files to already exist on disk before the rebuild:
+  #   /etc/hermes/hermes-josh.env (root:root 0600) - ANTHROPIC_API_KEY,
+  #     OPENAI_API_KEY, OPENROUTER_API_KEY, API_SERVER_KEY,
+  #     API_SERVER_ENABLED, API_SERVER_HOST
+  #   /etc/hermes/llm.env (ansible:users 0400) - OPENROUTER_API_KEY,
+  #     ANTHROPIC_API_KEY, OPENAI_API_KEY (interactive use, e.g. opencode)
 
   # Auto-source llm.env in interactive shells (e.g. for OpenCode). Guarded
   # with `-r` so shells that can't read the 0400 file (anything not root or
-  # ansible) don't error.
+  # ansible), or a first boot before Ansible has written it yet, don't error.
   environment.interactiveShellInit = ''
-    if [ -r ${config.sops.templates."llm.env".path} ]; then
+    if [ -r /etc/hermes/llm.env ]; then
       set -a
-      . ${config.sops.templates."llm.env".path}
+      . /etc/hermes/llm.env
       set +a
     fi
   '';
@@ -98,26 +71,33 @@
   virtualisation.oci-containers.containers.hermes-josh = {
     image = "nousresearch/hermes-agent:latest";
     cmd = [ "gateway" "run" ];
-    environmentFiles = [ config.sops.templates."hermes-josh.env".path ];
+    environmentFiles = [ "/etc/hermes/hermes-josh.env" ];
     environment = {
       HERMES_DASHBOARD = "1";
+      # The image defaults the dashboard bind to 0.0.0.0 (for port publishing),
+      # which triggers a mandatory auth gate. Loopback bind + SSH tunnel instead.
+      HERMES_DASHBOARD_HOST = "127.0.0.1";
     };
     volumes = [
       "/var/lib/hermes-josh:/opt/data"
     ];
-    ports = [
-      "127.0.0.1:8642:8642"
-      "127.0.0.1:9119:9119"
-    ];
+    # Host networking so the dashboard (9119) and API server (8642) can bind
+    # 127.0.0.1 on the VM itself: the image's auth gate refuses unauthenticated
+    # non-loopback binds, and with bridge networking a loopback bind would be
+    # unreachable from the host. Local-only by design - access via SSH tunnel.
     # Mirrors the hardening + resource limits from the archived docker-compose.yml.j2
     # (init, shm_size, mem_limit, cpus, pids_limit, cap_drop, security_opt).
+    # NB: no `--init` and no `--cap-drop=ALL` (both were in the old docker
+    # compose): the current hermes-agent image uses s6-overlay, which must run
+    # as PID 1 and needs SETUID/SETGID to drop privileges. Podman's default
+    # capability set is already restricted; the VM itself is the isolation
+    # boundary.
     extraOptions = [
-      "--init"
+      "--network=host"
       "--shm-size=1g"
       "--memory=2g"
       "--cpus=1.5"
       "--pids-limit=512"
-      "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];
   };

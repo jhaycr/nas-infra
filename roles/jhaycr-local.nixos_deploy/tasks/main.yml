@@ -2,6 +2,37 @@
 # Thin wrapper: copy the repo's NixOS config to the host, then rebuild.
 # SCAFFOLD - exercised once osiris hardware is online.
 
+# Written first so any out-of-band secret files (e.g. rendered from
+# ansible-vault) exist on disk before the Nix config that references them
+# gets rebuilt/activated. No-op when nixos_secret_files is empty (default).
+# Directory is world-traversable by default (0755): the secret files
+# themselves carry restrictive modes, and non-root owners (e.g. a per-user
+# env file) must be able to traverse the parent dir. Override per-item with
+# dir_mode if a stricter directory is wanted.
+- name: Ensure parent directories exist for NixOS secret files
+  ansible.builtin.file:
+    path: "{{ item.dest | dirname }}"
+    state: directory
+    mode: "{{ item.dir_mode | default('0755') }}"
+  become: true
+  loop: "{{ nixos_secret_files }}"
+  loop_control:
+    label: "{{ item.dest | dirname }}"
+  no_log: true
+
+- name: Write NixOS secret files
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0600') }}"
+  become: true
+  loop: "{{ nixos_secret_files }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  no_log: true
+
 - name: Copy NixOS configuration to host
   ansible.posix.synchronize:
     src: "{{ playbook_dir }}/{{ nixos_config_src }}/"
@@ -17,7 +48,9 @@
   become: true
   when: nixos_use_flake | bool
   register: nixos_rebuild_flake
-  changed_when: "'building the system configuration' in nixos_rebuild_flake.stderr or nixos_rebuild_flake.rc == 0"
+  changed_when: >-
+    (nixos_rebuild_flake.stderr is defined and 'building the system configuration' in nixos_rebuild_flake.stderr)
+    or (nixos_rebuild_flake.rc is defined and nixos_rebuild_flake.rc == 0)
 
 - name: Rebuild NixOS (legacy)
   ansible.builtin.command:
@@ -25,4 +58,4 @@
   become: true
   when: not (nixos_use_flake | bool)
   register: nixos_rebuild_legacy
-  changed_when: nixos_rebuild_legacy.rc == 0
+  changed_when: "nixos_rebuild_legacy.rc is defined and nixos_rebuild_legacy.rc == 0"

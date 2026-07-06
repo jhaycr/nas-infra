@@ -6,3 +6,12 @@ nixos_config_dest: /etc/nixos
 # Build via flake (`nixos-rebuild switch --flake <dest>#<host>`) vs. legacy.
 nixos_use_flake: true
 nixos_flake_host: "{{ inventory_hostname }}"
+
+# Optional out-of-band secret files written to the host before the rebuild -
+# e.g. rendered from ansible-vault, for Nix configs that expect a secret file
+# to already exist on disk rather than managing secrets themselves. Empty by
+# default; nothing host-specific lives in this role. Each item:
+#   dest:    absolute path on the target host (required)
+#   content: file content (required)
+#   owner / group / mode: default root/root/0600
+nixos_secret_files: []

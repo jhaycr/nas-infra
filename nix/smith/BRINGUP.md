@@ -22,33 +22,38 @@ covers finishing bring-up and deploying.
   guest — the VM must be created and NixOS installed by hand first (this doc).
 - **Network:** the UniFi controller is a standalone **Express 7** (UniFi Network
   app), not a Proxmox VM. DHCP reservations are set there.
-- **Secrets:** sops-nix, NOT ansible-vault. Do not touch `group_vars/*/vault.yml`
-  for this. The secrets live in `nix/smith/secrets.yaml` (sops-encrypted,
-  safe to commit, not covered by the repo's vault pre-commit hook). Secret key
-  names keep the `hermes_*` prefix (they belong to the Hermes agent, not the
-  host) — only the host/VM/repo-wiring identity is `smith`.
+- **Secrets:** this repo's standard `ansible-vault` workflow, NOT sops-nix
+  (an earlier iteration used sops-nix; superseded — see git history if
+  curious). Secrets live in `group_vars/smith/vault.yml` as `secret_*` vars
+  (naming matches the archived Docker `.env.j2`), edited via
+  `make vault-unlock` / `make vault-lock` like every other host. They're
+  rendered into plain env files **on the host** by
+  `jhaycr-local.nixos_deploy`'s `nixos_secret_files` var
+  (`group_vars/smith/vars.yml`) before every rebuild. Nothing secret-related
+  lives in `nix/smith/` at all. Secret var names keep the `hermes_josh_*`
+  segment (they belong to the Hermes agent/profile, not the host) — only the
+  host/VM/repo-wiring identity is `smith`.
 
 ### Already committed / scaffolded (do not recreate)
 
-- `nix/smith/flake.nix` — flake with `sops-nix` input. The
-  `hardware-configuration.nix` module line is **commented out** pending bring-up.
+- `nix/smith/flake.nix` — plain nixpkgs flake (no sops-nix input). The
+  `hardware-configuration.nix` module line is wired in.
 - `nix/smith/configuration.nix` — podman `oci-containers` def for `hermes-josh`
-  (matches the archived compose field-for-field), sops secret+template wiring,
-  `services.alloy`. Has **commented-out** placeholders for: the static-IP block
-  (`<IFNAME>`), and the `authorizedKeys.keyFiles = [ ./ansible.pub ]` line.
+  (matches the archived compose field-for-field), `services.alloy`. Expects
+  `/etc/hermes/hermes-josh.env` and `/etc/hermes/llm.env` to already exist on
+  disk (written by Ansible, not by this config).
 - `nix/smith/alloy-config.alloy` — journald → neo Loki
   (`http://192.168.1.3:3100/loki/api/v1/push`), label `instance="smith"`.
-- `nix/smith/.sops.yaml` — recipient scaffold with two `age1TODO_...`
-  placeholders (host key + admin key) to be replaced.
 - `nix/smith/README.md` — reference for the same workflow.
-- `group_vars/smith/vars.yml`, `[smith]` group in `inventory` (IP commented
-  out), `- hosts: smith` play in `site.yml`, `smith:` target in `makefile`.
+- `group_vars/smith/vars.yml` (incl. `nixos_secret_files`), `group_vars/smith/vault.yml`
+  (plaintext scaffold — fill in and `make vault-lock` before committing),
+  `[smith]` group in `inventory`, `- hosts: smith` play in `site.yml`,
+  `smith:` target in `makefile`.
 
-### Intentionally NOT committed (produced during bring-up)
+### Produced during bring-up (not scaffolded ahead of time)
 
 - `nix/smith/hardware-configuration.nix` — generated on the VM.
 - `nix/smith/ansible.pub` — the deploy pubkey.
-- `nix/smith/secrets.yaml` — can't be encrypted until the VM's host key exists.
 
 ---
 
@@ -151,35 +156,34 @@ Then edit these files to uncomment the placeholders:
   - confirm `system.stateVersion` matches the installed NixOS release.
 - `inventory` — uncomment the `192.168.1.61` line under `[smith]`.
 
-## Step 4 — Secrets (sops-nix, on trinity)
+## Step 4 — Secrets (ansible-vault, on trinity)
 
 ```bash
-# one-time local tools (NOT in repo tooling — install via nix/go/pkg mgr):
-#   sops, ssh-to-age
-
-# host age key (VM must be up from step 2):
-ssh-keyscan -t ed25519 192.168.1.61 | ssh-to-age
-# admin age key (your personal key, so you can edit secrets from trinity):
-cat ~/.ssh/id_ed25519.pub | ssh-to-age
+cd ~/Code/ansible/nas-infra
+make vault-unlock          # decrypts all group_vars/*/vault.yml, incl. smith's
 ```
 
-- Replace both `age1TODO_...` placeholders in `nix/smith/.sops.yaml` with the
-  two age keys above.
-- Create + encrypt the secrets:
-  ```bash
-  sops nix/smith/secrets.yaml
-  ```
-  Populate (key names keep the `hermes_` prefix — they belong to the agent,
-  not the host):
-  ```yaml
-  hermes_anthropic_api_key: <value>
-  hermes_openai_api_key: <value>
-  hermes_openrouter_api_key: <value>   # routes MiniMax/Qwen via OpenRouter
-  hermes_api_server_key: <value>   # e.g. openssl rand -hex 32
-  ```
-  Save (sops encrypts on write). These four secrets feed both
-  `hermes-josh.env` (the container) and `llm.env` (interactive OpenCode use,
-  auto-sourced via `environment.interactiveShellInit`).
+Edit `group_vars/smith/vault.yml`, filling in the four `secret_*` values
+(key names keep the `hermes_josh_` segment — they belong to the agent/profile,
+not the host):
+```yaml
+secret_hermes_josh_anthropic_api_key: "<value>"
+secret_hermes_josh_openai_api_key: "<value>"
+secret_hermes_josh_openrouter_api_key: "<value>"   # routes MiniMax/Qwen via OpenRouter
+secret_hermes_josh_api_server_key: "<value>"       # e.g. openssl rand -hex 32
+```
+
+```bash
+make vault-lock             # re-encrypts before committing
+```
+
+These four secrets get rendered into two plain env files **on the host** by
+`jhaycr-local.nixos_deploy`'s `nixos_secret_files` var (see
+`group_vars/smith/vars.yml`), written before every rebuild:
+`/etc/hermes/hermes-josh.env` (feeds the `hermes-josh` container) and
+`/etc/hermes/llm.env` (interactive OpenCode use, auto-sourced via
+`environment.interactiveShellInit`). `nix/smith/configuration.nix` has no
+secret-handling of its own — it just expects both files to exist.
 
 ## Step 5 — Deploy
 
@@ -204,19 +208,22 @@ ssh ansible@192.168.1.61 'curl -sf http://127.0.0.1:8642/ >/dev/null && echo ok'
 
 Then in Grafana/Loki (`http://192.168.1.3:3000`) query `{instance="smith"}` to
 confirm log shipping. Check the container's startup logs for a clean API-key
-load (no auth errors) to confirm the sops-rendered env file reached the
-container.
+load (no auth errors) to confirm `/etc/hermes/hermes-josh.env` (written by
+Ansible before the rebuild) reached the container correctly.
 
 ## Step 7 — Commit
 
 Once verified, commit the newly added `hardware-configuration.nix`,
-`ansible.pub`, `secrets.yaml`, and the uncommented edits. Do **not** run
-`make vault-lock` for these — they are sops-managed, not ansible-vault.
+`ansible.pub`, and the uncommented edits, plus `group_vars/smith/vault.yml`
+**encrypted** (run `make vault-lock` first — this one, unlike the rest of
+`nix/smith/`, goes through the normal vault flow) and
+`group_vars/smith/vars.yml`.
 
 ## Guardrails
 
-- Never read/inspect `group_vars/*/vault.yml`. Not needed here — smith uses
-  sops-nix, a separate mechanism.
+- `group_vars/smith/vault.yml` follows the same rules as every other host's
+  vault file: edit only via `make vault-unlock` / `make vault-lock`, never
+  commit it decrypted (the pre-commit hook blocks this anyway).
 - Do not run `make smith` until steps 1–4 are complete (the VM and its
   hardware-config/secrets must exist first).
 - Mirror `nix/osiris/` conventions for any Nix-side style questions.

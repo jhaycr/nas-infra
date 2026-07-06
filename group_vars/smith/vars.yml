@@ -14,3 +14,34 @@ nixos_config_src: "nix/smith"           # source dir in this repo
 nixos_config_dest: /etc/nixos           # destination on the host
 nixos_use_flake: true                   # build via `nixos-rebuild switch --flake`
 nixos_flake_host: smith                 # flake output name (.#smith)
+
+# Secrets: delivered as plain env files on the host (NOT sops-nix), rendered
+# from group_vars/smith/vault.yml's secret_* vars. nix/smith/configuration.nix
+# expects both files to already exist at these paths.
+nixos_secret_files:
+  # Consumed by the hermes-josh container (virtualisation.oci-containers'
+  # environmentFiles) - functionally identical to the archived
+  # docker/neo/ai/.archive/hermes-josh/.env.j2.
+  - dest: /etc/hermes/hermes-josh.env
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      ANTHROPIC_API_KEY={{ secret_hermes_josh_anthropic_api_key | default('') }}
+      OPENAI_API_KEY={{ secret_hermes_josh_openai_api_key | default('') }}
+      OPENROUTER_API_KEY={{ secret_hermes_josh_openrouter_api_key | default('') }}
+      API_SERVER_KEY={{ secret_hermes_josh_api_server_key | default('') }}
+      API_SERVER_ENABLED=true
+      # Loopback-only: container runs with host networking; access via SSH tunnel.
+      API_SERVER_HOST=127.0.0.1
+
+  # Auto-sourced in interactive shells (environment.interactiveShellInit) for
+  # e.g. opencode - same keys, no API_SERVER_KEY, restricted to the ansible user.
+  - dest: /etc/hermes/llm.env
+    owner: ansible
+    group: users
+    mode: "0400"
+    content: |
+      OPENROUTER_API_KEY={{ secret_hermes_josh_openrouter_api_key | default('') }}
+      ANTHROPIC_API_KEY={{ secret_hermes_josh_anthropic_api_key | default('') }}
+      OPENAI_API_KEY={{ secret_hermes_josh_openai_api_key | default('') }}
