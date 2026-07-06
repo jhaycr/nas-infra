@@ -171,6 +171,19 @@
 # oracle-push` pushes (set). See group_vars/oracle/vars.yml.
 - hosts: oracle
   gather_facts: no
+  pre_tasks:
+    # Backup gate: every config push (set mode) takes a partial Supervisor
+    # backup first. `raw` because python3 may not exist in the SSH addon yet
+    # (the role's prepare.yml installs it later). Skip only in emergencies
+    # with -e ha_skip_backup=true.
+    - name: Pre-push HA backup (partial)
+      raw: ha backups new --folders homeassistant --name "pre-push-{{ lookup('pipe', 'date -u +%Y%m%d-%H%M%S') }}" --no-progress
+      register: ha_backup_result
+      failed_when: "'slug:' not in ha_backup_result.stdout"
+      when:
+        - hass_control_mode == "set"
+        - not (ha_skip_backup | default(false) | bool)
+      tags: [ha, homeassistant]
   roles:
     - role: bellackn.hass_control
       tags: [ha, homeassistant]
