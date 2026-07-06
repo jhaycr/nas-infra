@@ -75,6 +75,7 @@ services:
     image: prometheuscommunity/smartctl-exporter:${SMARTCTL_EXPORTER_VERSION:-v0.12.0}
     cap_add:
       - SYS_RAWIO
+    privileged: true
     networks:
       - loki
     volumes:
