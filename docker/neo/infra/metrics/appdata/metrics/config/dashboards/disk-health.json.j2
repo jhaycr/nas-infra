@@ -447,7 +447,7 @@
         "defaults": {},
         "overrides": []
       },
-      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 40 },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 52 },
       "id": 4,
       "options": {
         "dedupStrategy": "none",
@@ -521,6 +521,65 @@
     },
     {
       "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+      "description": "Monthly calendar of SnapRAID runs. Green = run finished successfully, Red = run failed, empty day = no run. Click a day to zoom the dashboard time range to it — the SnapRAID Logs panel below will then show that run's logs.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed" },
+          "custom": {},
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "OK" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Failed" },
+            "properties": [
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 36 },
+      "id": 11,
+      "options": {
+        "autoScroll": false,
+        "colors": "frame",
+        "dateFormat": "inherit",
+        "defaultView": "month",
+        "displayTime": false,
+        "quickLinks": false,
+        "scrollToTime": { "hours": 0, "minutes": 0 },
+        "timeRangeType": "default",
+        "views": ["month", "week", "day"]
+      },
+      "pluginVersion": "3.9.0",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+          "expr": "sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |= \"Run finished successfully\" [1d])) > 0",
+          "instant": false,
+          "legendFormat": "OK",
+          "step": "1d",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+          "expr": "sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |~ \"Run failed$\" [1d])) > 0",
+          "instant": false,
+          "legendFormat": "Failed",
+          "step": "1d",
+          "refId": "B"
+        }
+      ],
+      "title": "SnapRAID Run Calendar",
+      "type": "marcusolsson-calendar-panel"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "${loki_datasource}" },
       "description": "Total SnapRAID ERROR-level log lines in the selected time range. Should be 0.",
       "fieldConfig": {
         "defaults": {
@@ -539,7 +598,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 36 },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 48 },
       "id": 6,
       "options": {
         "colorMode": "background",
@@ -583,8 +642,8 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 36 },
-      "id": 7,
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 48 },
+      "id": 10,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
