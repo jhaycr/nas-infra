@@ -1,0 +1,118 @@
+{% raw %}{
+  "__inputs": [],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "loki",
+      "name": "Loki",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "logs",
+      "name": "Logs",
+      "version": ""
+    }
+  ],
+  "annotations": { "list": [] },
+  "description": "Full SnapRAID runner log output for neo. Linked from the Disk Health dashboard.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Disk Health",
+      "type": "link",
+      "url": "/d/neo-disk-health-001/disk-health"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+      "description": "All SnapRAID runner log output. Use the search box or add |= filters to narrow (e.g. Completed, [ERROR ], [OUTERR], sync, scrub). Logs are collected from /var/log/snapraid.log on the host.",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": { "h": 24, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "dedupStrategy": "exact",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+          "expr": "{job=\"snapraid\", instance=~\"$instance\"} |~ \"$search\"",
+          "refId": "A"
+        }
+      ],
+      "title": "SnapRAID Logs",
+      "type": "logs"
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 41,
+  "tags": ["disks", "snapraid", "logs"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Loki",
+        "multi": false,
+        "name": "loki_datasource",
+        "options": [],
+        "query": "loki",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "current": { "text": "", "value": "" },
+        "hide": 0,
+        "label": "Search (regex)",
+        "name": "search",
+        "options": [{ "selected": true, "text": "", "value": "" }],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": { "text": ".*", "value": ".*" },
+        "hide": 2,
+        "label": "Instance",
+        "name": "instance",
+        "options": [{ "selected": true, "text": ".*", "value": ".*" }],
+        "query": ".*",
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": { "from": "now-7d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SnapRAID Logs",
+  "uid": "neo-snapraid-logs-001",
+  "version": 1,
+  "weekStart": ""
+}{% endraw %}

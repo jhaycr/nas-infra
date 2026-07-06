@@ -29,8 +29,6 @@ services:
      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
      - GF_AUTH_ANONYMOUS_ENABLED=true
      - GF_AUTH_BASIC_ENABLED=false
-     # Business Calendar panel (monthly SnapRAID run calendar on disk-health)
-     - GF_INSTALL_PLUGINS=marcusolsson-calendar-panel
    volumes:
      - {{ docker_appdata_path }}/metrics/data/grafana:/var/lib/grafana
      - {{ docker_appdata_path }}/metrics/config/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml

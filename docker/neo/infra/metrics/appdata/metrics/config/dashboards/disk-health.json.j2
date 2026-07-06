@@ -62,7 +62,19 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "doc",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "SnapRAID Logs",
+      "type": "link",
+      "url": "/d/neo-snapraid-logs-001/snapraid-logs"
+    }
+  ],
   "panels": [
     {
       "datasource": { "type": "prometheus", "uid": "${datasource}" },
@@ -110,9 +122,24 @@
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "expr": "(1 - node_filesystem_avail_bytes{mountpoint=~\"/mnt/(data[1-5]|parity[13]|cache1|storage)\", job=\"integrations/node_exporter\", instance=~\"$instance\"} / node_filesystem_size_bytes{mountpoint=~\"/mnt/(data[1-5]|parity[13]|cache1|storage)\", job=\"integrations/node_exporter\", instance=~\"$instance\"}) * 100",
+          "format": "table",
           "instant": true,
           "legendFormat": "{{mountpoint}}",
           "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": { "fields": {}, "sort": [{ "field": "mountpoint" }] }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true, "device": true, "fstype": true, "instance": true, "job": true },
+            "indexByName": {},
+            "renameByName": {}
+          }
         }
       ],
       "title": "Disk Usage % (per mountpoint)",
@@ -366,7 +393,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "smartctl_device_temperature_celsius{instance=~\"$instance\", job=\"smartctl\"}",
+          "expr": "smartctl_device_temperature{instance=~\"$instance\", job=\"smartctl\", temperature_type=\"current\"}",
           "instant": true,
           "legendFormat": "{{ device }}",
           "refId": "A"
@@ -417,21 +444,21 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "smartctl_device_attribute_raw_value{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Reallocated_Sector_Ct\"}",
+          "expr": "smartctl_device_attribute{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Reallocated_Sector_Ct\", attribute_value_type=\"raw\"}",
           "instant": true,
           "legendFormat": "{{ device }} Reallocated",
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "smartctl_device_attribute_raw_value{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Current_Pending_Sector\"}",
+          "expr": "smartctl_device_attribute{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Current_Pending_Sector\", attribute_value_type=\"raw\"}",
           "instant": true,
           "legendFormat": "{{ device }} Pending",
           "refId": "B"
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "smartctl_device_attribute_raw_value{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Offline_Uncorrectable\"}",
+          "expr": "smartctl_device_attribute{instance=~\"$instance\", job=\"smartctl\", attribute_name=\"Offline_Uncorrectable\", attribute_value_type=\"raw\"}",
           "instant": true,
           "legendFormat": "{{ device }} Uncorrectable",
           "refId": "C"
@@ -442,37 +469,7 @@
     },
     {
       "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-      "description": "All SnapRAID runner log output. Use the search bar to filter by keyword (e.g. Completed, error, sync, scrub). Logs are collected from /var/log/snapraid.log on the host.",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 52 },
-      "id": 4,
-      "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": false,
-        "showCommonLabels": false,
-        "showLabels": false,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "pluginVersion": "12.0.0",
-      "targets": [
-        {
-          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-          "expr": "{job=\"snapraid\", instance=~\"$instance\"}",
-          "refId": "A"
-        }
-      ],
-      "title": "SnapRAID Logs",
-      "type": "logs"
-    },
-    {
-      "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-      "description": "Each column is one day. Green = snapraid-runner finished successfully, Red = a run failed, Grey = no run at all. Encoded as: success=1, failure=2 (a day with both shows 3 = red). Sync runs nightly at 1am via snapraid-runner.",
+      "description": "Each column is one day. Green = snapraid-runner finished successfully, Red = a run failed, Grey = no run at all. Sync runs nightly at 1am via snapraid-runner. Click a bar and follow the 'View SnapRAID logs' link (or drag-select days first) to open the logs dashboard for that period.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -481,6 +478,12 @@
             "lineWidth": 0,
             "spanNulls": false
           },
+          "links": [
+            {
+              "title": "View SnapRAID logs",
+              "url": "/d/neo-snapraid-logs-001/snapraid-logs?${__url_time_range}"
+            }
+          ],
           "mappings": [
             { "options": { "0": { "color": "gray",  "index": 0, "text": "No Run" } }, "type": "value" },
             { "options": { "1": { "color": "green", "index": 1, "text": "OK" } }, "type": "value" },
@@ -521,65 +524,6 @@
     },
     {
       "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-      "description": "Monthly calendar of SnapRAID runs. Green = run finished successfully, Red = run failed, empty day = no run. Click a day to zoom the dashboard time range to it — the SnapRAID Logs panel below will then show that run's logs.",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "fixed" },
-          "custom": {},
-          "mappings": []
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "OK" },
-            "properties": [
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "Failed" },
-            "properties": [
-              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
-            ]
-          }
-        ]
-      },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 36 },
-      "id": 11,
-      "options": {
-        "autoScroll": false,
-        "colors": "frame",
-        "dateFormat": "inherit",
-        "defaultView": "month",
-        "displayTime": false,
-        "quickLinks": false,
-        "scrollToTime": { "hours": 0, "minutes": 0 },
-        "timeRangeType": "default",
-        "views": ["month", "week", "day"]
-      },
-      "pluginVersion": "3.9.0",
-      "targets": [
-        {
-          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-          "expr": "sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |= \"Run finished successfully\" [1d])) > 0",
-          "instant": false,
-          "legendFormat": "OK",
-          "step": "1d",
-          "refId": "A"
-        },
-        {
-          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-          "expr": "sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |~ \"Run failed$\" [1d])) > 0",
-          "instant": false,
-          "legendFormat": "Failed",
-          "step": "1d",
-          "refId": "B"
-        }
-      ],
-      "title": "SnapRAID Run Calendar",
-      "type": "marcusolsson-calendar-panel"
-    },
-    {
-      "datasource": { "type": "loki", "uid": "${loki_datasource}" },
       "description": "Total SnapRAID ERROR-level log lines in the selected time range. Should be 0.",
       "fieldConfig": {
         "defaults": {
@@ -598,7 +542,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 48 },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 36 },
       "id": 6,
       "options": {
         "colorMode": "background",
@@ -642,7 +586,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 48 },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 36 },
       "id": 10,
       "options": {
         "colorMode": "background",
