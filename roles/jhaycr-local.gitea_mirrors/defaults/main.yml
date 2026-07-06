@@ -1,0 +1,6 @@
+---
+gitea_url: "http://localhost:3105"
+gitea_admin_user: "admin"
+gitea_mirror_interval: "1m0s"
+gitea_orgs: []
+gitea_mirrors: []

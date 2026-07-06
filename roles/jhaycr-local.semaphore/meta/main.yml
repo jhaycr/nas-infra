@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: jhaycr
+  description: Configures Semaphore project, keys, repository, inventory, and task templates
+  license: MIT
+  min_ansible_version: "2.12"
+dependencies: []

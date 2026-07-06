@@ -1,0 +1,56 @@
+---
+- name: Get existing Semaphore key store entries
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/keys"
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    status_code: 200
+  register: _semaphore_keys
+
+- name: Create 'none' key
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/keys"
+    method: POST
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    body_format: json
+    body:
+      name: "none"
+      type: "none"
+      project_id: "{{ _semaphore_project_id | int }}"
+    status_code: 201
+  when: _semaphore_keys.json | selectattr('name', 'equalto', 'none') | list | length == 0
+  register: _new_none_key
+
+- name: Set none key ID
+  set_fact:
+    _semaphore_none_key_id: >-
+      {{ (_semaphore_keys.json | selectattr('name', 'equalto', 'none') | list | first).id
+         if _semaphore_keys.json | selectattr('name', 'equalto', 'none') | list | length > 0
+         else _new_none_key.json.id }}
+
+- name: Create 'vault-key' key
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/keys"
+    method: POST
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    body_format: json
+    body:
+      name: "vault-key"
+      type: "login_password"
+      project_id: "{{ _semaphore_project_id | int }}"
+      login_password:
+        login: ""
+        password: "{{ lookup('ansible.builtin.file', playbook_dir + '/../.ansible-vault.key') }}"
+    status_code: 201
+  when: _semaphore_keys.json | selectattr('name', 'equalto', 'vault-key') | list | length == 0
+  register: _new_vault_key
+  no_log: true
+
+- name: Set vault key ID
+  set_fact:
+    _semaphore_vault_key_id: >-
+      {{ (_semaphore_keys.json | selectattr('name', 'equalto', 'vault-key') | list | first).id
+         if _semaphore_keys.json | selectattr('name', 'equalto', 'vault-key') | list | length > 0
+         else _new_vault_key.json.id }}

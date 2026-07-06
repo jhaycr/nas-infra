@@ -1,0 +1,29 @@
+---
+- name: Ensure secrets directory exists
+  ansible.builtin.file:
+    path: "{{ infra_secrets_path }}"
+    state: directory
+    owner: "{{ main_username }}"
+    group: "{{ main_username }}"
+    mode: '0700'
+
+- name: Ensure gitea directory structure exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ main_username }}"
+    group: "{{ main_username }}"
+    mode: '0755'
+  loop:
+    - "{{ infra_working_clones_path }}/nas-infra"
+    - "{{ infra_repos_path }}"
+
+- name: Ensure vault key placeholder exists (prevents Docker creating it as a directory)
+  ansible.builtin.file:
+    path: "{{ infra_secrets_path }}/.ansible-vault.key"
+    state: touch
+    owner: "{{ main_username }}"
+    group: "{{ main_username }}"
+    mode: '0600'
+    modification_time: preserve
+    access_time: preserve

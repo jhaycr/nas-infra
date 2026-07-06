@@ -1,0 +1,22 @@
+---
+- name: Check if nas-infra working clone already exists
+  ansible.builtin.stat:
+    path: "{{ infra_working_clones_path }}/nas-infra/.git"
+  register: _nas_infra_git
+
+- name: Clone nas-infra working copy
+  ansible.builtin.git:
+    repo: "{{ infra_nas_infra_repo_url }}"
+    dest: "{{ infra_working_clones_path }}/nas-infra"
+    version: main
+    force: no
+  become_user: "{{ main_username }}"
+  when: not _nas_infra_git.stat.exists
+
+- name: Configure working clone to accept direct pushes from trinity
+  community.general.git_config:
+    repo: "{{ infra_working_clones_path }}/nas-infra"
+    name: receive.denyCurrentBranch
+    value: updateInstead
+    scope: local
+  become_user: "{{ main_username }}"

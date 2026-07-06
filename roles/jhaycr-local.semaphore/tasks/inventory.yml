@@ -1,0 +1,33 @@
+---
+- name: Get existing Semaphore inventories
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/inventory"
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    status_code: 200
+  register: _semaphore_inventories
+
+- name: Create neo-local inventory
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/inventory"
+    method: POST
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    body_format: json
+    body:
+      name: "neo-local"
+      project_id: "{{ _semaphore_project_id | int }}"
+      type: "static"
+      inventory: "localhost ansible_connection=local"
+      ssh_key_id: "{{ _semaphore_none_key_id | int }}"
+      become_key_id: "{{ _semaphore_none_key_id | int }}"
+    status_code: 201
+  when: _semaphore_inventories.json | selectattr('name', 'equalto', 'neo-local') | list | length == 0
+  register: _new_inventory
+
+- name: Set inventory ID
+  set_fact:
+    _semaphore_inventory_id: >-
+      {{ (_semaphore_inventories.json | selectattr('name', 'equalto', 'neo-local') | list | first).id
+         if _semaphore_inventories.json | selectattr('name', 'equalto', 'neo-local') | list | length > 0
+         else _new_inventory.json.id }}

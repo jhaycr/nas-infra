@@ -1,0 +1,52 @@
+---
+- name: Check if Gitea orgs exist
+  uri:
+    url: "{{ gitea_url }}/api/v1/orgs/{{ item.name }}"
+    user: "{{ gitea_admin_user }}"
+    password: "{{ secret_gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  loop: "{{ gitea_orgs }}"
+  register: _org_status
+
+- name: Create missing Gitea orgs
+  uri:
+    url: "{{ gitea_url }}/api/v1/orgs"
+    method: POST
+    user: "{{ gitea_admin_user }}"
+    password: "{{ secret_gitea_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body:
+      username: "{{ item.item.name }}"
+      visibility: "{{ item.item.visibility | default('private') }}"
+    status_code: 201
+  loop: "{{ _org_status.results }}"
+  when: item.status == 404
+
+- name: Get teams for each Gitea org
+  uri:
+    url: "{{ gitea_url }}/api/v1/orgs/{{ item.name }}/teams"
+    user: "{{ gitea_admin_user }}"
+    password: "{{ secret_gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: 200
+  loop: "{{ gitea_orgs }}"
+  register: _org_teams
+
+- name: Add members to org Owners teams
+  vars:
+    _owners_team_id: >-
+      {{ (_org_teams.results
+           | selectattr('item.name', 'equalto', item.0.name)
+           | list | first).json
+           | selectattr('name', 'equalto', 'Owners')
+           | map(attribute='id') | first }}
+  uri:
+    url: "{{ gitea_url }}/api/v1/teams/{{ _owners_team_id }}/members/{{ item.1 }}"
+    method: PUT
+    user: "{{ gitea_admin_user }}"
+    password: "{{ secret_gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [204]
+  loop: "{{ gitea_orgs | subelements('members', skip_missing=True) }}"

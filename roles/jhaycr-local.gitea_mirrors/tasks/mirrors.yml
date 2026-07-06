@@ -1,0 +1,29 @@
+---
+- name: Check if Gitea mirrors exist
+  uri:
+    url: "{{ gitea_url }}/api/v1/repos/{{ item.owner }}/{{ item.repo }}"
+    user: "{{ gitea_admin_user }}"
+    password: "{{ secret_gitea_admin_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  loop: "{{ gitea_mirrors }}"
+  register: _mirror_status
+
+- name: Create missing Gitea mirrors
+  uri:
+    url: "{{ gitea_url }}/api/v1/repos/migrate"
+    method: POST
+    user: "{{ gitea_admin_user }}"
+    password: "{{ secret_gitea_admin_password }}"
+    force_basic_auth: true
+    body_format: json
+    body:
+      clone_addr: "{{ item.item.url }}"
+      mirror: true
+      mirror_interval: "{{ item.item.interval | default(gitea_mirror_interval) }}"
+      private: "{{ item.item.private | default(false) }}"
+      repo_name: "{{ item.item.repo }}"
+      repo_owner: "{{ item.item.owner }}"
+    status_code: 201
+  loop: "{{ _mirror_status.results }}"
+  when: item.status == 404

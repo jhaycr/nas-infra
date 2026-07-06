@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: jhaycr
+  description: Bootstraps neo infra directory structure, vault files, and nas-infra working clone
+  license: MIT
+  min_ansible_version: "2.12"
+dependencies: []

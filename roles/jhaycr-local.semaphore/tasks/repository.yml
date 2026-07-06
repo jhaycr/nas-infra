@@ -1,0 +1,32 @@
+---
+- name: Get existing Semaphore repositories
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/repositories"
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    status_code: 200
+  register: _semaphore_repos
+
+- name: Create nas-infra repository
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/repositories"
+    method: POST
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    body_format: json
+    body:
+      name: "nas-infra"
+      project_id: "{{ _semaphore_project_id | int }}"
+      git_url: "{{ semaphore_repo_path }}"
+      git_branch: "main"
+      ssh_key_id: "{{ _semaphore_none_key_id | int }}"
+    status_code: 201
+  when: _semaphore_repos.json | selectattr('name', 'equalto', 'nas-infra') | list | length == 0
+  register: _new_repo
+
+- name: Set repository ID
+  set_fact:
+    _semaphore_repo_id: >-
+      {{ (_semaphore_repos.json | selectattr('name', 'equalto', 'nas-infra') | list | first).id
+         if _semaphore_repos.json | selectattr('name', 'equalto', 'nas-infra') | list | length > 0
+         else _new_repo.json.id }}

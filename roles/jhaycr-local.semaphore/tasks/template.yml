@@ -1,0 +1,27 @@
+---
+- name: Get existing Semaphore task templates
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/templates"
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    status_code: 200
+  register: _semaphore_templates
+
+- name: Create 'Deploy neo (compose)' task template
+  uri:
+    url: "{{ semaphore_url }}/api/project/{{ _semaphore_project_id }}/templates"
+    method: POST
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    body_format: json
+    body:
+      name: "Deploy neo (compose)"
+      project_id: "{{ _semaphore_project_id | int }}"
+      playbook: "site.yml"
+      arguments: '["--tags", "compose", "--limit", "neo"]'
+      repository_id: "{{ _semaphore_repo_id | int }}"
+      inventory_id: "{{ _semaphore_inventory_id | int }}"
+      vault_key_id: "{{ _semaphore_vault_key_id | int }}"
+      type: "task"
+    status_code: 201
+  when: _semaphore_templates.json | selectattr('name', 'equalto', 'Deploy neo (compose)') | list | length == 0

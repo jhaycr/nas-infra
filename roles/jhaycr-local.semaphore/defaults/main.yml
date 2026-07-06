@@ -1,0 +1,5 @@
+---
+semaphore_url: "http://localhost:3030"
+semaphore_admin_user: "admin"
+semaphore_project_name: "nas-infra"
+semaphore_repo_path: "/home/{{ main_username }}/code/gitea-working-clones/nas-infra"

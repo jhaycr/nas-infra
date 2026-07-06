@@ -1,0 +1,15 @@
+---
+- name: Wait for Gitea API to be ready
+  uri:
+    url: "{{ gitea_url }}/api/v1/version"
+    status_code: 200
+  register: _gitea_health
+  until: _gitea_health.status == 200
+  retries: 30
+  delay: 5
+
+- import_tasks: orgs.yml
+  when: gitea_orgs | length > 0
+
+- import_tasks: mirrors.yml
+  when: gitea_mirrors | length > 0

@@ -1,0 +1,4 @@
+---
+- import_tasks: directories.yml
+- import_tasks: vault.yml
+- import_tasks: working_clone.yml

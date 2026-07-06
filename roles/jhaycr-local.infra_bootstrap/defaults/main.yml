@@ -1,0 +1,5 @@
+---
+infra_nas_infra_repo_url: "https://github.com/jhaycr/nas-infra.git"
+infra_working_clones_path: "/home/{{ main_username }}/code/gitea-working-clones"
+infra_repos_path: "/home/{{ main_username }}/code/gitea-repos"
+infra_secrets_path: "/home/{{ main_username }}/.secrets"

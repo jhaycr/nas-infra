@@ -1,0 +1,27 @@
+---
+- name: Wait for Semaphore API to be ready
+  uri:
+    url: "{{ semaphore_url }}/api/ping"
+    status_code: 200
+  register: _semaphore_health
+  until: _semaphore_health.status == 200
+  retries: 30
+  delay: 5
+
+- name: Login to Semaphore
+  uri:
+    url: "{{ semaphore_url }}/api/auth/login"
+    method: POST
+    body_format: json
+    body:
+      auth: "{{ semaphore_admin_user }}"
+      password: "{{ secret_semaphore_admin_password }}"
+    status_code: 204
+  register: _semaphore_login
+  no_log: true
+
+- import_tasks: project.yml
+- import_tasks: keys.yml
+- import_tasks: repository.yml
+- import_tasks: inventory.yml
+- import_tasks: template.yml

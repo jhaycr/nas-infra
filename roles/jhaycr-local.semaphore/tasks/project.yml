@@ -1,0 +1,31 @@
+---
+- name: Get existing Semaphore projects
+  uri:
+    url: "{{ semaphore_url }}/api/projects"
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    status_code: 200
+  register: _semaphore_projects
+
+- name: Create Semaphore project
+  uri:
+    url: "{{ semaphore_url }}/api/projects"
+    method: POST
+    headers:
+      Cookie: "{{ _semaphore_login.cookies_string }}"
+    body_format: json
+    body:
+      name: "{{ semaphore_project_name }}"
+      alert: false
+      alert_chat: ""
+      max_parallel_tasks: 0
+    status_code: 201
+  when: _semaphore_projects.json | selectattr('name', 'equalto', semaphore_project_name) | list | length == 0
+  register: _new_project
+
+- name: Set project ID
+  set_fact:
+    _semaphore_project_id: >-
+      {{ (_semaphore_projects.json | selectattr('name', 'equalto', semaphore_project_name) | list | first).id
+         if _semaphore_projects.json | selectattr('name', 'equalto', semaphore_project_name) | list | length > 0
+         else _new_project.json.id }}
