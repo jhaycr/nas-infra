@@ -472,7 +472,7 @@
     },
     {
       "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-      "description": "Each column is one day. Green = completed successfully, Red = errors detected, Grey = no run. Sync runs daily at 1am; scrub runs periodically based on snapraid-runner config.",
+      "description": "Each column is one day. Green = snapraid-runner finished successfully, Red = a run failed, Grey = no run at all. Encoded as: success=1, failure=2 (a day with both shows 3 = red). Sync runs nightly at 1am via snapraid-runner.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -483,40 +483,17 @@
           },
           "mappings": [
             { "options": { "0": { "color": "gray",  "index": 0, "text": "No Run" } }, "type": "value" },
-            { "options": { "from": 1, "result": { "color": "green", "index": 1, "text": "OK" },    "to": 9999 }, "type": "range" }
+            { "options": { "1": { "color": "green", "index": 1, "text": "OK" } }, "type": "value" },
+            { "options": { "from": 2, "result": { "color": "red", "index": 2, "text": "Failed" }, "to": 9999 }, "type": "range" }
           ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "gray",  "value": null },
-              { "color": "green", "value": 1 }
+              { "color": "gray", "value": null }
             ]
           }
         },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Errors" },
-            "properties": [
-              {
-                "id": "mappings",
-                "value": [
-                  { "options": { "0": { "color": "gray",  "index": 0, "text": "No Run" } }, "type": "value" },
-                  { "options": { "from": 1, "result": { "color": "red", "index": 1, "text": "Errors" }, "to": 9999 }, "type": "range" }
-                ]
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    { "color": "gray", "value": null },
-                    { "color": "red",  "value": 1 }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": { "h": 6, "w": 24, "x": 0, "y": 30 },
       "id": 5,
@@ -532,17 +509,11 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-          "expr": "count_over_time({job=\"snapraid\", instance=~\"$instance\"} |= \"Running sync\" [$__interval])",
+          "expr": "(sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |~ \"Run failed$\" [1d])) or vector(0)) * 2 + (sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |= \"Run finished successfully\" [1d])) or vector(0))",
           "instant": false,
-          "legendFormat": "Sync/Scrub Completed",
+          "legendFormat": "SnapRAID Run",
+          "step": "1d",
           "refId": "A"
-        },
-        {
-          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
-          "expr": "count_over_time({job=\"snapraid\", instance=~\"$instance\"} |= \"Run failed\" [$__interval])",
-          "instant": false,
-          "legendFormat": "Errors",
-          "refId": "B"
         }
       ],
       "title": "SnapRAID Run History",
@@ -589,6 +560,50 @@
         }
       ],
       "title": "SnapRAID Errors",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+      "description": "Outcome of the most recent nightly snapraid-runner run (last 24h). Grey/orange = no run completed in 24h (stuck or cron disabled), green = success, red = failed.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "orange", "index": 0, "text": "No Run (24h)" } }, "type": "value" },
+            { "options": { "1": { "color": "green",  "index": 1, "text": "OK" } }, "type": "value" },
+            { "options": { "from": 2, "result": { "color": "red", "index": 2, "text": "Failed" }, "to": 9999 }, "type": "range" }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "orange", "value": null }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 36 },
+      "id": 7,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "${loki_datasource}" },
+          "expr": "(sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |~ \"Run failed$\" [1d])) or vector(0)) * 2 + (sum(count_over_time({job=\"snapraid\", instance=~\"$instance\"} |= \"Run finished successfully\" [1d])) or vector(0))",
+          "instant": true,
+          "legendFormat": "Last Run",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Nightly Run",
       "type": "stat"
     }
   ],
