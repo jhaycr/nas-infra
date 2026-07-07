@@ -166,6 +166,23 @@
         line: "{{ internal_ip_neo }} neo.lan"
         state: present
 
+    - name: Check if zellij is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/zellij
+      register: zellij_binary
+
+    # Prebuilt musl binary from GitHub releases (no Rust toolchain needed).
+    # Only runs when the binary is missing, so re-running the playbook won't
+    # re-download it; delete /usr/local/bin/zellij to force an update.
+    - name: Download and install zellij (prebuilt musl binary)
+      become: yes
+      ansible.builtin.unarchive:
+        src: "{{ zellij_download_url }}"
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: '0755'
+      when: not zellij_binary.stat.exists
+
 # oracle = Home Assistant Green (HAOS). Config managed via bellackn.hass_control
 # over the Terminal & SSH addon. Default `make oracle` pulls (get); `make
 # oracle-push` pushes (set). See group_vars/oracle/vars.yml.

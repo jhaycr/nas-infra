@@ -6,6 +6,12 @@ docker_compose_path: '/opt/docker/compose'
 docker_appdata_path: '/home/{{ main_username }}/docker/appdata'
 
 # -----
+# zellij (terminal multiplexer) - https://github.com/zellij-org/zellij
+# Installed from the prebuilt musl release binary rather than apt/snap/cargo.
+# -----
+zellij_download_url: "https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz"
+
+# -----
 # grog.package
 # -----
 package_list:
