@@ -69,7 +69,13 @@
   '';
 
   # Persistent profile data dir (was {{ docker_appdata_path }}/hermes/profiles/josh on neo).
-  systemd.tmpfiles.rules = [ "d /var/lib/hermes-josh 0750 root root -" ];
+  systemd.tmpfiles.rules = [
+    "d /var/lib/hermes-josh 0750 root root -"
+    # Agent workspace: git clones Hermes authors in (home-assistant-config, ...).
+    # Bind-mounted into the container as /workspace. Hermes pushes branches only;
+    # deployment to live systems stays human-gated (see WORKFLOW.md in the dir).
+    "d /var/lib/hermes-workspace 0755 root root -"
+  ];
 
   virtualisation.oci-containers.containers.hermes-josh = {
     image = "nousresearch/hermes-agent:latest";
@@ -83,6 +89,11 @@
     };
     volumes = [
       "/var/lib/hermes-josh:/opt/data"
+      # Git-first authoring workspace (see tmpfiles rule above).
+      "/var/lib/hermes-workspace:/workspace"
+      # Deploy key mounted at the SAME path as on the host so the repo-local
+      # core.sshCommand works from both the VM shell and inside the container.
+      "/etc/hermes/ha-config-deploy.key:/etc/hermes/ha-config-deploy.key:ro"
     ];
     # Host networking so the dashboard (9119) and API server (8642) can bind
     # 127.0.0.1 on the VM itself: the image's auth gate refuses unauthenticated

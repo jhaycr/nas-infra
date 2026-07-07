@@ -48,3 +48,14 @@ nixos_secret_files:
       OPENROUTER_API_KEY={{ secret_hermes_josh_openrouter_api_key | default('') }}
       ANTHROPIC_API_KEY={{ secret_hermes_josh_anthropic_api_key | default('') }}
       OPENAI_API_KEY={{ secret_hermes_josh_openai_api_key | default('') }}
+
+  # SSH deploy key (read-write) for the private jhaycr/home-assistant-config
+  # repo. Git-first HA workflow: Hermes authors changes in the clone at
+  # /var/lib/hermes-workspace/home-assistant-config and pushes hermes/* branches
+  # for review; it has NO write access to the live HA box (oracle). Mounted
+  # read-only into the container at the same path (see nix/smith/configuration.nix).
+  - dest: /etc/hermes/ha-config-deploy.key
+    owner: root
+    group: root
+    mode: "0600"
+    content: "{{ secret_hermes_josh_ha_deploy_key | default('') }}"
