@@ -15,6 +15,12 @@ nixos_config_dest: /etc/nixos           # destination on the host
 nixos_use_flake: true                   # build via `nixos-rebuild switch --flake`
 nixos_flake_host: smith                 # flake output name (.#smith)
 
+# The hermes-josh container reads /etc/hermes/*.env only at start; restart it
+# whenever a secret file's content changes (nixos-rebuild won't - the unit
+# definition is unchanged on a content-only edit).
+nixos_secret_restart_units:
+  - podman-hermes-josh.service
+
 # Secrets: delivered as plain env files on the host (NOT sops-nix), rendered
 # from group_vars/smith/vault.yml's secret_* vars. nix/smith/configuration.nix
 # expects both files to already exist at these paths.

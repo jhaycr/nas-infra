@@ -32,6 +32,7 @@
   loop_control:
     label: "{{ item.dest }}"
   no_log: true
+  register: nixos_secret_write
 
 - name: Copy NixOS configuration to host
   ansible.posix.synchronize:
@@ -59,3 +60,15 @@
   when: not (nixos_use_flake | bool)
   register: nixos_rebuild_legacy
   changed_when: "nixos_rebuild_legacy.rc is defined and nixos_rebuild_legacy.rc == 0"
+
+# After the rebuild (so a freshly-activated unit isn't immediately restarted
+# into stale config), bounce units whose secret files changed content-only -
+# nixos-rebuild won't have restarted those itself because the unit definition
+# is unchanged.
+- name: Restart units consuming changed secret files
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+  become: true
+  loop: "{{ nixos_secret_restart_units }}"
+  when: nixos_secret_write is changed

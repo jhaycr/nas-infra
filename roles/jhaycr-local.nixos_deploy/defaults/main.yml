@@ -15,3 +15,9 @@ nixos_flake_host: "{{ inventory_hostname }}"
 #   content: file content (required)
 #   owner / group / mode: default root/root/0600
 nixos_secret_files: []
+
+# Systemd units to restart after the rebuild when any secret file's CONTENT
+# changed. Units that read secret files only at start (e.g. podman
+# environmentFiles) aren't restarted by nixos-rebuild on a content-only
+# change - the unit definition itself is unchanged. Empty by default.
+nixos_secret_restart_units: []
