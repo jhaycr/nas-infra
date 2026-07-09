@@ -72,3 +72,8 @@ nixos_secret_files:
       HA_DEV_URL=http://127.0.0.1:8124
       HA_DEV_USERNAME=hermes
       HA_DEV_PASSWORD={{ secret_hermes_josh_ha_dev_password | default('') }}
+      # Read-only context from the LIVE HA box (oracle): token from a
+      # NON-ADMIN HA user (see nix/smith/HERMES-WORKFLOW.md). Empty until
+      # secret_hermes_josh_ha_live_token is added to the vault.
+      HA_LIVE_URL=http://192.168.1.152:8123
+      HA_LIVE_TOKEN={{ secret_hermes_josh_ha_live_token | default('') }}
