@@ -59,3 +59,16 @@ nixos_secret_files:
     group: root
     mode: "0600"
     content: "{{ secret_hermes_josh_ha_deploy_key | default('') }}"
+
+  # Dev/proving-ground HA instance login (ha-dev container on smith:8124).
+  # Loaded into the hermes-josh container (environmentFiles) so the agent can
+  # mint API tokens via the login_flow endpoint; Josh uses the same login in
+  # the web UI at http://192.168.1.61:8124.
+  - dest: /etc/hermes/ha-dev.env
+    owner: root
+    group: root
+    mode: "0600"
+    content: |
+      HA_DEV_URL=http://127.0.0.1:8124
+      HA_DEV_USERNAME=hermes
+      HA_DEV_PASSWORD={{ secret_hermes_josh_ha_dev_password | default('') }}

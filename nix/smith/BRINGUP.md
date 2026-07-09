@@ -227,3 +227,38 @@ Once verified, commit the newly added `hardware-configuration.nix`,
 - Do not run `make smith` until steps 1–4 are complete (the VM and its
   hardware-config/secrets must exist first).
 - Mirror `nix/osiris/` conventions for any Nix-side style questions.
+
+## Dev HA instance (ha-dev) — provisioning & reset
+
+The `ha-dev` oci-container is Hermes's proving ground: a throwaway HA Core
+pinned to oracle's Core version (bump the image tag in `configuration.nix`
+when oracle upgrades). Config lives in `/var/lib/ha-dev` (= container
+`/config`), which the hermes-josh container sees read-write at
+`/workspace/ha-dev-config`. Login: owner user `hermes`, password in vault as
+`secret_hermes_josh_ha_dev_password` (rendered to `/etc/hermes/ha-dev.env`).
+UI on the LAN: http://192.168.1.61:8124.
+
+Provision (first boot, or after a reset) — all over plain HTTP from any LAN
+machine; `PW` = the vault password value, `BASE=http://192.168.1.61:8124`,
+`CID="$BASE/"`:
+
+1. `POST $BASE/api/onboarding/users`
+   `{"client_id":CID,"name":"Hermes","username":"hermes","password":PW,"language":"en"}`
+   → returns `auth_code`. Exchange at `POST $BASE/auth/token`
+   (`grant_type=authorization_code`, `code`, `client_id=CID`) → access token.
+2. With the token: `POST /api/onboarding/core_config`,
+   `POST /api/onboarding/analytics`, and `POST /api/onboarding/integration`
+   (`{"client_id":CID,"redirect_uri":CID}`) — all three must return 200.
+3. Set timezone to match oracle (websocket `config/core/update`,
+   `{"time_zone":"America/Los_Angeles"}`) — REST has no endpoint for this;
+   run it via `podman exec ha-dev python3` + aiohttp, or from the UI
+   (Settings → System → General).
+
+Reset to a blank slate:
+`systemctl stop podman-ha-dev && rm -rf /var/lib/ha-dev/* /var/lib/ha-dev/.storage /var/lib/ha-dev/.cloud && systemctl start podman-ha-dev`,
+then re-provision as above.
+
+Gotcha: don't `systemctl stop podman-ha-dev` in the first ~2 minutes after
+onboarding — HA debounces `.storage` writes and an early stop can truncate
+`core.config` (seen during bring-up: empty `core.config.tmp`, instance falls
+back to UTC defaults). Fix by re-running the websocket `config/core/update`.

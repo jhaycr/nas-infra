@@ -21,8 +21,9 @@
   networking.defaultGateway = "192.168.1.1";
   networking.nameservers = [ "192.168.1.1" ];
 
-  # Hermes API (bearer-auth) + dashboard (basic-auth) exposed to the LAN.
-  networking.firewall.allowedTCPPorts = [ 8642 9119 ];
+  # Hermes API (bearer-auth) + dashboard (basic-auth) + dev HA instance
+  # (owner-auth, throwaway) exposed to the LAN.
+  networking.firewall.allowedTCPPorts = [ 8642 9119 8124 ];
 
   # --- Users ---
   # 'ansible' deploy user so this repo's nixos_deploy role can connect.
@@ -75,12 +76,19 @@
     # Bind-mounted into the container as /workspace. Hermes pushes branches only;
     # deployment to live systems stays human-gated (see WORKFLOW.md in the dir).
     "d /var/lib/hermes-workspace 0755 root root -"
+    # Config dir of the dev/proving-ground HA instance (ha-dev container).
+    # Disposable: wipe it and re-run the provisioning steps in BRINGUP.md to
+    # reset the dev instance to a blank slate.
+    "d /var/lib/ha-dev 0755 root root -"
   ];
 
   virtualisation.oci-containers.containers.hermes-josh = {
     image = "nousresearch/hermes-agent:latest";
     cmd = [ "gateway" "run" ];
-    environmentFiles = [ "/etc/hermes/hermes-josh.env" ];
+    environmentFiles = [
+      "/etc/hermes/hermes-josh.env"
+      "/etc/hermes/ha-dev.env"   # dev HA instance login (HA_DEV_URL/USERNAME/PASSWORD)
+    ];
     environment = {
       HERMES_DASHBOARD = "1";
       # LAN-exposed on 0.0.0.0 (image default): the mandatory auth gate is
@@ -94,6 +102,9 @@
       # Deploy key mounted at the SAME path as on the host so the repo-local
       # core.sshCommand works from both the VM shell and inside the container.
       "/etc/hermes/ha-config-deploy.key:/etc/hermes/ha-config-deploy.key:ro"
+      # Live config dir of the dev HA instance: Hermes copies YAML from its
+      # branch worktree here, then check_config + restart via the dev API.
+      "/var/lib/ha-dev:/workspace/ha-dev-config"
     ];
     # Host networking so the dashboard (9119) and API server (8642) can bind
     # 127.0.0.1 on the VM itself: the image's auth gate refuses unauthenticated
@@ -114,6 +125,20 @@
       "--pids-limit=512"
       "--security-opt=no-new-privileges:true"
     ];
+  };
+
+  # --- Dev/proving-ground Home Assistant (integration-test target) ---
+  # Throwaway HA Core instance, SAME version as oracle (the HA Green), that
+  # Hermes deploys branch config to BEFORE opening a PR: check_config via API,
+  # restart, seed entity states via POST /api/states (fires real state_changed
+  # events, so automations under test actually trigger), then verify via
+  # traces/logbook and attach evidence to the PR. No radios/hardware here -
+  # entities are seeded fakes; live deployment to oracle stays human-gated.
+  # Provisioned offline (owner user + onboarding skip) - see BRINGUP.md.
+  virtualisation.oci-containers.containers.ha-dev = {
+    image = "ghcr.io/home-assistant/home-assistant:2026.7.1";   # = oracle Core version; bump together
+    volumes = [ "/var/lib/ha-dev:/config" ];
+    ports = [ "8124:8123" ];   # LAN-exposed so Josh can eyeball dashboards under test
   };
 
   # --- Log shipping (Alloy -> neo's Loki) ---
