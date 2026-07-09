@@ -27,7 +27,7 @@ automatic pre-push Supervisor backup.
 | `secret_hermes_josh_dashboard_password` / `_hash` | Hermes dashboard :9119 basic auth | chosen + scrypt hash |
 | `secret_hermes_josh_ha_deploy_key` | SSH deploy key, read-write, for private `jhaycr/home-assistant-config` | already installed (GitHub repo → Settings → Deploy keys → "hermes@smith"). Rotate: generate new keypair, replace on GitHub + in vault, `make smith` |
 | `secret_hermes_josh_ha_dev_password` | Dev HA (:8124) owner login `hermes` — you use it in the web UI too | generated during bring-up; in vault |
-| `secret_hermes_josh_ha_live_token` | **TODO — read-only live context.** Long-lived token from a NON-ADMIN HA user on oracle | see next section |
+| `secret_hermes_josh_ha_live_token` | Read-only live context: long-lived token of the NON-ADMIN `hermes-ro` user on oracle (in place since 2026-07-09) | see next section; revoke/rotate as hermes-ro → Security |
 
 Edit flow for any of these: `make vault-unlock` → edit
 `group_vars/smith/vault.yml` → `make vault-lock` → `make smith` (re-renders
