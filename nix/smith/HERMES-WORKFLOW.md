@@ -92,6 +92,29 @@ writes". Acceptable for a LAN agent — revoke if it misbehaves.
 - The dev `configuration.yaml` is a disposable test fixture. Nothing in
   `/var/lib/ha-dev` is precious.
 
+## nas-infra in the workspace
+
+`configuration.nix` seeds `/var/lib/hermes-workspace/nas-infra` (a oneshot
+`hermes-workspace-seed` service) so Hermes has the IaC repo at
+`/workspace/nas-infra` in the container. Notes:
+
+- **Pull-only for now**: the remote is the public GitHub repo over https.
+  To let Hermes push `hermes/<topic>` branches like the HA pipeline, add a
+  write deploy key on `jhaycr/nas-infra`, store it in the vault (e.g.
+  `secret_hermes_josh_nas_infra_deploy_key`), wire it through
+  `nixos_secret_files` + a container volume like `ha-config-deploy.key`,
+  and set the repo-local `core.sshCommand`.
+- Vault files in the clone stay encrypted — Hermes has no vault key and
+  must never get one.
+- The `files/home_assistant` submodule is left uninitialized; the separate
+  `home-assistant-config` clone next to it is the authoring copy for HA.
+- Workspace ownership is enforced declaratively (uid 10000 = the agent's
+  in-container user); `WORKFLOW.md` and `README.md` stay root-owned so the
+  agent can't edit its own rules.
+- `workspace-README.md` in this dir is deployed to `/workspace/README.md`
+  (tmpfiles `C+`) — the agent-facing command reference for pull/push,
+  GitHub limits, and who deploys what. Edit it here, `make smith` to ship.
+
 ## Not built yet (phase 3)
 
 Smith-triggered deploys: a Semaphore template wrapping oracle-push that

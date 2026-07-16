@@ -72,15 +72,60 @@
   # Persistent profile data dir (was {{ docker_appdata_path }}/hermes/profiles/josh on neo).
   systemd.tmpfiles.rules = [
     "d /var/lib/hermes-josh 0750 root root -"
-    # Agent workspace: git clones Hermes authors in (home-assistant-config, ...).
-    # Bind-mounted into the container as /workspace. Hermes pushes branches only;
-    # deployment to live systems stays human-gated (see WORKFLOW.md in the dir).
-    "d /var/lib/hermes-workspace 0755 root root -"
+    # Agent workspace: git clones Hermes authors in (home-assistant-config,
+    # nas-infra - seeded by hermes-workspace-seed below). Bind-mounted into the
+    # container as /workspace. The agent process in the container runs as uid
+    # 10000 (s6 drops privileges from root; rootful podman without userns remap
+    # = same uid on the host), so the workspace must be owned by 10000 or the
+    # agent can't write anywhere in it. The Z line re-asserts ownership
+    # recursively on every activation. Hermes pushes branches only; deployment
+    # to live systems stays human-gated (see WORKFLOW.md in the dir).
+    "d /var/lib/hermes-workspace 0755 10000 10000 -"
+    "Z /var/lib/hermes-workspace - 10000 10000 -"
+    # ...except the agent-rules file, which stays root-owned so the agent
+    # can't rewrite its own guardrails (lines apply in order; this one runs
+    # after the Z above and wins).
+    "z /var/lib/hermes-workspace/WORKFLOW.md 0644 root root -"
+    # Command reference for the agent (pull/push/GitHub/deploys), sourced from
+    # this repo. C+ = copy unconditionally, so edits to workspace-README.md
+    # land on the next rebuild; root-owned for the same reason as WORKFLOW.md
+    # (the trailing z is needed - the C+ ownership fields lose to the Z above).
+    "C+ /var/lib/hermes-workspace/README.md 0644 root root - ${./workspace-README.md}"
+    "z /var/lib/hermes-workspace/README.md 0644 root root -"
     # Config dir of the dev/proving-ground HA instance (ha-dev container).
     # Disposable: wipe it and re-run the provisioning steps in BRINGUP.md to
     # reset the dev instance to a blank slate.
     "d /var/lib/ha-dev 0755 root root -"
   ];
+
+  # Seed the agent workspace with a nas-infra clone so Hermes has the IaC to
+  # work against. https remote to the public GitHub repo = pull-only; push
+  # access (hermes/<topic> branches, like the HA pipeline) needs a write
+  # deploy key wired the same way as ha-config-deploy.key - not set up yet.
+  # Idempotent oneshot: skips if the clone already exists, so local work in
+  # the clone is never touched. The home-assistant-config clone predates this
+  # and was made by hand; the files/home_assistant submodule is left
+  # uninitialized (private repo, and that clone already exists separately).
+  systemd.services.hermes-workspace-seed = {
+    description = "Seed git clones in the Hermes agent workspace";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" "systemd-tmpfiles-setup.service" ];
+    wants = [ "network-online.target" ];
+    path = [ pkgs.git ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      ws=/var/lib/hermes-workspace
+      if [ ! -d "$ws/nas-infra/.git" ]; then
+        git clone https://github.com/jhaycr/nas-infra.git "$ws/nas-infra"
+        git -C "$ws/nas-infra" config user.name  "Hermes (smith)"
+        git -C "$ws/nas-infra" config user.email "hermes@smith.homelab"
+        chown -R 10000:10000 "$ws/nas-infra"
+      fi
+    '';
+  };
 
   virtualisation.oci-containers.containers.hermes-josh = {
     image = "nousresearch/hermes-agent:latest";
