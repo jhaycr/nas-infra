@@ -1,5 +1,7 @@
 # Hermes HA pipeline — Josh's runbook
 
+Quickstart (launching Hermes, NAS + HA task recipes): `docs/hermes.md`.
+
 How to use smith's Hermes agent to build Home Assistant changes safely.
 The agent-side rules live on smith at `/var/lib/hermes-workspace/WORKFLOW.md`;
 this doc is the human side: secrets, day-to-day flow, and maintenance.
