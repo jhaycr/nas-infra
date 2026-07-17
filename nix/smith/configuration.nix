@@ -71,7 +71,13 @@
 
   # Persistent profile data dir (was {{ docker_appdata_path }}/hermes/profiles/josh on neo).
   systemd.tmpfiles.rules = [
-    "d /var/lib/hermes-josh 0750 root root -"
+    # Mounted as /opt/data = $HOME/$HERMES_HOME of the in-container hermes
+    # user (uid 10000). Must be owned by 10000: the supervised gateway runs
+    # as it, and the image's /opt/hermes/bin/hermes shim drops root->hermes
+    # for CLI calls too, which EACCES on a root-owned dir (0750 root root
+    # here broke `hermes` via podman exec).
+    "d /var/lib/hermes-josh 0750 10000 10000 -"
+    "Z /var/lib/hermes-josh - 10000 10000 -"
     # Agent workspace: git clones Hermes authors in (home-assistant-config,
     # nas-infra - seeded by hermes-workspace-seed below). Bind-mounted into the
     # container as /workspace. The agent process in the container runs as uid
