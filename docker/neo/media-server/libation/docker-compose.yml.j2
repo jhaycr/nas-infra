@@ -7,7 +7,7 @@ services:
     # drops decrypted books into /data. No published ports: runs as a
     # periodic `scan && liberate` loop (SLEEP_TIME=3600s) so the
     # override's `restart: unless-stopped` policy keeps it running.
-    image: rmcrackan/libation:13.5.0
+    image: rmcrackan/libation:13.5.1
     container_name: libation
     user: 1000:1000
     volumes:
