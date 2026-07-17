@@ -215,6 +215,24 @@
       [ -t 0 ] && tty_flag="-t"
       exec sudo podman exec -i $tty_flag hermes-josh hermes "$@"
     '')
+
+    # `hermes-in <workspace> [hermes args...]`: same as `hermes`, but started
+    # inside a workspace clone so the CLI auto-injects that repo's context
+    # files (AGENTS.md / CLAUDE.md / .cursorrules resolve from cwd). A bare
+    # name is relative to /workspace, e.g.:
+    #   hermes-in home-assistant-config chat
+    #   hermes-in nas-infra -z "one-shot task"
+    (writeShellScriptBin "hermes-in" ''
+      if [ $# -eq 0 ]; then
+        echo "usage: hermes-in <workspace-dir> [hermes args...]" >&2
+        exit 2
+      fi
+      dir="$1"; shift
+      case "$dir" in /*) ;; *) dir="/workspace/$dir" ;; esac
+      tty_flag=""
+      [ -t 0 ] && tty_flag="-t"
+      exec sudo podman exec -i $tty_flag -w "$dir" hermes-josh hermes "$@"
+    '')
   ];
 
   system.stateVersion = "26.05";   # matches the installed NixOS release (confirmed during bring-up)
