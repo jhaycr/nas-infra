@@ -60,10 +60,13 @@ nixos_secret_files:
   # /var/lib/hermes-workspace/home-assistant-config and pushes hermes/* branches
   # for review; it has NO write access to the live HA box (oracle). Mounted
   # read-only into the container at the same path (see nix/smith/configuration.nix).
+  # Owned by uid 10000 (the in-container hermes user; rootful podman, no
+  # userns remap) - the agent does the git fetch/push, and root:root 0600
+  # made the key unreadable to it once the image's priv-drop shim landed.
   - dest: /etc/hermes/ha-config-deploy.key
-    owner: root
-    group: root
-    mode: "0600"
+    owner: "10000"
+    group: "10000"
+    mode: "0400"
     content: "{{ secret_hermes_josh_ha_deploy_key | default('') }}"
 
   # Dev/proving-ground HA instance login (ha-dev container on smith:8124).
