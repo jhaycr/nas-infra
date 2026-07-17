@@ -70,3 +70,6 @@ unifi:
 
 compose:
 	ansible-playbook site.yml --tags compose $(EXTRA_VARS:%=-e '%')
+
+minecraft-check-versions:
+	bin/minecraft-check-versions.sh $(ARGS)

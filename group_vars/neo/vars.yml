@@ -49,6 +49,23 @@ docker_appdata_folders_to_own:
 - recyclarr
 
 # -----
+# Minecraft stack (docker/neo/games/minecraft, minecraft-proxy)
+# Explicit, validated pins only — never "latest". Bump via bin/minecraft-check-versions.sh,
+# which smoke-tests a candidate combo before it's safe to write here.
+# -----
+minecraft_versions:
+  paper: "26.2"
+  velocity_version: "3.6.0-SNAPSHOT"
+  velocity_build: 613
+  geyser_version: "2.11.0"
+  geyser_build: 1199
+  floodgate_version: "2.2.5"
+  floodgate_build: 138
+  viaversion: "5.11.0"
+  viabackwards: "5.11.0"
+  viarewind: "4.1.3"
+
+# -----
 # jhaycr-local.semaphore
 # -----
 semaphore_url: "http://localhost:3030"

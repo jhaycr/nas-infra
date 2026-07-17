@@ -9,13 +9,15 @@ services:
     hostname: mc
     environment:
       TYPE: "VELOCITY"
-      VELOCITY_VERSION: "3.5.1"
-      # VELOCITY_BUILD_ID: "latest"
+      VELOCITY_VERSION: "{{ minecraft_versions.velocity_version }}"
+      VELOCITY_BUILD_ID: "{{ minecraft_versions.velocity_build }}"
 
       # Auto-download plugins via URLs
+      # Pinned (not "latest") to avoid Velocity/Geyser Adventure-library drift —
+      # see bin/minecraft-check-versions.sh to validate a new combo before bumping.
       PLUGINS: |
-        https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
-        https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
+        https://download.geysermc.org/v2/projects/geyser/versions/{{ minecraft_versions.geyser_version }}/builds/{{ minecraft_versions.geyser_build }}/downloads/velocity
+        https://download.geysermc.org/v2/projects/floodgate/versions/{{ minecraft_versions.floodgate_version }}/builds/{{ minecraft_versions.floodgate_build }}/downloads/velocity
     # Explicit DNS servers so the container can resolve external hostnames.
     # Without this, the custom bridge network (minecraft) can fail to resolve
     # public DNS (e.g. api.geysermc.org) causing Geyser FloodgateSkinUploader
