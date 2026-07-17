@@ -10,6 +10,9 @@ in `WORKFLOW.md` — read that first; this file is just the commands.
 | `/workspace/nas-infra` | `https://github.com/jhaycr/nas-infra` (public) | **pull-only** |
 | `/workspace/home-assistant-config` | `git@github.com:jhaycr/home-assistant-config` (private) | pull + push `hermes/*` branches (deploy key) |
 
+Deterministic tools live in `/workspace/bin/` (root-owned; run, don't edit):
+`ha-dev` wraps the entire dev-HA test loop — see `WORKFLOW.md`.
+
 Git identity (`Hermes (smith)`) is already configured in both clones.
 
 ## Pull — get latest

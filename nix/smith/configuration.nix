@@ -88,16 +88,13 @@
     # to live systems stays human-gated (see WORKFLOW.md in the dir).
     "d /var/lib/hermes-workspace 0755 10000 10000 -"
     "Z /var/lib/hermes-workspace - 10000 10000 -"
-    # ...except the agent-rules file, which stays root-owned so the agent
-    # can't rewrite its own guardrails (lines apply in order; this one runs
-    # after the Z above and wins).
-    "z /var/lib/hermes-workspace/WORKFLOW.md 0644 root root -"
-    # Command reference for the agent (pull/push/GitHub/deploys), sourced from
-    # this repo. C+ = copy unconditionally, so edits to workspace-README.md
-    # land on the next rebuild; root-owned for the same reason as WORKFLOW.md
-    # (the trailing z is needed - the C+ ownership fields lose to the Z above).
-    "C+ /var/lib/hermes-workspace/README.md 0644 root root - ${./workspace-README.md}"
-    "z /var/lib/hermes-workspace/README.md 0644 root root -"
+    # NB: guardrail files (WORKFLOW.md, README.md, bin/ha-dev) are NOT
+    # tmpfiles-managed - systemd-tmpfiles refuses to manage root-owned
+    # entries under the 10000-owned workspace ("unsafe path transition",
+    # symlink-attack protection). They're read-only volume mounts on the
+    # hermes-josh container instead (see volumes below), which is the
+    # stronger guarantee anyway: the agent can't modify an ro mount no
+    # matter who owns it.
     # Config dir of the dev/proving-ground HA instance (ha-dev container).
     # Disposable: wipe it and re-run the provisioning steps in BRINGUP.md to
     # reset the dev instance to a blank slate. The HA container runs as root
@@ -166,6 +163,13 @@
       # Deploy key mounted at the SAME path as on the host so the repo-local
       # core.sshCommand works from both the VM shell and inside the container.
       "/etc/hermes/ha-config-deploy.key:/etc/hermes/ha-config-deploy.key:ro"
+      # Agent rules + command reference + deterministic tools, straight from
+      # the nix store as READ-ONLY mounts: the agent can execute but never
+      # modify them, and edits in nas-infra ship via rebuild (unit change =
+      # container restart). tmpfiles can't manage these (see note above).
+      "${./workspace-WORKFLOW.md}:/workspace/WORKFLOW.md:ro"
+      "${./workspace-README.md}:/workspace/README.md:ro"
+      "${./ha-dev.sh}:/workspace/bin/ha-dev:ro"
       # Live config dir of the dev HA instance: Hermes copies YAML from its
       # branch worktree here, then check_config + restart via the dev API.
       "/var/lib/ha-dev:/workspace/ha-dev-config"
