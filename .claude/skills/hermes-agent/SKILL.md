@@ -14,11 +14,14 @@ spend-capped), its own workspace, and its own rules
 
 ```bash
 bash .claude/skills/hermes-agent/scripts/run.sh "task text here"
+bash .claude/skills/hermes-agent/scripts/run.sh -w home-assistant-config "repo task"
 ```
 
-Wraps `ssh ansible@192.168.1.61 hermes -z <task>`. Output comes back on
-stdout. Long agent loops can take minutes — use a generous timeout and
-consider running in the background.
+Wraps `ssh ansible@192.168.1.61 hermes -z <task>` (or `hermes-in <workspace>
+-z` with `-w`, which starts Hermes inside `/workspace/<name>` so that repo's
+CLAUDE.md/AGENTS.md auto-load — always use `-w` for tasks on a clone).
+Output comes back on stdout. Long agent loops can take minutes — run in the
+background rather than guessing a timeout.
 
 ## What Hermes has that this session doesn't
 

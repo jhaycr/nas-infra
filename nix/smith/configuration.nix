@@ -100,8 +100,13 @@
     "z /var/lib/hermes-workspace/README.md 0644 root root -"
     # Config dir of the dev/proving-ground HA instance (ha-dev container).
     # Disposable: wipe it and re-run the provisioning steps in BRINGUP.md to
-    # reset the dev instance to a blank slate.
+    # reset the dev instance to a blank slate. The HA container runs as root
+    # and creates root-owned files, but the Hermes agent (uid 10000) must be
+    # able to deploy test YAML here - a chown wouldn't survive HA re-creating
+    # files, so grant access via ACLs instead: the default (d:) entry makes
+    # new root-created files inherit rw for uid 10000.
     "d /var/lib/ha-dev 0755 root root -"
+    "A+ /var/lib/ha-dev - - - - u:10000:rwX,d:u:10000:rwX"
   ];
 
   # Seed the agent workspace with a nas-infra clone so Hermes has the IaC to
@@ -145,6 +150,14 @@
       # LAN-exposed on 0.0.0.0 (image default): the mandatory auth gate is
       # satisfied by the basic-auth provider configured via
       # HERMES_DASHBOARD_BASIC_AUTH_* in /etc/hermes/hermes-josh.env.
+
+      # The image bakes HERMES_WRITE_SAFE_ROOT=/opt/data, which makes the
+      # agent's file tools deny every write outside it ("protected
+      # system/credential file") - including the entire /workspace authoring
+      # area, breaking the git-first pipeline. Extend the allowlist
+      # (os.pathsep-separated) to cover the workspace. /etc and the rest of
+      # the container stay write-denied.
+      HERMES_WRITE_SAFE_ROOT = "/opt/data:/workspace";
     };
     volumes = [
       "/var/lib/hermes-josh:/opt/data"
