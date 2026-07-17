@@ -1,0 +1,26 @@
+---
+services:
+
+  libation:
+    # Headless CLI audiobook liberator (ghcr.io/rmcrackan/libation).
+    # Decrypts DRM from Audible library, drops decrypted books into /data.
+    # No published ports: runs as a periodic `scan && liberate` loop
+    # (SLEEP_TIME=3600s) so the override's `restart: unless-stopped`
+    # policy keeps it running on its own.
+    image: ghcr.io/rmcrackan/libation:latest
+    container_name: libation
+    user: 1000:1000
+    volumes:
+      # Config + SQLite database live together; the entrypoint symlinks
+      # the DB file under /db when /db is a separate mount.
+      - {{ docker_appdata_path }}/libation:/config
+      - {{ docker_appdata_path }}/libation/db:/db
+      # Liberated (DRM-free) audiobooks land here, alongside the existing
+      # audiobooks tree that Audiobookshelf already scans.
+      - {{ nas_storage_path }}/media/audio/audiobooks/libation:/data
+    environment:
+      # SLEEP_TIME=-1 would run once and exit; loop hourly instead so
+      # newly-released audiobooks are picked up automatically.
+      SLEEP_TIME: "3600"
+      # Pin books dir to /data explicitly (also the Dockerfile default).
+      LIBATION_BOOKS_DIR: /data
