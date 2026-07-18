@@ -214,6 +214,22 @@
     ports = [ "8124:8123" ];   # LAN-exposed so Josh can eyeball dashboards under test
   };
 
+  # HA's entrypoint chmods /config on every start, which clamps the ACL
+  # mask and silently revokes the Hermes agent's write access (canary
+  # check ha-dev-cfg-writable). Re-assert the ACL - including the mask -
+  # after each ha-dev start; the sleep outwaits the entrypoint chmod.
+  systemd.services.ha-dev-acl-reassert = {
+    description = "Re-assert Hermes agent ACLs on /var/lib/ha-dev";
+    wantedBy = [ "podman-ha-dev.service" ];
+    after = [ "podman-ha-dev.service" ];
+    path = [ pkgs.acl ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      sleep 30
+      setfacl -R -m u:10000:rwX -m m:rwX -m d:u:10000:rwX -m d:m:rwX /var/lib/ha-dev
+    '';
+  };
+
   # --- Log shipping (Alloy -> neo's Loki) ---
   # services.alloy is a real nixpkgs module (nixos/modules/services/monitoring/alloy.nix):
   # options enable/configPath/extraFlags/environmentFile/package. Pointing configPath
