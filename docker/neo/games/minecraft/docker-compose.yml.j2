@@ -23,7 +23,8 @@ services:
       MODE: "creative"
       DIFFICULTY: "peaceful"
       MAX_PLAYERS: "12"
-      MEMORY: "1G"
+      MEMORY: "768M"
+      USE_AIKAR_FLAGS: "true"
       VIEW_DISTANCE: "4"
       SIMULATION_DISTANCE: "4"
       SEED: "4859979374641661651"
@@ -58,11 +59,24 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/{{ minecraft_versions.viaversion }}/PAPER/ViaVersion-{{ minecraft_versions.viaversion }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/{{ minecraft_versions.viabackwards }}/PAPER/ViaBackwards-{{ minecraft_versions.viabackwards }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/{{ minecraft_versions.viarewind }}/PAPER/ViaRewind-{{ minecraft_versions.viarewind }}.jar
+    labels:
+      lazymc.enabled: "true"
+      lazymc.group: "survival"
+      lazymc.server.address: "10.86.86.11:25565"
+      lazymc.port: "25566"
+      lazymc.server.directory: "/server/survival"
+      lazymc.public.version: "{{ minecraft_versions.paper }}"
+      lazymc.public.protocol: "{{ minecraft_versions.paper_protocol }}"
+      lazymc.time.sleep_after: "600"
+      lazymc.server.start_timeout: "300"
+      lazymc.server.stop_timeout: "120"
     networks:
-      - minecraft
+      minecraft: {}
+      minecraft-lazy:
+        ipv4_address: 10.86.86.11
     volumes:
       - {{ docker_appdata_path }}/minecraft-1:/data
-    restart: unless-stopped
+    restart: "no"
 
   minecraft-pvp:
     container_name: minecraft-pvp
@@ -93,8 +107,36 @@ services:
         https://download.luckperms.net/{{ minecraft_versions.luckperms_build }}/bukkit/loader/LuckPerms-Bukkit-{{ minecraft_versions.luckperms_version }}.jar
       # PlayerKits 2 (kits via /kit GUI): https://www.spigotmc.org/resources/112616/
       SPIGET_RESOURCES: "112616"
+    labels:
+      lazymc.enabled: "true"
+      lazymc.group: "pvp"
+      lazymc.server.address: "10.86.86.12:25565"
+      lazymc.port: "25567"
+      lazymc.server.directory: "/server/pvp"
+      lazymc.public.version: "{{ minecraft_versions.paper }}"
+      lazymc.public.protocol: "{{ minecraft_versions.paper_protocol }}"
+      lazymc.time.sleep_after: "600"
+      lazymc.server.start_timeout: "300"
+      lazymc.server.stop_timeout: "120"
     networks:
-      - minecraft
+      minecraft: {}
+      minecraft-lazy:
+        ipv4_address: 10.86.86.12
     volumes:
       - {{ docker_appdata_path }}/minecraft-2:/data
+    restart: "no"
+
+  # Sleeps survival/pvp when empty and wakes them on join. Velocity points at
+  # this container (ports 25566/25567) instead of the backends directly.
+  lazymc:
+    container_name: lazymc
+    image: ghcr.io/joesturge/lazymc-docker-proxy:v2.7.5
+    networks:
+      minecraft: {}
+      minecraft-lazy:
+        ipv4_address: 10.86.86.10
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - {{ docker_appdata_path }}/minecraft-1:/server/survival:ro
+      - {{ docker_appdata_path }}/minecraft-2:/server/pvp:ro
     restart: unless-stopped

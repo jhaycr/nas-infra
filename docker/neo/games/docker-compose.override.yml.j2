@@ -17,7 +17,13 @@ x-common-env: &common-env
 services:
 {% for service in services %}
   {{ service }}:
+{% if service in ['minecraft-survival', 'minecraft-pvp'] %}
+    # lazymc owns these containers' lifecycle; docker must not auto-restart them
+    restart: "no"
+    logging: *default-logging
+{% else %}
     <<: *common-keys
+{% endif %}
     pull_policy: missing
     environment:
       <<: *common-env

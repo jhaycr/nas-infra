@@ -11,6 +11,7 @@ services:
       TYPE: "VELOCITY"
       VELOCITY_VERSION: "{{ minecraft_versions.velocity_version }}"
       VELOCITY_BUILD_ID: "{{ minecraft_versions.velocity_build }}"
+      MEMORY: "512M"
 
       # Auto-download plugins via URLs
       # Pinned (not "latest") to avoid Velocity/Geyser Adventure-library drift —

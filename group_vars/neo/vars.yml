@@ -55,6 +55,7 @@ docker_appdata_folders_to_own:
 # -----
 minecraft_versions:
   paper: "26.2"
+  paper_protocol: 776
   velocity_version: "3.6.0-SNAPSHOT"
   velocity_build: 613
   geyser_version: "2.11.0"
