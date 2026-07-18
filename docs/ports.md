@@ -9,6 +9,8 @@ gateway (e.g. gluetun) are listed under the gateway service, not the proxied ser
 
 | Host | Stack | Service | Host Port | Container Port/Proto |
 |------|-------|---------|-----------|----------------------|
+| 192.168.1.3 | games | minecraft-proxy | `25565` | `25565` |
+| 192.168.1.3 | games | minecraft-proxy | `19132` | `19132/udp` |
 | 192.168.1.3 | infra | alloy | `12345` | `12345` |
 | 192.168.1.3 | infra | alloy | `4317` | `4317` |
 | 192.168.1.3 | infra | alloy | `4318` | `4318` |
@@ -17,3 +19,66 @@ gateway (e.g. gluetun) are listed under the gateway service, not the proxied ser
 | 192.168.1.3 | infra | grafana | `3000` | `3000/tcp` |
 | 192.168.1.3 | infra | loki | `3100` | `3100` |
 | 192.168.1.3 | infra | whoami | `8094` | `80` |
+| 192.168.1.3 | media-server | apprise | `4002` | `8000` |
+| 192.168.1.3 | media-server | audiobookshelf | `13378` | `80` |
+| 192.168.1.3 | media-server | authentik | `9090` | `9000` |
+| 192.168.1.3 | media-server | authentik | `9443` | `9443` |
+| 192.168.1.3 | media-server | bazarr | `6767` | `6767` |
+| 192.168.1.3 | media-server | calibre-web-automated | `8083` | `8083` |
+| 192.168.1.3 | media-server | calibre-web-automated-book-downloader | `8084` | `8084` |
+| 192.168.1.3 | media-server | calibre-web-automated-kids | `8882` | `8083` |
+| 192.168.1.3 | media-server | chaptarr | `8789` | `8789` |
+| 192.168.1.3 | media-server | deemix | `6595` | `6595` |
+| 192.168.1.3 | media-server | dockerproxy | `127.0.0.1:2375` | `2375` |
+| 192.168.1.3 | media-server | dozzle | `8081` | `8080` |
+| 192.168.1.3 | media-server | freshrss | `8012` | `80` |
+| 192.168.1.3 | media-server | gluetun | `8089` | `8089` |
+| 192.168.1.3 | media-server | gluetun | `8945` | `8945` |
+| 192.168.1.3 | media-server | gluetun | `4848` | `4848` |
+| 192.168.1.3 | media-server | gluetun | `8113` | `8113` |
+| 192.168.1.3 | media-server | gluetun | `6881` | `6881` |
+| 192.168.1.3 | media-server | gluetun | `6881` | `6881/udp` |
+| 192.168.1.3 | media-server | gluetun | `5000` | `5000` |
+| 192.168.1.3 | media-server | grampsweb | `5002` | `5000` |
+| 192.168.1.3 | media-server | immich-server | `2283` | `2283` |
+| 192.168.1.3 | media-server | jackett | `9117` | `9117` |
+| 192.168.1.3 | media-server | komga | `25600` | `25600` |
+| 192.168.1.3 | media-server | komga-kids | `25601` | `25600` |
+| 192.168.1.3 | media-server | maintainerr | `6246` | `6246` |
+| 192.168.1.3 | media-server | mylar3 | `8090` | `8090` |
+| 192.168.1.3 | media-server | npm-internal | `80` | `80` |
+| 192.168.1.3 | media-server | npm-internal | `443` | `443` |
+| 192.168.1.3 | media-server | npm-internal | `81` | `81` |
+| 192.168.1.3 | media-server | overseerr | `5055` | `5055` |
+| 192.168.1.3 | media-server | portainer | `9000` | `9000` |
+| 192.168.1.3 | media-server | prowlarr | `9696` | `9696` |
+| 192.168.1.3 | media-server | pyload-ng | `8000` | `8000` |
+| 192.168.1.3 | media-server | pyload-ng | `9666` | `9666` |
+| 192.168.1.3 | media-server | radarr | `7878` | `7878` |
+| 192.168.1.3 | media-server | radarr-anime | `8878` | `7878` |
+| 192.168.1.3 | media-server | restic | `8500` | `8000` |
+| 192.168.1.3 | media-server | romm | `3011` | `8080` |
+| 192.168.1.3 | media-server | sabnzbd | `8080` | `8080` |
+| 192.168.1.3 | media-server | scrutiny | `8082` | `8080` |
+| 192.168.1.3 | media-server | scrutiny | `8086` | `8086` |
+| 192.168.1.3 | media-server | sonarr | `8989` | `8989` |
+| 192.168.1.3 | media-server | sonarr-anime | `9989` | `8989` |
+| 192.168.1.3 | media-server | speedtest-tracker | `8085` | `80` |
+| 192.168.1.3 | media-server | tautulli | `8181` | `8181` |
+| 192.168.1.3 | media-server | tunarr | `8265` | `8000` |
+| 192.168.1.3 | media-server | uptimekuma | `3001` | `3001` |
+| 192.168.1.3 | media-server | vaultwarden | `8087` | `80` |
+| 192.168.1.3 | media-server | wizarr | `5690` | `5690` |
+
+## VPN Gateway Services
+
+Services running inside a VPN gateway's network namespace (ports are owned by the gateway above):
+
+| Host | Stack | Gateway | Service |
+|------|-------|---------|---------|
+| 192.168.1.3 | media-server | gluetun | changedetection |
+| 192.168.1.3 | media-server | gluetun | pinchflat |
+| 192.168.1.3 | media-server | gluetun | qbittorrent |
+| 192.168.1.3 | media-server | gluetun | tubearchivist |
+| 192.168.1.3 | media-server | gluetun | tubearchivist-es |
+| 192.168.1.3 | media-server | gluetun | tubearchivist-redis |
