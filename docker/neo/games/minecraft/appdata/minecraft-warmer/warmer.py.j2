@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+"""Wake the survival backend (via lazymc) whenever the lobby has players.
+
+lazymc only starts a sleeping backend when a join reaches it, so switching
+servers from the lobby hits Velocity's 5s connect timeout while the
+container cold-starts (~60s). This watcher polls the lobby's status ping
+and sends a throwaway login to lazymc as soon as anyone connects to the
+lobby, so survival is warm by the time they /server over.
+"""
+import json
+import os
+import socket
+import struct
+import time
+
+
+def _addr(env, default):
+    host, port = os.environ.get(env, default).rsplit(":", 1)
+    return host, int(port)
+
+
+LOBBY = _addr("LOBBY_ADDR", "minecraft-lobby:25565")
+WAKE = _addr("WAKE_ADDR", "lazymc:25566")
+BACKEND = _addr("BACKEND_ADDR", "10.86.86.11:25565")
+POLL_SECONDS = int(os.environ.get("POLL_SECONDS", "10"))
+WAKE_COOLDOWN = int(os.environ.get("WAKE_COOLDOWN", "180"))
+PROTOCOL = int(os.environ.get("PROTOCOL", "776"))
+
+
+def log(msg):
+    print(msg, flush=True)
+
+
+def varint(n):
+    out = b""
+    while True:
+        b = n & 0x7F
+        n >>= 7
+        out += bytes([b | (0x80 if n else 0)])
+        if not n:
+            return out
+
+
+def mcstring(s):
+    b = s.encode()
+    return varint(len(b)) + b
+
+
+def packet(pid, data):
+    body = varint(pid) + data
+    return varint(len(body)) + body
+
+
+def handshake(host, port, next_state):
+    return packet(
+        0, varint(PROTOCOL) + mcstring(host) + struct.pack(">H", port) + varint(next_state)
+    )
+
+
+def read_varint_sock(sock):
+    num = 0
+    for i in range(5):
+        b = sock.recv(1)
+        if not b:
+            raise EOFError("connection closed mid-varint")
+        num |= (b[0] & 0x7F) << (7 * i)
+        if not b[0] & 0x80:
+            return num
+    raise ValueError("varint too long")
+
+
+def read_varint_bytes(data, pos):
+    num = 0
+    for i in range(5):
+        b = data[pos]
+        pos += 1
+        num |= (b & 0x7F) << (7 * i)
+        if not b & 0x80:
+            return num, pos
+    raise ValueError("varint too long")
+
+
+def read_exact(sock, n):
+    buf = b""
+    while len(buf) < n:
+        chunk = sock.recv(n - len(buf))
+        if not chunk:
+            raise EOFError("connection closed mid-packet")
+        buf += chunk
+    return buf
+
+
+def lobby_players():
+    """Return the lobby's online player count via a status ping."""
+    with socket.create_connection(LOBBY, timeout=3) as s:
+        s.settimeout(3)
+        s.sendall(handshake(*LOBBY, next_state=1) + packet(0, b""))
+        length = read_varint_sock(s)
+        data = read_exact(s, length)
+    _pid, pos = read_varint_bytes(data, 0)
+    strlen, pos = read_varint_bytes(data, pos)
+    status = json.loads(data[pos : pos + strlen])
+    return status["players"]["online"]
+
+
+def backend_up():
+    try:
+        with socket.create_connection(BACKEND, timeout=2):
+            return True
+    except OSError:
+        return False
+
+
+def send_wake():
+    """A login attempt is what makes lazymc start the backend; it never completes."""
+    with socket.create_connection(WAKE, timeout=5) as s:
+        s.sendall(handshake(*WAKE, next_state=2))
+        s.sendall(packet(0, mcstring("LobbyWarmer") + b"\x00" * 16))
+        time.sleep(1)
+
+
+def main():
+    log(f"warmer: lobby={LOBBY} wake={WAKE} backend={BACKEND} poll={POLL_SECONDS}s")
+    last_wake = 0.0
+    last_players = None
+    while True:
+        try:
+            players = lobby_players()
+        except (OSError, EOFError, ValueError, KeyError) as e:
+            players = None
+            if last_players is not None:
+                log(f"warmer: lobby ping failed: {e}")
+        if players != last_players:
+            log(f"warmer: lobby players = {players}")
+            last_players = players
+        if players and time.time() - last_wake > WAKE_COOLDOWN and not backend_up():
+            log("warmer: lobby occupied and survival asleep -> waking")
+            try:
+                send_wake()
+            except OSError as e:
+                log(f"warmer: wake failed: {e}")
+            last_wake = time.time()
+        time.sleep(POLL_SECONDS)
+
+
+if __name__ == "__main__":
+    main()
