@@ -10,3 +10,6 @@ roles/*
 
 # session-derived Claude Code agent memory
 .claude/agent-memory/
+
+# auto-generated architecture docs (regenerable, often stale)
+.sop/

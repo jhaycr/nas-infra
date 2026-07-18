@@ -1,0 +1,22 @@
+# Copilot Instructions for nas-infra
+
+- Scope: Ansible IaC for homelab (NAS, Proxmox, Docker stacks) across hosts neo/morpheus/trinity; see [README.md](README.md).
+- Play entrypoint: [site.yml](site.yml) defines per-host roles; neo runs storage/docker roles, morpheus/trinity are lighter with compose only.
+- Variables: global defaults in [group_vars/all.yml](group_vars/all.yml); per-host values in [group_vars/neo/vars.yml](group_vars/neo/vars.yml); secrets live in vaulted group_vars/*/vault.yml (use `make vault-lock`/`vault-unlock`).
+- Docker stack layout: stacks live under docker/<host>/<stack>; root stack file [docker/neo/media-server/docker-compose.yml.j2](docker/neo/media-server/docker-compose.yml.j2) lists `include` fragments relative to the stack directory; service fragments are compose YAML (not Jinja) and can have optional `.env` templates.
+- Compose generation flow (role [roles/jhaycr-local.docker_compose/tasks/main.yml](roles/jhaycr-local.docker_compose/tasks/main.yml)):
+  - [1_templates.yml](roles/jhaycr-local.docker_compose/tasks/1_templates.yml) finds compose/appdata templates under the stack, renders them to `docker_compose_path/<stack>` and `docker_appdata_path`.
+  - [2_overrides.yml](roles/jhaycr-local.docker_compose/tasks/2_overrides.yml) parses the root `include` list, gathers service names from each included compose file, then renders the stack [docker-compose.override.yml.j2](docker/neo/media-server/docker-compose.override.yml.j2) (common env/logging).
+  - [3_docker.yml](roles/jhaycr-local.docker_compose/tasks/3_docker.yml) runs `community.docker.docker_compose_v2` with `.env`, `docker-compose.yml`, and `docker-compose.override.yml`, then prunes images.
+  - Behavior toggles come from vars or env: `docker_compose_debug_print`, `docker_compose_debug_halt`, `docker_compose_copy_templates`, `docker_compose_start_stack`, `docker_compose_show_status`, `docker_compose_restart`; overridable via `DOCKER_COMPOSE_*` env or `EXTRA_VARS`.
+- Adding a service: place its compose file under the stack (e.g., [docker/neo/media-server/minecraft/docker-compose.yml.j2](docker/neo/media-server/minecraft/docker-compose.yml.j2)), add it to the root stack `include` list, keep service names unique, and add any appdata templates under an `appdata/` subdir (mirrored into `docker_appdata_path`).
+- Common defaults: stack override [docker/neo/media-server/docker-compose.override.yml.j2](docker/neo/media-server/docker-compose.override.yml.j2) applies restart policy, JSON-file logging, and TZ/PUID/PGID env to every detected service.
+- Paths: default `docker_compose_path=/opt/docker/compose`, `docker_appdata_path=/home/user0/docker/appdata` for neo (set in [group_vars/neo/vars.yml](group_vars/neo/vars.yml)); ensure volume mounts in compose files align with `nas_cache_path`/`nas_storage_path`.
+- Developer commands (make targets in [makefile](makefile)):
+  - `make reqs` installs collections from [requirements.yml](requirements.yml).
+  - `make neo-docker` / `make morpheus` / `make trinity` run [site.yml](site.yml) limited to a host; `*-docker` includes `--tags compose`; plain targets skip compose; pass extra vars via `EXTRA_VARS="k=v"`.
+  - `make bootstrap-ssh LIMIT=hostname` to prep SSH on new hosts; `make vault-lock` / `make vault-unlock` for all group_vars vaults.
+- Templates/scripts: extra cron/script templates live in [templates](templates); site play creates helper scripts for gluetun IP rotation and tubearchivist reset for `main_username` home.
+- External deps: uses Galaxy roles/collections (geerlingguy.docker, tigattack.mergerfs, IronicBadger.snapraid, arillso.system.users, etc.) installed via [requirements.yml](requirements.yml); Proxmox API vars in [group_vars/neo/vars.yml](group_vars/neo/vars.yml) drive proxmox_images/proxmox_vms.
+- Debugging compose generation: set `docker_compose_debug_print=true` to show discovered files/services; set `docker_compose_debug_halt=true` to stop before templating; `docker_compose_start_stack=false` to only render files.
+- Safety: secrets referenced in compose files (e.g., `secret_minecraft_server_op`, `secret_tailscale_auth_key_minecraft`) must exist in vaulted vars before running compose plays.
