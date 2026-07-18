@@ -1,0 +1,62 @@
+# ServerSelector (lobby): locked compass in slot 4 opens a tap-friendly
+# server picker — works for Bedrock/iPad players through Geyser.
+# Schema: default config.yml inside ServerSelector-1.8.jar.
+
+gui:
+  title: "&8&lServer Selector"
+  size: 27
+
+selector:
+  material: COMPASS
+  name: "&6&lServer Selector"
+  lore:
+    - "&7Tap to pick a server"
+  slot: 4
+
+give-on-every-join: true
+
+world-specific:
+  enabled: false
+  worlds: []
+
+lock-selector-item: true
+
+# Requires PlaceholderAPI (not installed)
+auto-refresh:
+  enabled: false
+  interval: 30
+
+decoration:
+  enabled: true
+  alternate-colors: true
+  use-pattern: true
+  pattern:
+    - "111111111"
+    - "122222221"
+    - "111111111"
+  pattern-items:
+    "1":
+      material: LIGHT_BLUE_STAINED_GLASS_PANE
+      name: " "
+    "2":
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+
+# command "server:<name>" must match a [servers] key in velocity.toml
+items:
+  survival:
+    slot: 11
+    material: GRASS_BLOCK
+    name: "&a&lSurvival"
+    lore:
+      - "&7Build and explore together."
+      - "&8Waking from sleep can take a minute."
+    command: "server:survival"
+  pvp:
+    slot: 15
+    material: IRON_SWORD
+    name: "&c&lPVP Arena"
+    lore:
+      - "&7Battle with kits &8-&7 grab gear with /kit"
+      - "&8Waking from sleep can take a minute."
+    command: "server:pvp"
