@@ -136,7 +136,11 @@
   };
 
   virtualisation.oci-containers.containers.hermes-josh = {
-    image = "nousresearch/hermes-agent:latest";
+    # Digest-pinned: a :latest drift silently broke all workspace writes
+    # once (HERMES_WRITE_SAFE_ROOT default change, 2026-07-17). Bump the
+    # digest deliberately and run the hermes-agent skill's canary.sh after.
+    # renovate: datasource=docker depName=nousresearch/hermes-agent
+    image = "nousresearch/hermes-agent:latest@sha256:24af4359a7c544209323cc9a427fd0b34a6d7a78a8480bfbdfe565fc05ba89db";
     cmd = [ "gateway" "run" ];
     environmentFiles = [
       "/etc/hermes/hermes-josh.env"
@@ -170,6 +174,7 @@
       "${./workspace-WORKFLOW.md}:/workspace/WORKFLOW.md:ro"
       "${./workspace-README.md}:/workspace/README.md:ro"
       "${./ha-dev.sh}:/workspace/bin/ha-dev:ro"
+      "${./compose-check.sh}:/workspace/bin/compose-check:ro"
       # Live config dir of the dev HA instance: Hermes copies YAML from its
       # branch worktree here, then check_config + restart via the dev API.
       "/var/lib/ha-dev:/workspace/ha-dev-config"
@@ -204,7 +209,7 @@
   # entities are seeded fakes; live deployment to oracle stays human-gated.
   # Provisioned offline (owner user + onboarding skip) - see BRINGUP.md.
   virtualisation.oci-containers.containers.ha-dev = {
-    image = "ghcr.io/home-assistant/home-assistant:2026.7.1";   # = oracle Core version; bump together
+    image = "ghcr.io/home-assistant/home-assistant:2026.7.2";   # = oracle Core version; bump together
     volumes = [ "/var/lib/ha-dev:/config" ];
     ports = [ "8124:8123" ];   # LAN-exposed so Josh can eyeball dashboards under test
   };

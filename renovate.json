@@ -6,7 +6,21 @@
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
   "enabledManagers": [
-    "docker-compose"
+    "docker-compose",
+    "custom.regex"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Digest-pinned hermes-agent image in the smith NixOS config",
+      "managerFilePatterns": [
+        "/^nix/smith/configuration\\.nix$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\s*\\n\\s*image = \"[^\"@]+@(?<currentDigest>sha256:[a-f0-9]{64})\""
+      ],
+      "currentValueTemplate": "latest"
+    }
   ],
   "ignorePaths": [
     "docker/morpheus/**",
