@@ -26,6 +26,7 @@ hass_control_config_files:
   - scenes
   - configuration
   - climate-dashboard
+  - appliance-dashboard
 
 # Jinja2-templated files (e.g. secrets.yaml) rendered from templates/home_assistant/
 hass_control_config_templates: []
