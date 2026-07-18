@@ -1,47 +1,42 @@
-# Starter PVP kit for the pvp backend. Claim in-game with /kit.
-# Format reference: https://github.com/Ajneb97/PlayerKits2 (kits/*.yml)
+# Fast, fragile PVP kit with ender pearls. Format: see warrior.yml.j2.
 cooldown: 60
 permission_required: false
 auto_armor: true
 items:
   1:
-    id: IRON_SWORD
+    id: GOLDEN_SWORD
     amount: 1
+    enchants:
+      - "FIRE_ASPECT;1"
   2:
-    id: BOW
-    amount: 1
+    id: ENDER_PEARL
+    amount: 4
   3:
-    id: ARROW
-    amount: 32
-  4:
-    id: SHIELD
-    amount: 1
-  5:
     id: GOLDEN_APPLE
     amount: 3
-  6:
+  4:
     id: COOKED_BEEF
     amount: 16
+  5:
+    id: LEATHER_HELMET
+    amount: 1
+  6:
+    id: LEATHER_CHESTPLATE
+    amount: 1
   7:
-    id: IRON_HELMET
+    id: LEATHER_LEGGINGS
     amount: 1
   8:
-    id: IRON_CHESTPLATE
-    amount: 1
-  9:
-    id: IRON_LEGGINGS
-    amount: 1
-  10:
-    id: IRON_BOOTS
+    id: LEATHER_BOOTS
     amount: 1
 display:
   default:
-    id: IRON_SWORD
-    name: '&c&lWarrior &cKit'
+    id: ENDER_PEARL
+    name: '&5&lNinja &5Kit'
     lore:
       - '&fThis kit includes:'
-      - '&8- &7Iron sword, bow + 32 arrows, shield'
-      - '&8- &7Full iron armor (auto-equipped)'
+      - '&8- &7Fire gold sword, x4 ender pearls'
+      - '&8- &7Leather armor - fast but fragile'
       - '&8- &7x3 Golden apples, x16 steak'
       - ' '
       - '&7Cooldown: &c1 minute'
@@ -51,8 +46,8 @@ display:
     item_flags:
       - HIDE_ATTRIBUTES
   cooldown:
-    id: IRON_SWORD
-    name: '&c&lWarrior &cKit'
+    id: ENDER_PEARL
+    name: '&5&lNinja &5Kit'
     lore:
       - "&cYou need to wait &7%time%"
       - "&cto claim this kit again."
