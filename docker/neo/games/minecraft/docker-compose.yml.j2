@@ -90,8 +90,9 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/{{ minecraft_versions.viaversion }}/PAPER/ViaVersion-{{ minecraft_versions.viaversion }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/{{ minecraft_versions.viabackwards }}/PAPER/ViaBackwards-{{ minecraft_versions.viabackwards }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/{{ minecraft_versions.viarewind }}/PAPER/ViaRewind-{{ minecraft_versions.viarewind }}.jar
-        https://www.spigotmc.org/resources/luckperms.28140/
-        https://www.spigotmc.org/resources/kitpvp.27107/
+        https://download.luckperms.net/{{ minecraft_versions.luckperms_build }}/bukkit/loader/LuckPerms-Bukkit-{{ minecraft_versions.luckperms_version }}.jar
+      # PlayerKits 2 (kits via /kit GUI): https://www.spigotmc.org/resources/112616/
+      SPIGET_RESOURCES: "112616"
     networks:
       - minecraft
     volumes:

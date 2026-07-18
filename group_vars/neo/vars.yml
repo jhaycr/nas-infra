@@ -64,6 +64,8 @@ minecraft_versions:
   viaversion: "5.11.0"
   viabackwards: "5.11.0"
   viarewind: "4.1.3"
+  luckperms_version: "5.5.60"
+  luckperms_build: 1648
 
 # -----
 # jhaycr-local.semaphore
