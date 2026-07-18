@@ -1,0 +1,67 @@
+# Starter PVP kit for the pvp backend. Claim in-game with /kit.
+# Format reference: https://github.com/Ajneb97/PlayerKits2 (kits/*.yml)
+cooldown: 300
+permission_required: false
+auto_armor: true
+items:
+  1:
+    id: IRON_SWORD
+    amount: 1
+  2:
+    id: BOW
+    amount: 1
+  3:
+    id: ARROW
+    amount: 32
+  4:
+    id: SHIELD
+    amount: 1
+  5:
+    id: GOLDEN_APPLE
+    amount: 3
+  6:
+    id: COOKED_BEEF
+    amount: 16
+  7:
+    id: IRON_HELMET
+    amount: 1
+  8:
+    id: IRON_CHESTPLATE
+    amount: 1
+  9:
+    id: IRON_LEGGINGS
+    amount: 1
+  10:
+    id: IRON_BOOTS
+    amount: 1
+display:
+  default:
+    id: IRON_SWORD
+    name: '&c&lWarrior &cKit'
+    lore:
+      - '&fThis kit includes:'
+      - '&8- &7Iron sword, bow + 32 arrows, shield'
+      - '&8- &7Full iron armor (auto-equipped)'
+      - '&8- &7x3 Golden apples, x16 steak'
+      - ' '
+      - '&7Cooldown: &c5 minutes'
+      - ''
+      - '&aLeft Click to claim!'
+      - '&bRight Click to preview!'
+    item_flags:
+      - HIDE_ATTRIBUTES
+  cooldown:
+    id: IRON_SWORD
+    name: '&c&lWarrior &cKit'
+    lore:
+      - "&cYou need to wait &7%time%"
+      - "&cto claim this kit again."
+    item_flags:
+      - HIDE_ATTRIBUTES
+actions:
+  claim:
+    1:
+      action: "playsound: BLOCK_NOTE_BLOCK_PLING;10;2"
+  error:
+    1:
+      action: "playsound: BLOCK_NOTE_BLOCK_PLING;10;0.1"
