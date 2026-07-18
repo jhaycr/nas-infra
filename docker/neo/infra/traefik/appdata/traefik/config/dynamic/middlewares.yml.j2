@@ -8,6 +8,12 @@ http:
         stsPreload: true
         stsIncludeSubdomains: false
 
+    # Applied globally via the websecure entrypoint (traefik.yml).
+    # Cloudflare only compresses edge->client; without this the origin->edge
+    # tunnel leg carries uncompressed payloads
+    compress:
+      compress: {}
+
     # Authentik forward auth — reference with middlewares: ["auth@file,auth-errors@file"] in traefik_services
     # Requires authentik container to be reachable on bridge_proxy_external
     auth:
