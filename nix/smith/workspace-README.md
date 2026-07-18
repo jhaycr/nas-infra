@@ -11,7 +11,9 @@ in `WORKFLOW.md` — read that first; this file is just the commands.
 | `/workspace/home-assistant-config` | `git@github.com:jhaycr/home-assistant-config` (private) | pull + push `hermes/*` branches (deploy key) |
 
 Deterministic tools live in `/workspace/bin/` (root-owned; run, don't edit):
-`ha-dev` wraps the entire dev-HA test loop — see `WORKFLOW.md`.
+`ha-dev` wraps the entire dev-HA test loop, `compose-check` validates
+compose `.j2` files, `neo-diag` gives read-only container logs/status on
+neo — see `WORKFLOW.md`.
 
 Git identity (`Hermes (smith)`) is already configured in both clones.
 

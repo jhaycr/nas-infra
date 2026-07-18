@@ -1,0 +1,53 @@
+#!/bin/sh
+# hermes-neo-diag-root — READ-ONLY docker/network diagnostics for the Hermes
+# agent on smith. Runs as root via a single sudoers entry for the hermes-diag
+# user; reached ONLY through the forced-command SSH key (see the
+# jhaycr-local.hermes_neo_diag role). This script is the enforcement point:
+# it revalidates everything and exposes a fixed read-only command menu -
+# nothing here mutates state. Root-owned 0755; hermes-diag cannot edit it.
+#
+# Dispatched forms (from SSH_ORIGINAL_COMMAND via the forced command):
+#   logs <container> [tail]   docker logs (default --tail 200, max 2000)
+#   ps [filter]               docker ps, optionally --filter name=<filter>
+#   health <container>        docker inspect health/state block
+#   listeners                 ss -ltnu (listening sockets)
+set -eu
+
+# Container names / filters: docker's own allowed charset, nothing else.
+valid_name() {
+  case "$1" in
+    *[!a-zA-Z0-9_.-]*|"") return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+cmd="${1:-}"; [ $# -gt 0 ] && shift
+case "$cmd" in
+  logs)
+    name="${1:?logs needs a container name}"
+    tail="${2:-200}"
+    valid_name "$name" || { echo "invalid container name" >&2; exit 2; }
+    case "$tail" in *[!0-9]*|"") echo "invalid tail count" >&2; exit 2 ;; esac
+    [ "$tail" -le 2000 ] || tail=2000
+    exec docker logs --tail "$tail" -- "$name" 2>&1
+    ;;
+  ps)
+    if [ $# -gt 0 ] && [ -n "$1" ]; then
+      valid_name "$1" || { echo "invalid filter" >&2; exit 2; }
+      exec docker ps --filter "name=$1" --format '{{.Names}}\t{{.Status}}\t{{.Image}}'
+    fi
+    exec docker ps --format '{{.Names}}\t{{.Status}}\t{{.Image}}'
+    ;;
+  health)
+    name="${1:?health needs a container name}"
+    valid_name "$name" || { echo "invalid container name" >&2; exit 2; }
+    exec docker inspect --format '{{.Name}} state={{.State.Status}} restarts={{.RestartCount}} health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}} started={{.State.StartedAt}}' -- "$name"
+    ;;
+  listeners)
+    exec ss -ltnu
+    ;;
+  *)
+    echo "usage: logs <container> [tail] | ps [filter] | health <container> | listeners" >&2
+    exit 2
+    ;;
+esac

@@ -1,0 +1,4 @@
+---
+# Public half of the keypair generated in place on smith at
+# /etc/hermes/neo-diag.key (private key never leaves smith).
+hermes_neo_diag_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAPbO/8nuRPcA067c8m2CflJpjeFss2rSdcVvs1ia871 hermes-diag@smith"

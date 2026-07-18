@@ -1,0 +1,10 @@
+#!/bin/sh
+# Forced-command shim for the hermes-diag SSH key (authorized_keys
+# command="..."). Whatever the client asked for arrives ONLY in
+# SSH_ORIGINAL_COMMAND; we parse it into argv with a strict word split
+# (no eval, no shell re-interpretation) and hand it to the root dispatcher,
+# which revalidates everything. Runs as the unprivileged hermes-diag user.
+set -eu
+# shellcheck disable=SC2086
+set -- ${SSH_ORIGINAL_COMMAND:-}
+exec sudo /usr/local/bin/hermes-neo-diag-root "$@"

@@ -167,6 +167,9 @@
       # Deploy key mounted at the SAME path as on the host so the repo-local
       # core.sshCommand works from both the VM shell and inside the container.
       "/etc/hermes/ha-config-deploy.key:/etc/hermes/ha-config-deploy.key:ro"
+      # neo read-only diagnostics key (generated in place on smith, owned by
+      # uid 10000 - see roles/jhaycr-local.hermes_neo_diag/README.md).
+      "/etc/hermes/neo-diag.key:/etc/hermes/neo-diag.key:ro"
       # Agent rules + command reference + deterministic tools, straight from
       # the nix store as READ-ONLY mounts: the agent can execute but never
       # modify them, and edits in nas-infra ship via rebuild (unit change =
@@ -175,6 +178,10 @@
       "${./workspace-README.md}:/workspace/README.md:ro"
       "${./ha-dev.sh}:/workspace/bin/ha-dev:ro"
       "${./compose-check.sh}:/workspace/bin/compose-check:ro"
+      # Read-only neo diagnostics (docker logs/ps/health, listeners) over a
+      # forced-command SSH key; server-side enforcement on neo (see the
+      # jhaycr-local.hermes_neo_diag role, README there for rebuild steps).
+      "${./neo-diag.sh}:/workspace/bin/neo-diag:ro"
       # Live config dir of the dev HA instance: Hermes copies YAML from its
       # branch worktree here, then check_config + restart via the dev API.
       "/var/lib/ha-dev:/workspace/ha-dev-config"

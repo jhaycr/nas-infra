@@ -30,6 +30,9 @@
     - role: jhaycr-local.symlinks
       become: true
       tags: symlinks
+    - role: jhaycr-local.hermes_neo_diag
+      become: true
+      tags: [hermes-diag]
     - role: jhaycr-local.proxmox_images
       become: yes
       tags: pve

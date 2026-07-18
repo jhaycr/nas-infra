@@ -1,0 +1,51 @@
+---
+# Read-only docker/network diagnostics access for the Hermes agent on smith.
+# Server-side enforcement: a dedicated no-password user whose ONLY entry
+# point is a forced-command shim (restrict option: no pty/forwarding), which
+# sudos into a root-owned dispatcher exposing a fixed read-only menu
+# (docker logs/ps/health, ss listeners). The private key lives ONLY on
+# smith at /etc/hermes/neo-diag.key (generated in place, never in a repo
+# or vault); rotate by regenerating there and re-running this role with
+# the new public key in defaults/main.yml.
+
+- name: Create hermes-diag user (no password, regular shell for forced command)
+  ansible.builtin.user:
+    name: hermes-diag
+    shell: /bin/sh
+    create_home: true
+    password: "!"
+    comment: "Hermes agent read-only diagnostics (forced command only)"
+
+- name: Install root dispatcher (the enforcement point)
+  ansible.builtin.copy:
+    src: hermes-neo-diag-root
+    dest: /usr/local/bin/hermes-neo-diag-root
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install forced-command shim
+  ansible.builtin.copy:
+    src: hermes-neo-diag-shim
+    dest: /usr/local/bin/hermes-neo-diag-shim
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Allow hermes-diag to run ONLY the dispatcher as root
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/hermes-diag
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+    content: |
+      hermes-diag ALL=(root) NOPASSWD: /usr/local/bin/hermes-neo-diag-root
+      hermes-diag ALL=(root) NOPASSWD: /usr/local/bin/hermes-neo-diag-root *
+
+- name: Authorize smith's neo-diag key, locked to the forced command
+  ansible.posix.authorized_key:
+    user: hermes-diag
+    key: "{{ hermes_neo_diag_pubkey }}"
+    key_options: 'command="/usr/local/bin/hermes-neo-diag-shim",restrict'
+    exclusive: true

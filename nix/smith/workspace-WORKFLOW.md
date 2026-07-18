@@ -76,3 +76,9 @@ Pull-only remote (no push credential — intentional). Author on
 it directly from this clone. Repo conventions: its `AGENTS.md` + `CLAUDE.md`
 (written for trinity agents — path/skill references there don't apply to
 you). Never decrypt or edit `group_vars/*/vault.yml`.
+
+Deployed-container diagnostics on neo (READ-ONLY, server-enforced):
+`/workspace/bin/neo-diag logs <container> [tail] | ps [filter] |
+health <container> | listeners`. Use it to verify a deployed change or
+debug a container; filter locally with grep. Anything beyond this menu is
+rejected server-side — don't try.

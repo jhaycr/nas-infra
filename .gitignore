@@ -6,4 +6,7 @@ roles/*
 */**/vault.yml
 
 # my roles
-!roles/jhaycr*.*/.claude/agent-memory/
+!roles/jhaycr*.*
+
+# session-derived Claude Code agent memory
+.claude/agent-memory/
