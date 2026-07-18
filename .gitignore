@@ -6,4 +6,4 @@ roles/*
 */**/vault.yml
 
 # my roles
-!roles/jhaycr*.*/
+!roles/jhaycr*.*/.claude/agent-memory/
