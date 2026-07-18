@@ -10,3 +10,10 @@ include:
 networks:
   minecraft:
     driver: bridge
+  # lazymc needs static backend IPs: docker DNS names vanish while a managed
+  # container is stopped, so its server.address labels use fixed addresses.
+  minecraft-lazy:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.86.86.0/24
