@@ -28,10 +28,13 @@ services:
       VIEW_DISTANCE: "4"
       SIMULATION_DISTANCE: "4"
       SEED: "4859979374641661651"
+      # Last PLUGINS entry: ServerSelector 1.8-1 (compass server picker GUI)
+      # https://modrinth.com/plugin/serverselector
       PLUGINS: |
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/{{ minecraft_versions.viaversion }}/PAPER/ViaVersion-{{ minecraft_versions.viaversion }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/{{ minecraft_versions.viabackwards }}/PAPER/ViaBackwards-{{ minecraft_versions.viabackwards }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/{{ minecraft_versions.viarewind }}/PAPER/ViaRewind-{{ minecraft_versions.viarewind }}.jar
+        https://cdn.modrinth.com/data/eCvG237D/versions/42b8TojQ/ServerSelector-1.8.jar
     networks:
       - minecraft
     volumes:
@@ -67,7 +70,7 @@ services:
       lazymc.server.directory: "/server/survival"
       lazymc.public.version: "{{ minecraft_versions.paper }}"
       lazymc.public.protocol: "{{ minecraft_versions.paper_protocol }}"
-      lazymc.time.sleep_after: "600"
+      lazymc.time.sleep_after: "1800"
       lazymc.server.start_timeout: "300"
       lazymc.server.stop_timeout: "120"
     networks:
@@ -115,7 +118,7 @@ services:
       lazymc.server.directory: "/server/pvp"
       lazymc.public.version: "{{ minecraft_versions.paper }}"
       lazymc.public.protocol: "{{ minecraft_versions.paper_protocol }}"
-      lazymc.time.sleep_after: "600"
+      lazymc.time.sleep_after: "1800"
       lazymc.server.start_timeout: "300"
       lazymc.server.stop_timeout: "120"
     networks:
