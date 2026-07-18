@@ -108,3 +108,14 @@ because a site.yml pre_task backs up first.
 `.sop/summary/` contains auto-generated architecture docs (may be stale). `.github/copilot-instructions.md` has additional context.
 
 @AGENTS.md
+### .claude/ Encryption (git-crypt)
+
+`.claude/**` is git-crypt filtered: ciphertext in the pushed (public) repo,
+cleartext in an unlocked working tree. After a fresh clone on a trusted
+machine: `git-crypt unlock ~/Secrets/.ansible-secrets/nas-infra-git-crypt.key`
+(key lives next to the vault key, never in any repo). Clones without the key
+(smith, gitea mirrors) see ciphertext for `.claude/` only — nothing outside
+trinity executes those files. Requires `git-crypt` on PATH (trinity:
+`~/.local/bin/git-crypt`). Known limitation: git-crypt fails in linked git
+worktrees (`smudge filter git-crypt failed`) — work on `.claude/` from the
+primary checkout.
