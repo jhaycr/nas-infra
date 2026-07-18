@@ -140,3 +140,23 @@ services:
       - {{ docker_appdata_path }}/minecraft-1:/server/survival:ro
       - {{ docker_appdata_path }}/minecraft-2:/server/pvp:ro
     restart: unless-stopped
+
+  # Pre-warms survival: polls the lobby's status ping and fires a throwaway
+  # login at lazymc as soon as anyone is in the lobby, so the /server switch
+  # doesn't hit a cold start.
+  minecraft-warmer:
+    container_name: minecraft-warmer
+    image: python:3.13-alpine
+    command: ["python", "-u", "/app/warmer.py"]
+    environment:
+      LOBBY_ADDR: "minecraft-lobby:25565"
+      WAKE_ADDR: "lazymc:25566"
+      BACKEND_ADDR: "10.86.86.11:25565"
+      PROTOCOL: "{{ minecraft_versions.paper_protocol }}"
+    networks:
+      minecraft: {}
+      minecraft-lazy:
+        ipv4_address: 10.86.86.13
+    volumes:
+      - {{ docker_appdata_path }}/minecraft-warmer:/app:ro
+    restart: unless-stopped
