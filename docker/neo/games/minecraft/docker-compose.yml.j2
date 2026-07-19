@@ -67,6 +67,7 @@ services:
       lazymc.group: "survival"
       lazymc.server.address: "10.86.86.11:25565"
       lazymc.port: "25566"
+      lazymc.join.kick.starting: "Survival is waking up! Try again in about a minute."
       lazymc.server.directory: "/server/survival"
       lazymc.public.version: "{{ minecraft_versions.paper }}"
       lazymc.public.protocol: "{{ minecraft_versions.paper_protocol }}"
@@ -123,6 +124,7 @@ services:
       lazymc.group: "pvp"
       lazymc.server.address: "10.86.86.12:25565"
       lazymc.port: "25567"
+      lazymc.join.kick.starting: "The PVP Arena is waking up! Try again in about a minute."
       lazymc.server.directory: "/server/pvp"
       lazymc.public.version: "{{ minecraft_versions.paper }}"
       lazymc.public.protocol: "{{ minecraft_versions.paper_protocol }}"
@@ -161,8 +163,7 @@ services:
     command: ["python", "-u", "/app/warmer.py"]
     environment:
       LOBBY_ADDR: "minecraft-lobby:25565"
-      WAKE_ADDR: "lazymc:25566"
-      BACKEND_ADDR: "10.86.86.11:25565"
+      TARGETS: "survival=lazymc:25566=10.86.86.11:25565,pvp=lazymc:25567=10.86.86.12:25565"
       PROTOCOL: "{{ minecraft_versions.paper_protocol }}"
     networks:
       minecraft: {}
