@@ -10,6 +10,8 @@ services:
       - "8013:8000"
     volumes:
       - {{ docker_appdata_path }}/tarot:/data
+    environment:
+      TAROT_ADMIN_USERS: "{{ tarot_admin_users }}"
     # Multi-user: front with authentik proxy provider; identity comes from the
     # X-authentik-username header. Direct LAN access maps to user "local".
     #
