@@ -159,7 +159,7 @@ services:
   # doesn't hit a cold start.
   minecraft-warmer:
     container_name: minecraft-warmer
-    image: python:3.13-alpine
+    image: python:3.14-alpine
     command: ["python", "-u", "/app/warmer.py"]
     environment:
       LOBBY_ADDR: "minecraft-lobby:25565"
