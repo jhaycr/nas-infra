@@ -1,0 +1,18 @@
+---
+services:
+
+  tarot:
+    container_name: tarot
+    image: ghcr.io/jhaycr/tarot:0.1.0
+    networks:
+      - bridge_proxy_external
+    ports:
+      - "8013:8000"
+    volumes:
+      - {{ docker_appdata_path }}/tarot:/data
+    # Multi-user: front with authentik proxy provider; identity comes from the
+    # X-authentik-username header. Direct LAN access maps to user "local".
+    # environment:
+    #   TAROT_LLM_BASE_URL: http://ollama:11434/v1  # enables AI interpretation
+    #   TAROT_LLM_MODEL: llama3.1
+    #   TAROT_LLM_API_KEY: reference a secret_tarot_llm_api_key vault var here if needed
