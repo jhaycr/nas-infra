@@ -326,7 +326,7 @@ logrotate_logs:
 # Release tag of ghcr.io/jhaycr/tarot to run. Override with a locally loaded
 # image for testing: make neo-docker EXTRA_VARS="tarot_image_tag=dev"
 # (see bin/tarot-deploy-dev.sh)
-tarot_image_tag: "0.4.3"
+tarot_image_tag: "0.5.0"
 # Authentik usernames allowed to manage the AI connection in-app;
 # "local" keeps direct LAN access (no proxy headers) as admin.
 tarot_admin_users: "josh,local"
