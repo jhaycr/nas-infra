@@ -72,6 +72,15 @@ minecraft_versions:
   playerkits_spiget_id: "112616"
 
 # -----
+# Forge (docker/neo/games/forge) - MTG rules engine, github.com/Card-Forge/forge.
+# No server mode: runs inside a LinuxServer Webtop desktop, installed on first
+# boot by appdata/custom-cont-init.d/10-install-forge.sh.j2. Bump by checking
+# https://github.com/Card-Forge/forge/releases for the current release tag
+# (the tarball asset is forge-installer-<version>.tar.bz2).
+# -----
+forge_version: "2.0.13"
+
+# -----
 # jhaycr-local.semaphore
 # -----
 semaphore_url: "http://localhost:3030"
@@ -316,4 +325,4 @@ logrotate_logs:
 # Release tag of ghcr.io/jhaycr/tarot to run. Override with a locally loaded
 # image for testing: make neo-docker EXTRA_VARS="tarot_image_tag=dev"
 # (see bin/tarot-deploy-dev.sh)
-tarot_image_tag: "0.2.0"
+tarot_image_tag: "0.3.1"
