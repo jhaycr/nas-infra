@@ -3,7 +3,7 @@ services:
 
   tarot:
     container_name: tarot
-    image: ghcr.io/jhaycr/tarot:0.1.0
+    image: ghcr.io/jhaycr/tarot:{{ tarot_image_tag }}
     networks:
       - bridge_proxy_external
     ports:

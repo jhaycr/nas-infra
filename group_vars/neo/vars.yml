@@ -309,3 +309,11 @@ logrotate_logs:
     # These settings will use the defaults
   - path: /var/log/autorestic.log
     # These settings will use the defaults
+
+# -----
+# tarot (Tarotarium)
+# -----
+# Release tag of ghcr.io/jhaycr/tarot to run. Override with a locally loaded
+# image for testing: make neo-docker EXTRA_VARS="tarot_image_tag=dev"
+# (see bin/tarot-deploy-dev.sh)
+tarot_image_tag: "0.1.1"
