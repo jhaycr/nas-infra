@@ -325,4 +325,4 @@ logrotate_logs:
 # Release tag of ghcr.io/jhaycr/tarot to run. Override with a locally loaded
 # image for testing: make neo-docker EXTRA_VARS="tarot_image_tag=dev"
 # (see bin/tarot-deploy-dev.sh)
-tarot_image_tag: "0.4.0"
+tarot_image_tag: "0.4.1"
