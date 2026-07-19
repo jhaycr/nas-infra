@@ -73,6 +73,9 @@ show_status() {
   echo "  floodgate: ${MV_FLOODGATE_VERSION} build ${MV_FLOODGATE_BUILD}"
   echo "  paper:     ${MV_PAPER}"
   echo "  via*:      ViaVersion ${MV_VIAVERSION} / ViaBackwards ${MV_VIABACKWARDS} / ViaRewind ${MV_VIAREWIND}"
+  echo "  luckperms: ${MV_LUCKPERMS_VERSION} build ${MV_LUCKPERMS_BUILD}"
+  echo "  serverselector: ${MV_SERVERSELECTOR_VERSION} (modrinth file ${MV_SERVERSELECTOR_MODRINTH_FILE})"
+  echo "  playerkits: spiget resource ${MV_PLAYERKITS_SPIGET_ID} (always latest - spiget cannot pin)"
   echo
   echo "Latest available upstream (not yet validated - use --test-latest to check compatibility):"
   local gv gb fb vb
@@ -123,19 +126,25 @@ https://download.geysermc.org/v2/projects/floodgate/versions/${fv}/builds/${fb}/
   return 1
 }
 
-# Smoke-test one Paper backend with the pinned Via* plugins (no proxy needed -
-# this only checks that Paper + Via* load together without erroring).
+# Smoke-test one Paper backend with the full pinned plugin loadout (union of
+# what lobby and pvp run: Via*, ServerSelector, LuckPerms, PlayerKits 2 via
+# spiget). No proxy needed - this only checks that everything loads together
+# without erroring; exactly the class of breakage a Paper bump causes (KitPvP
+# died this way on 26.2).
 smoke_test_paper() {
   local paper="$1" vv="$2" vbw="$3" vrw="$4"
   local name="mc-paper-check-$$"
   cleanup_containers+=("$name")
 
-  echo "--- paper smoke test: paper ${paper}, viaversion ${vv}, viabackwards ${vbw}, viarewind ${vrw} ---"
+  echo "--- paper smoke test: paper ${paper}, viaversion ${vv}, viabackwards ${vbw}, viarewind ${vrw}, luckperms ${MV_LUCKPERMS_VERSION}, serverselector ${MV_SERVERSELECTOR_VERSION}, playerkits (spiget latest) ---"
   docker run -d --name "$name" \
     -e EULA=true -e TYPE=PAPER -e VERSION="$paper" -e ONLINE_MODE=false -e MEMORY=512M \
+    -e SPIGET_RESOURCES="${MV_PLAYERKITS_SPIGET_ID}" \
     -e PLUGINS="https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/${vv}/PAPER/ViaVersion-${vv}.jar
 https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/${vbw}/PAPER/ViaBackwards-${vbw}.jar
-https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/${vrw}/PAPER/ViaRewind-${vrw}.jar" \
+https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/${vrw}/PAPER/ViaRewind-${vrw}.jar
+https://download.luckperms.net/${MV_LUCKPERMS_BUILD}/bukkit/loader/LuckPerms-Bukkit-${MV_LUCKPERMS_VERSION}.jar
+https://cdn.modrinth.com/data/eCvG237D/versions/${MV_SERVERSELECTOR_MODRINTH_FILE}/ServerSelector-${MV_SERVERSELECTOR_VERSION}.jar" \
     itzg/minecraft-server:2026.7.0 >/dev/null
 
   local waited=0

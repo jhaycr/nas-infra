@@ -44,16 +44,19 @@ rcon "fill -13 -60 11 -11 -58 13 oak_planks"
 rcon "fill 11 -60 -13 13 -58 -11 oak_planks"
 rcon "fill -13 -60 -13 -11 -58 -11 oak_planks"
 
-# Spawn in the middle, spread joins a little
+# Spawn in the middle, spread joins a little.
+# Gamerule ids are the 26.x snake_case registry names; several were renamed
+# outright in 25w44a (doDaylightCycle -> advance_time, doMobSpawning ->
+# spawn_mobs, spawnRadius -> respawn_radius, ...).
 rcon "setworldspawn 0 -60 0"
-rcon "gamerule spawnRadius 8"
+rcon "gamerule respawn_radius 8"
 
 # Arena rules: instant respawn, always day, no weather, no mobs
-rcon "gamerule doImmediateRespawn true"
-rcon "gamerule doDaylightCycle false"
-rcon "gamerule doWeatherCycle false"
-rcon "gamerule doMobSpawning false"
-rcon "gamerule keepInventory false"
+rcon "gamerule immediate_respawn true"
+rcon "gamerule advance_time false"
+rcon "gamerule advance_weather false"
+rcon "gamerule spawn_mobs false"
+rcon "gamerule keep_inventory false"
 rcon "time set day"
 rcon "weather clear"
 

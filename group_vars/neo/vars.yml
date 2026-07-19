@@ -67,6 +67,9 @@ minecraft_versions:
   viarewind: "4.1.3"
   luckperms_version: "5.5.60"
   luckperms_build: 1648
+  serverselector_version: "1.8"
+  serverselector_modrinth_file: "42b8TojQ"
+  playerkits_spiget_id: "112616"
 
 # -----
 # jhaycr-local.semaphore
