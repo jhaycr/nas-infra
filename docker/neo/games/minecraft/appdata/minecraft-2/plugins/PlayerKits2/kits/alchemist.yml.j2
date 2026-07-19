@@ -1,0 +1,83 @@
+# Splash-potion kit. potion_data.type = Bukkit PotionType enum names
+# (verified against Paper API: HARMING, SLOWNESS, HEALING). Format: see warrior.yml.j2.
+cooldown: 60
+permission_required: false
+auto_armor: true
+clear_inventory: true
+items:
+  1:
+    id: STONE_SWORD
+    amount: 1
+  2:
+    id: SPLASH_POTION
+    amount: 1
+    name: "&cSplash Potion of Harming"
+    potion_data:
+      type: HARMING
+  3:
+    id: SPLASH_POTION
+    amount: 1
+    name: "&cSplash Potion of Harming"
+    potion_data:
+      type: HARMING
+  4:
+    id: SPLASH_POTION
+    amount: 1
+    name: "&7Splash Potion of Slowness"
+    potion_data:
+      type: SLOWNESS
+  5:
+    id: SPLASH_POTION
+    amount: 1
+    name: "&dSplash Potion of Healing"
+    potion_data:
+      type: HEALING
+  6:
+    id: GOLDEN_APPLE
+    amount: 2
+  7:
+    id: COOKED_BEEF
+    amount: 16
+  8:
+    id: LEATHER_HELMET
+    amount: 1
+  9:
+    id: LEATHER_CHESTPLATE
+    amount: 1
+  10:
+    id: LEATHER_LEGGINGS
+    amount: 1
+  11:
+    id: LEATHER_BOOTS
+    amount: 1
+display:
+  default:
+    id: SPLASH_POTION
+    name: '&5&lAlchemist &5Kit'
+    lore:
+      - '&fThis kit includes:'
+      - '&8- &7x2 Splash harming, x1 slowness'
+      - '&8- &7x1 Splash healing (throw at your feet!)'
+      - '&8- &7Stone sword, leather armor'
+      - ' '
+      - '&7Cooldown: &c1 minute'
+      - ''
+      - '&aLeft Click to claim!'
+      - '&bRight Click to preview!'
+    item_flags:
+      - HIDE_ATTRIBUTES
+  cooldown:
+    id: SPLASH_POTION
+    name: '&5&lAlchemist &5Kit'
+    lore:
+      - "&cYou need to wait &7%time%"
+      - "&cto claim this kit again."
+    item_flags:
+      - HIDE_ATTRIBUTES
+actions:
+  claim:
+    1:
+      action: "playsound: BLOCK_NOTE_BLOCK_PLING;10;2"
+  error:
+    1:
+      action: "playsound: BLOCK_NOTE_BLOCK_PLING;10;0.1"

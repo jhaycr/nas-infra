@@ -1,45 +1,45 @@
-# Tanky melee PVP kit. Format: see warrior.yml.j2.
+# Firework-crossbow kit. Rockets load from the OFF HAND into a crossbow. Format: see warrior.yml.j2.
 cooldown: 60
 permission_required: false
 auto_armor: true
 clear_inventory: true
 items:
   1:
-    id: IRON_SWORD
+    id: CROSSBOW
     amount: 1
-    enchants:
-      - "KNOCKBACK;1"
   2:
-    id: SHIELD
-    amount: 1
+    id: FIREWORK_ROCKET
+    amount: 24
   3:
+    id: STONE_SWORD
+    amount: 1
+  4:
     id: GOLDEN_APPLE
     amount: 2
-  4:
+  5:
     id: COOKED_BEEF
     amount: 16
-  5:
-    id: IRON_HELMET
-    amount: 1
   6:
-    id: DIAMOND_CHESTPLATE
+    id: CHAINMAIL_HELMET
     amount: 1
   7:
-    id: IRON_LEGGINGS
+    id: CHAINMAIL_CHESTPLATE
     amount: 1
   8:
-    id: IRON_BOOTS
+    id: CHAINMAIL_LEGGINGS
+    amount: 1
+  9:
+    id: CHAINMAIL_BOOTS
     amount: 1
 display:
   default:
-    id: DIAMOND_CHESTPLATE
-    name: '&b&lKnight &bKit'
+    id: FIREWORK_ROCKET
+    name: '&c&lBomber &cKit'
     lore:
       - '&fThis kit includes:'
-      - '&8- &7Knockback iron sword + shield'
-      - '&8- &7Diamond chestplate, iron armor'
-      - '&8- &7x2 Golden apples, x16 steak'
-      - '&8- &7No bow - get in close!'
+      - '&8- &7Crossbow + x24 firework rockets'
+      - '&8- &7Hold rockets in your OFF HAND to load them!'
+      - '&8- &7Stone sword, chainmail armor'
       - ' '
       - '&7Cooldown: &c1 minute'
       - ''
@@ -48,8 +48,8 @@ display:
     item_flags:
       - HIDE_ATTRIBUTES
   cooldown:
-    id: DIAMOND_CHESTPLATE
-    name: '&b&lKnight &bKit'
+    id: FIREWORK_ROCKET
+    name: '&c&lBomber &cKit'
     lore:
       - "&cYou need to wait &7%time%"
       - "&cto claim this kit again."

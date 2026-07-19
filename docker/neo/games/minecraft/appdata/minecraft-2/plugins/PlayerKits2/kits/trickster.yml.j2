@@ -1,45 +1,48 @@
-# Tanky melee PVP kit. Format: see warrior.yml.j2.
+# Knockback/utility kit: fishing rod hooks, snowball + egg spam. Format: see warrior.yml.j2.
 cooldown: 60
 permission_required: false
 auto_armor: true
 clear_inventory: true
 items:
   1:
-    id: IRON_SWORD
+    id: STONE_SWORD
     amount: 1
-    enchants:
-      - "KNOCKBACK;1"
   2:
-    id: SHIELD
+    id: FISHING_ROD
     amount: 1
   3:
-    id: GOLDEN_APPLE
-    amount: 2
+    id: SNOWBALL
+    amount: 16
   4:
-    id: COOKED_BEEF
+    id: EGG
     amount: 16
   5:
-    id: IRON_HELMET
-    amount: 1
+    id: GOLDEN_APPLE
+    amount: 2
   6:
-    id: DIAMOND_CHESTPLATE
-    amount: 1
+    id: COOKED_BEEF
+    amount: 16
   7:
-    id: IRON_LEGGINGS
+    id: LEATHER_HELMET
     amount: 1
   8:
-    id: IRON_BOOTS
+    id: LEATHER_CHESTPLATE
+    amount: 1
+  9:
+    id: LEATHER_LEGGINGS
+    amount: 1
+  10:
+    id: LEATHER_BOOTS
     amount: 1
 display:
   default:
-    id: DIAMOND_CHESTPLATE
-    name: '&b&lKnight &bKit'
+    id: FISHING_ROD
+    name: '&d&lTrickster &dKit'
     lore:
       - '&fThis kit includes:'
-      - '&8- &7Knockback iron sword + shield'
-      - '&8- &7Diamond chestplate, iron armor'
-      - '&8- &7x2 Golden apples, x16 steak'
-      - '&8- &7No bow - get in close!'
+      - '&8- &7Fishing rod - hook and yank players!'
+      - '&8- &7x16 Snowballs, x16 eggs (knockback)'
+      - '&8- &7Stone sword, leather armor'
       - ' '
       - '&7Cooldown: &c1 minute'
       - ''
@@ -48,8 +51,8 @@ display:
     item_flags:
       - HIDE_ATTRIBUTES
   cooldown:
-    id: DIAMOND_CHESTPLATE
-    name: '&b&lKnight &bKit'
+    id: FISHING_ROD
+    name: '&d&lTrickster &dKit'
     lore:
       - "&cYou need to wait &7%time%"
       - "&cto claim this kit again."
