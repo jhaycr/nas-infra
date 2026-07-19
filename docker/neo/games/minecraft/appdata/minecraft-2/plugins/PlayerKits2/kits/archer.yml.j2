@@ -1,48 +1,47 @@
-# Starter PVP kit for the pvp backend. Claim in-game with /kit.
-# Format reference: https://github.com/Ajneb97/PlayerKits2 (kits/*.yml)
+# Ranged PVP kit. Format: see warrior.yml.j2.
 cooldown: 60
 permission_required: false
 auto_armor: true
 items:
   1:
-    id: IRON_SWORD
+    id: STONE_SWORD
     amount: 1
   2:
     id: BOW
     amount: 1
   3:
-    id: ARROW
-    amount: 32
-  4:
-    id: SHIELD
+    id: CROSSBOW
     amount: 1
+  4:
+    id: ARROW
+    amount: 64
   5:
     id: GOLDEN_APPLE
-    amount: 3
+    amount: 2
   6:
     id: COOKED_BEEF
     amount: 16
   7:
-    id: IRON_HELMET
+    id: CHAINMAIL_HELMET
     amount: 1
   8:
-    id: IRON_CHESTPLATE
+    id: CHAINMAIL_CHESTPLATE
     amount: 1
   9:
-    id: IRON_LEGGINGS
+    id: CHAINMAIL_LEGGINGS
     amount: 1
   10:
-    id: IRON_BOOTS
+    id: CHAINMAIL_BOOTS
     amount: 1
 display:
   default:
-    id: IRON_SWORD
-    name: '&c&lWarrior &cKit'
+    id: BOW
+    name: '&e&lArcher &eKit'
     lore:
       - '&fThis kit includes:'
-      - '&8- &7Iron sword, bow + 32 arrows, shield'
-      - '&8- &7Full iron armor (auto-equipped)'
-      - '&8- &7x3 Golden apples, x16 steak'
+      - '&8- &7Bow + crossbow, x64 arrows'
+      - '&8- &7Stone sword, chainmail armor'
+      - '&8- &7x2 Golden apples, x16 steak'
       - ' '
       - '&7Cooldown: &c1 minute'
       - ''
@@ -51,8 +50,8 @@ display:
     item_flags:
       - HIDE_ATTRIBUTES
   cooldown:
-    id: IRON_SWORD
-    name: '&c&lWarrior &cKit'
+    id: BOW
+    name: '&e&lArcher &eKit'
     lore:
       - "&cYou need to wait &7%time%"
       - "&cto claim this kit again."

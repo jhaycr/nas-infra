@@ -34,7 +34,7 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/{{ minecraft_versions.viaversion }}/PAPER/ViaVersion-{{ minecraft_versions.viaversion }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaBackwards/versions/{{ minecraft_versions.viabackwards }}/PAPER/ViaBackwards-{{ minecraft_versions.viabackwards }}.jar
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/{{ minecraft_versions.viarewind }}/PAPER/ViaRewind-{{ minecraft_versions.viarewind }}.jar
-        https://cdn.modrinth.com/data/eCvG237D/versions/42b8TojQ/ServerSelector-1.8.jar
+        https://cdn.modrinth.com/data/eCvG237D/versions/{{ minecraft_versions.serverselector_modrinth_file }}/ServerSelector-{{ minecraft_versions.serverselector_version }}.jar
     networks:
       - minecraft
     volumes:
@@ -95,7 +95,15 @@ services:
       VELOCITY_ENABLED: "true"
       VELOCITY_SECRET: {{ secret_minecraft_velocity_secret }}
       SERVER_NAME: PVP
-      MODE: "survival"
+      # Dedicated flat arena world (old "world" dir stays on the volume;
+      # revert = drop LEVEL/LEVEL_TYPE). Adventure mode keeps the arena
+      # ungriefable while PVP still works; bin/minecraft-build-pvp-arena.sh
+      # builds the arena and sets gamerules.
+      LEVEL: "arena"
+      LEVEL_TYPE: "FLAT"
+      GENERATE_STRUCTURES: "false"
+      MODE: "adventure"
+      FORCE_GAMEMODE: "true"
       DIFFICULTY: "normal"
       MAX_PLAYERS: "16"
       PVP: "true"
@@ -109,7 +117,7 @@ services:
         https://hangarcdn.papermc.io/plugins/ViaVersion/ViaRewind/versions/{{ minecraft_versions.viarewind }}/PAPER/ViaRewind-{{ minecraft_versions.viarewind }}.jar
         https://download.luckperms.net/{{ minecraft_versions.luckperms_build }}/bukkit/loader/LuckPerms-Bukkit-{{ minecraft_versions.luckperms_version }}.jar
       # PlayerKits 2 (kits via /kit GUI): https://www.spigotmc.org/resources/112616/
-      SPIGET_RESOURCES: "112616"
+      SPIGET_RESOURCES: "{{ minecraft_versions.playerkits_spiget_id }}"
     labels:
       lazymc.enabled: "true"
       lazymc.group: "pvp"
