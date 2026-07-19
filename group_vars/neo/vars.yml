@@ -82,6 +82,15 @@ minecraft_versions:
 forge_version: "2.0.13"
 
 # -----
+# Matrix stack (docker/neo/media-server/continuwuity, element, baibot).
+# Internal-only (WireGuard/LAN via npm-internal) - see
+# docker/neo/media-server/continuwuity/README.md. matrix_admin_user is the
+# localpart of Josh's Matrix account (@josh:matrix.lab.<secret_domain>) -
+# used to scope baibot's admin and allowed-user patterns to Josh only.
+# -----
+matrix_admin_user: josh
+
+# -----
 # jhaycr-local.semaphore
 # -----
 semaphore_url: "http://localhost:3030"
@@ -326,7 +335,7 @@ logrotate_logs:
 # Release tag of ghcr.io/jhaycr/tarot to run. Override with a locally loaded
 # image for testing: make neo-docker EXTRA_VARS="tarot_image_tag=dev"
 # (see bin/tarot-deploy-dev.sh)
-tarot_image_tag: "0.5.0"
+tarot_image_tag: "0.6.0"
 # Authentik usernames allowed to manage the AI connection in-app;
 # "local" keeps direct LAN access (no proxy headers) as admin.
 tarot_admin_users: "josh,local"
