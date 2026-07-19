@@ -14,14 +14,23 @@ import struct
 import time
 
 
-def _addr(env, default):
-    host, port = os.environ.get(env, default).rsplit(":", 1)
+def _addr(spec):
+    host, port = spec.rsplit(":", 1)
     return host, int(port)
 
 
-LOBBY = _addr("LOBBY_ADDR", "minecraft-lobby:25565")
-WAKE = _addr("WAKE_ADDR", "lazymc:25566")
-BACKEND = _addr("BACKEND_ADDR", "10.86.86.11:25565")
+LOBBY = _addr(os.environ.get("LOBBY_ADDR", "minecraft-lobby:25565"))
+# name=wake_host:port=backend_host:port, comma-separated
+TARGETS = [
+    (name, _addr(wake), _addr(backend))
+    for name, wake, backend in (
+        spec.split("=")
+        for spec in os.environ.get(
+            "TARGETS",
+            "survival=lazymc:25566=10.86.86.11:25565,pvp=lazymc:25567=10.86.86.12:25565",
+        ).split(",")
+    )
+]
 POLL_SECONDS = int(os.environ.get("POLL_SECONDS", "10"))
 WAKE_COOLDOWN = int(os.environ.get("WAKE_COOLDOWN", "180"))
 PROTOCOL = int(os.environ.get("PROTOCOL", "776"))
@@ -103,25 +112,25 @@ def lobby_players():
     return status["players"]["online"]
 
 
-def backend_up():
+def backend_up(backend):
     try:
-        with socket.create_connection(BACKEND, timeout=2):
+        with socket.create_connection(backend, timeout=2):
             return True
     except OSError:
         return False
 
 
-def send_wake():
+def send_wake(wake):
     """A login attempt is what makes lazymc start the backend; it never completes."""
-    with socket.create_connection(WAKE, timeout=5) as s:
-        s.sendall(handshake(*WAKE, next_state=2))
+    with socket.create_connection(wake, timeout=5) as s:
+        s.sendall(handshake(*wake, next_state=2))
         s.sendall(packet(0, mcstring("LobbyWarmer") + b"\x00" * 16))
         time.sleep(1)
 
 
 def main():
-    log(f"warmer: lobby={LOBBY} wake={WAKE} backend={BACKEND} poll={POLL_SECONDS}s")
-    last_wake = 0.0
+    log(f"warmer: lobby={LOBBY} targets={[t[0] for t in TARGETS]} poll={POLL_SECONDS}s")
+    last_wake = {name: 0.0 for name, _, _ in TARGETS}
     last_players = None
     while True:
         try:
@@ -133,13 +142,15 @@ def main():
         if players != last_players:
             log(f"warmer: lobby players = {players}")
             last_players = players
-        if players and time.time() - last_wake > WAKE_COOLDOWN and not backend_up():
-            log("warmer: lobby occupied and survival asleep -> waking")
-            try:
-                send_wake()
-            except OSError as e:
-                log(f"warmer: wake failed: {e}")
-            last_wake = time.time()
+        if players:
+            for name, wake, backend in TARGETS:
+                if time.time() - last_wake[name] > WAKE_COOLDOWN and not backend_up(backend):
+                    log(f"warmer: lobby occupied and {name} asleep -> waking")
+                    try:
+                        send_wake(wake)
+                    except OSError as e:
+                        log(f"warmer: wake {name} failed: {e}")
+                    last_wake[name] = time.time()
         time.sleep(POLL_SECONDS)
 
 
