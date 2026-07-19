@@ -15,7 +15,7 @@ services:
   # init runs, then exits; forge waits for it via depends_on/service_completed_successfully.
   forge-init:
     container_name: forge-init
-    image: busybox:1.36.1
+    image: busybox:1.38.0
     command: ["sh", "-c", "chmod +x /custom-cont-init.d/*.sh"]
     volumes:
       - {{ docker_appdata_path }}/forge/custom-cont-init.d:/custom-cont-init.d
