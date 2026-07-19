@@ -1,0 +1,38 @@
+---
+services:
+
+  # Forge has no server mode — this runs a full desktop (LinuxServer Webtop,
+  # KasmVNC-in-browser) with Forge installed as a regular XFCE app. One
+  # "player" hosts a game from inside the desktop; other players connect
+  # from their own Forge clients over TCP 36743 (see PLAYING.md in the
+  # Forge release docs — Forge multiplayer is peer-to-peer, not a server
+  # container).
+  #
+  # forge-init: the compose-generation pipeline (jhaycr-local.docker_compose)
+  # hardcodes mode 0644 when it templates appdata files, but LinuxServer's
+  # custom-cont-init.d silently ignores any script that isn't executable.
+  # This one-shot helper fixes the bit on the shared volume before webtop's
+  # init runs, then exits; forge waits for it via depends_on/service_completed_successfully.
+  forge-init:
+    container_name: forge-init
+    image: busybox:1.36.1
+    command: ["sh", "-c", "chmod +x /custom-cont-init.d/*.sh"]
+    volumes:
+      - {{ docker_appdata_path }}/forge/custom-cont-init.d:/custom-cont-init.d
+
+  forge:
+    container_name: forge
+    image: lscr.io/linuxserver/webtop:ubuntu-xfce-version-4c34ccd4
+    shm_size: "1gb"
+    depends_on:
+      forge-init:
+        condition: service_completed_successfully
+    environment:
+      DOCKER_MODS: linuxserver/mods:universal-package-install
+      INSTALL_PACKAGES: openjdk-17-jre
+    volumes:
+      - {{ docker_appdata_path }}/forge:/config
+      - {{ docker_appdata_path }}/forge/custom-cont-init.d:/custom-cont-init.d:ro
+    ports:
+      - "3010:3000"
+      - "36743:36743"
