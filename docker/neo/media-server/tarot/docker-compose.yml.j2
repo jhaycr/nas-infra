@@ -12,7 +12,11 @@ services:
       - {{ docker_appdata_path }}/tarot:/data
     # Multi-user: front with authentik proxy provider; identity comes from the
     # X-authentik-username header. Direct LAN access maps to user "local".
-    # environment:
-    #   TAROT_LLM_BASE_URL: http://ollama:11434/v1  # enables AI interpretation
-    #   TAROT_LLM_MODEL: llama3.1
-    #   TAROT_LLM_API_KEY: reference a secret_tarot_llm_api_key vault var here if needed
+    #
+    # AI interpretation: preferred path is the in-app Settings page as an admin
+    # (OpenRouter/OpenAI/Anthropic/Ollama base URL + model; the API key is
+    # encrypted at rest in /data). Env alternative: set TAROT_LLM_BASE_URL
+    # (e.g. https://openrouter.ai/api/v1), TAROT_LLM_MODEL (e.g.
+    # minimax/minimax-m2) and TAROT_LLM_API_KEY from a secret_* vault var.
+    # When exposing via authentik, also set TAROT_ADMIN_USERS to the usernames
+    # allowed to edit the AI connection.
