@@ -1,0 +1,14 @@
+---
+services:
+
+  synapse:
+    container_name: synapse
+    image: ghcr.io/element-hq/synapse:v1.156.0
+    # Run as uid/gid 1000 so it owns the appdata bind-mount (appdata is user0).
+    # Synapse ignores the PUID/PGID env the override injects (that's an LSIO
+    # convention); the `user:` directive is what actually sets the runtime uid.
+    user: "1000:1000"
+    ports:
+      - "8014:8008"
+    volumes:
+      - {{ docker_appdata_path }}/synapse:/data

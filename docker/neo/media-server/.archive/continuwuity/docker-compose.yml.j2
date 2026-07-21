@@ -1,0 +1,22 @@
+---
+services:
+
+  continuwuity:
+    container_name: continuwuity
+    # TEMPORARY: pinned to a `main` build (by digest) because the newest tagged
+    # release, v26.6.2 (2026-07-12), predates the fix for bug #779 — rooms not
+    # syncing their state to a client on join, which breaks the baibot bridge
+    # (see README.md "Troubleshooting"). The fix is commit eff454218c
+    # (2026-07-17), main-only for now. Revert to a pinned v26.6.x tag once a
+    # release past that commit ships (then Renovate resumes managing it).
+    image: forgejo.ellis.link/continuwuation/continuwuity:main@sha256:f7d429bd5b6c211316b02d898aaa8420726d7163cec211c223fb248de7d9590e
+    # Upstream ships /sbin/conduwuit as the binary name (continuwuity forked
+    # from conduwuit and kept the entrypoint name); the base image's default
+    # entrypoint doesn't invoke it, so it must be set explicitly here.
+    command: /sbin/conduwuit
+    ports:
+      - "8014:8008"
+    volumes:
+      - {{ docker_appdata_path }}/continuwuity:/var/lib/continuwuity
+    env_file:
+      - .env
