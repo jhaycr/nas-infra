@@ -48,6 +48,19 @@ services:
         mkdir -p /etc/grafana/dashboards
         cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
         apiVersion: 1
+        # deleteDatasources runs before datasources are provisioned, so it purges
+        # any pre-existing "Loki"/"Prometheus" records that were created (on an
+        # older stack) WITHOUT a pinned uid. Provisioning matches by name and will
+        # NOT rewrite an existing datasource's uid, so without this the uid:loki /
+        # uid:prometheus pins below are silently ignored and the Loki datasource
+        # keeps its auto-generated uid. That breaks the SnapRAID alert rule, which
+        # hardcodes datasourceUid: loki (alerts can't use dashboard variables) ->
+        # "data source not found" -> execErrState Alerting -> perpetual false alert.
+        deleteDatasources:
+        - name: Loki
+          orgId: 1
+        - name: Prometheus
+          orgId: 1
         datasources:
         - name: Loki
           type: loki
