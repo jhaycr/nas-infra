@@ -1,0 +1,10 @@
+---
+services:
+
+  element:
+    container_name: element
+    image: vectorim/element-web:v1.12.23
+    ports:
+      - "8015:80"
+    volumes:
+      - {{ docker_appdata_path }}/element/config.json:/app/config.json

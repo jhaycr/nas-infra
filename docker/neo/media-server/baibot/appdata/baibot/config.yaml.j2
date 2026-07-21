@@ -1,0 +1,84 @@
+# baibot (Matrix <-> LLM bridge) config. Schema per upstream
+# etc/app/config.yml.dist. Bridges the "hermes" Matrix bot user to the
+# Hermes agent running on smith (192.168.1.61:8642) via its OpenAI-compatible
+# API endpoint.
+
+homeserver:
+  server_name: matrix.lab.{{ secret_domain }}
+  url: http://continuwuity:8008
+
+user:
+  mxid_localpart: hermes
+  password: "{{ secret_baibot_matrix_password }}"
+  name: Hermes
+  encryption:
+    recovery_passphrase: "{{ secret_baibot_recovery_passphrase }}"
+    # Never auto-reset recovery on password/key loss - force a manual fix
+    # instead of silently starting a fresh (unverified) encryption identity.
+    recovery_reset_allowed: false
+
+command_prefix: "!hermes"
+
+room:
+  post_join_self_introduction_enabled: true
+
+# Restrict who can administer the bot (reconfigure agents, etc.) to Josh only.
+access:
+  admin_patterns:
+    - "@{{ matrix_admin_user }}:matrix.lab.{{ secret_domain }}"
+
+persistence:
+  data_dir_path: /data
+  session_encryption_key: "{{ secret_baibot_session_encryption_key }}"
+  config_encryption_key: "{{ secret_baibot_config_encryption_key }}"
+
+agents:
+  static_definitions:
+    - id: hermes
+      provider: openai-compatible
+      config:
+        base_url: http://192.168.1.61:8642/v1
+        api_key: "{{ secret_hermes_api_key }}"
+        text_generation:
+          model_id: hermes-agent
+          prompt: "You are Hermes, Josh's homelab AI agent, reachable here over Matrix via a WireGuard/LAN-only bridge. Be concise and helpful."
+          temperature: 1.0
+          max_response_tokens: 4096
+          max_context_tokens: 128000
+      # Hermes is text-only - no speech_to_text / text_to_speech / image_generation.
+    - id: whisper
+      provider: groq
+      config:
+        base_url: https://api.groq.com/openai/v1
+        api_key: "{{ secret_baibot_groq_api_key }}"
+        speech_to_text:
+          # whisper-large-v3-turbo, not whisper-large-v3 (upstream's sample
+          # config default) - turbo is the $0.04/hr model. Groq bills a
+          # 10-second minimum per request, so very short voice notes cost
+          # slightly more than their real duration.
+          model_id: whisper-large-v3-turbo
+      # Deliberately no text_generation block here - baibot derives an
+      # agent's capabilities from which config keys are present, so omitting
+      # it means this agent can only ever transcribe and can never
+      # accidentally get selected as a text-generation handler.
+      #
+      # Migration path: once local inference hardware exists, swap this to
+      # provider: openai-compatible with base_url pointed at a self-hosted
+      # faster-whisper server - nothing else in the stack changes.
+
+# Route text generation to the static "hermes" agent, speech-to-text to the
+# static "whisper" agent (Groq); no other providers configured. Restrict
+# usage to Josh only (not the whole homeserver) since this instance has
+# open-ish registration during bootstrap.
+initial_global_config:
+  handler:
+    catch_all: null
+    text_generation: static/hermes
+    text_to_speech: null
+    speech_to_text: static/whisper
+    image_generation: null
+  user_patterns:
+    - "@{{ matrix_admin_user }}:matrix.lab.{{ secret_domain }}"
+
+# Tracing filter string (not a map) - external crates at warn, our own at info.
+logging: warn,mxlink=info,baibot=info

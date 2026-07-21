@@ -1,0 +1,14 @@
+---
+services:
+
+  baibot:
+    container_name: baibot
+    image: ghcr.io/etkecc/baibot:v1.25.0
+    volumes:
+      - {{ docker_appdata_path }}/baibot:/data
+      - {{ docker_appdata_path }}/baibot/config.yaml:/config/config.yaml
+    environment:
+      BAIBOT_PERSISTENCE_DATA_DIR_PATH: /data
+      BAIBOT_CONFIG_FILE_PATH: /config/config.yaml
+    depends_on:
+      - continuwuity
