@@ -130,6 +130,33 @@ values, never grep it for secrets):
   `whisper` static agent for speech-to-text)
 - `secret_domain` (shared across the repo, not Matrix-specific)
 
+## Troubleshooting: Hermes stops replying (continuwuity #779)
+
+**Symptom:** you send a message and Hermes gets stuck "typing" and never
+replies, or Hermes is silent in a freshly-created room.
+
+**Cause:** continuwuity bug
+[#779](https://forgejo.ellis.link/continuwuation/continuwuity/issues/779) — on
+`/sync` v3, a room a client just joined sometimes comes down without its state
+(power levels, etc.), because a `/sync` landing mid-join hits broken DB
+invariants. baibot is the joining client, so it never gets the room's power
+levels: in an **encrypted** room it can't read history to build context ("Local
+cache doesn't contain all necessary data"); in a **plain** room its own send is
+rejected ("Event is not authorized"). Neither is a config error on our side.
+
+**On-demand workaround:** run `./resync-baibot.sh` (this directory). It restarts
+baibot; on the fresh sync, already-joined rooms come down with full state and
+replies work again. For a **new** room: invite `@hermes`, wait for "Hermes
+joined", *then* run the script, *then* send your first message. `--logs` appends
+recent baibot logs for diagnosis.
+
+**Permanent fix:** #779 is fixed by continuwuity commit `eff454218c`
+(2026-07-17), which is **not** in any tagged release as of the pinned `v26.6.2`
+(2026-07-12). When a release past that ships, Renovate will bump the
+`continuwuity` image in `docker-compose.yml.j2` and this workaround becomes
+unnecessary. To fix sooner, move the image tag to `main` (bleeding edge,
+unpinned — accept the reproducibility tradeoff) and redeploy.
+
 ## Voice messages
 
 Send a voice message in Element X / FluffyChat to the Hermes bot and it
