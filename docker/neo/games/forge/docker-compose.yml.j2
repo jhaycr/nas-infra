@@ -22,7 +22,7 @@ services:
   # depends_on dependency without needing a separate --profile flag.
   forge-init:
     container_name: forge-init
-    image: busybox:1.36.1
+    image: busybox:1.38.0
     profiles:
       - manual
     command: ["sh", "-c", "chmod +x /custom-cont-init.d/*.sh"]
