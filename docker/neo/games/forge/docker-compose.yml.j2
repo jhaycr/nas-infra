@@ -13,9 +13,18 @@ services:
   # custom-cont-init.d silently ignores any script that isn't executable.
   # This one-shot helper fixes the bit on the shared volume before webtop's
   # init runs, then exits; forge waits for it via depends_on/service_completed_successfully.
+  #
+  # Both services carry the "manual" profile so `make neo-docker` (plain
+  # `up --remove-orphans`, no --profile flag) never starts either one, and a
+  # running instance is left alone by later deploys. forge-init shares the
+  # profile so that explicitly targeting `forge` (which auto-activates a
+  # targeted service's own profile) also brings up its first-level
+  # depends_on dependency without needing a separate --profile flag.
   forge-init:
     container_name: forge-init
     image: busybox:1.36.1
+    profiles:
+      - manual
     command: ["sh", "-c", "chmod +x /custom-cont-init.d/*.sh"]
     volumes:
       - {{ docker_appdata_path }}/forge/custom-cont-init.d:/custom-cont-init.d
@@ -24,12 +33,19 @@ services:
     container_name: forge
     image: lscr.io/linuxserver/webtop:ubuntu-xfce-version-4c34ccd4
     shm_size: "1gb"
+    profiles:
+      - manual
     depends_on:
       forge-init:
         condition: service_completed_successfully
     environment:
       DOCKER_MODS: linuxserver/mods:universal-package-install
-      INSTALL_PACKAGES: openjdk-17-jre
+      # bzip2 is required at runtime: forge-installer-*.tar.bz2 needs it to
+      # decompress (tar -xjf shells out to bzip2), but the webtop base image
+      # doesn't ship it — confirmed missing via `docker exec forge which
+      # bzip2` after a real install failure (tar exited 2, empty version dir
+      # left behind). openjdk-17-jre is Forge's own runtime requirement.
+      INSTALL_PACKAGES: openjdk-17-jre|bzip2
     volumes:
       - {{ docker_appdata_path }}/forge:/config
       - {{ docker_appdata_path }}/forge/custom-cont-init.d:/custom-cont-init.d:ro

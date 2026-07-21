@@ -21,6 +21,19 @@ services:
     # lazymc owns these containers' lifecycle; docker must not auto-restart them
     restart: "no"
     logging: *default-logging
+{% elif service in ['forge-init'] %}
+    # One-shot chmod helper (see docker/neo/games/forge/docker-compose.yml.j2)
+    # runs to completion and exits 0 — must not be restarted.
+    restart: "no"
+    logging: *default-logging
+{% elif service in ['forge', 'xmage'] %}
+    # Manual-start-only games (compose "manual" profile, never brought up by
+    # `make neo-docker`). restart "no" so a Docker daemon restart or host
+    # reboot doesn't resurrect an instance Josh started/stopped by hand —
+    # profiles only gate `docker compose up`, not the container's own
+    # restart policy once it exists.
+    restart: "no"
+    logging: *default-logging
 {% else %}
     <<: *common-keys
 {% endif %}
