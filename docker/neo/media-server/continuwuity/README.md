@@ -54,20 +54,38 @@ repo, so they can't be rendered from a template — add them by hand once,
 in the admin UI at `http://192.168.1.3:81`:
 
 1. **`matrix.lab.<domain>`** → forward to `continuwuity:8008`
-   - Enable **Websockets Support** (Matrix sync uses long-polling/websockets)
-   - SSL tab: use the existing `*.lab.<domain>` wildcard cert (same one
-     `vaultwarden`/`healthchecks`/`jellyfin` use), force SSL
+   - Enable **Websockets Support** — Matrix sync relies on long-lived
+     connections; without this it fails intermittently and confusingly
+   - SSL tab: a `*.lab.<domain>` wildcard cert, force SSL
 2. **`chat.lab.<domain>`** → forward to `element:80`
    - SSL tab: same `*.lab.<domain>` cert, force SSL
 
+The cert must be a **Let's Encrypt wildcard for `*.lab.<domain>` via the
+Cloudflare DNS-01 challenge** — HTTP-01 can't work here, because the hostname
+resolves to a private IP Let's Encrypt can't reach. If npm-internal doesn't
+already hold that cert, create it first: SSL Certificates → Add → Let's
+Encrypt → "Use a DNS Challenge" → Cloudflare → API token.
+
 ### DNS
 
-`*.lab.<domain>` must already resolve to neo's LAN IP (192.168.1.3). This
-is what makes the hostname reachable over WireGuard/LAN (where the resolver
-sees 192.168.1.3 and can route to it) while remaining unreachable from the
-public internet (an RFC1918 address isn't routable out there, so a public
-DNS record pointing at it is safe by construction — nothing new to set up
-here if `vaultwarden`/`healthchecks`/`jellyfin` already resolve correctly).
+`*.lab.<domain>` must resolve to neo's LAN IP (192.168.1.3). A public DNS
+record pointing at an RFC1918 address is safe by construction: reachable
+over WireGuard/LAN (the resolver returns 192.168.1.3 and you can route to
+it), dead from the public internet (that address isn't routable there).
+
+This is a **wildcard you must add explicitly** — it is NOT covered by the
+existing `*.<domain>` Cloudflare tunnel record, because DNS wildcards match
+only a single label: `*.<domain>` matches `foo.<domain>` but not
+`foo.lab.<domain>`. In Cloudflare (jjosh.org → DNS → Add record):
+
+    Type: A   Name: *.lab   IPv4: 192.168.1.3   Proxy: DNS only (grey)   TTL: Auto
+
+It will display "DNS only - reserved IP" (Cloudflare flagging the private
+IP) — expected, same as the existing `lab.<domain>` record. Do **not** proxy
+it (orange cloud): a proxied record on a private IP breaks and defeats the
+LAN-only design. Verify: `dig +short matrix.lab.<domain> @8.8.8.8` →
+`192.168.1.3`. One wildcard covers `matrix.lab`, `chat.lab`, and any future
+`.lab` service.
 
 ## Bootstrap sequence (first deploy)
 
@@ -76,16 +94,26 @@ here if `vaultwarden`/`healthchecks`/`jellyfin` already resolve correctly).
    `continuwuity/.env.j2`) and the registration token set via
    `secret_continuwuity_registration_token`.
 2. Add the two npm-internal proxy hosts above.
-3. Register two accounts against `https://matrix.lab.<domain>` using the
-   registration token:
-   - `josh` — Josh's personal account (matches `matrix_admin_user` in
-     `group_vars/neo/vars.yml`)
-   - `hermes` — the bot account baibot logs in as
-     (`user.mxid_localpart` in `baibot/appdata/baibot/config.yaml.j2`)
+3. Register two accounts. **continuwuity ignores `REGISTRATION_TOKEN` for the
+   very first account**: on first boot with no accounts it prints a one-time
+   *bootstrap* token to its logs (`docker logs continuwuity` → "using the
+   registration token ..."), and whoever registers first with it becomes the
+   server admin. So order matters:
+   - `josh` **first**, with the bootstrap token — run
+     `bootstrap-register-josh.sh` (this directory); it fetches the token from
+     the logs and prompts (with confirmation) for a password. This is the
+     admin account (matches `matrix_admin_user` in `group_vars/neo/vars.yml`).
+   - `hermes` **second**, with the now-active
+     `secret_continuwuity_registration_token` — the bot account baibot logs in
+     as (`user.mxid_localpart` in `baibot/appdata/baibot/config.yaml.j2`).
 4. Flip `CONTINUWUITY_ALLOW_REGISTRATION` to `false` in
    `continuwuity/.env.j2` and redeploy (`make neo-docker`). Leaving
    registration open past this point means anyone who can reach
    `matrix.lab.<domain>` over WireGuard/LAN can create accounts.
+
+_Status: bootstrapped 2026-07-21 — both accounts exist and registration is
+flipped to `false` in the template (deploy to apply). The steps above are the
+runbook for a from-scratch rebuild._
 
 ## Required secrets
 
