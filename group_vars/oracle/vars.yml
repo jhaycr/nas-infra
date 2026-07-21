@@ -29,4 +29,6 @@ hass_control_config_files:
   - appliance-dashboard
 
 # Jinja2-templated files (e.g. secrets.yaml) rendered from templates/home_assistant/
-hass_control_config_templates: []
+# secrets: renders secrets.yaml (plex_token from neo vault — see site.yml vars_files)
+hass_control_config_templates:
+  - secrets
