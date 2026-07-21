@@ -1,0 +1,29 @@
+---
+services:
+
+  # True client/server MTG engine (github.com/magefree/mage) — unlike Forge,
+  # this is server-only: players connect with their own XMage client, and
+  # the server holds no card art (art is fetched client-side on demand).
+  # Manual-start only — see docker-compose.override.yml.j2's no-restart
+  # carve-out and the "manual" profile below; never brought up by
+  # `make neo-docker` or a host/daemon restart.
+  #
+  # Image: klastic/xmage-beta, a fork of mage-docker/xmage-beta-docker
+  # (https://hub.docker.com/r/goesta/xmage-beta) tracking upstream XMage
+  # "dev" builds. Pin format is <xmage_version>-dev_<build_date>; check
+  # https://hub.docker.com/r/klastic/xmage-beta/tags for a newer build.
+  xmage:
+    container_name: xmage
+    image: klastic/xmage-beta:1.4.60-dev_2026-07-11_16-06
+    profiles:
+      - manual
+    environment:
+      XMAGE_DOCKER_SERVER_ADDRESS: "{{ internal_ip_neo }}"
+      XMAGE_DOCKER_SERVER_NAME: "neo-xmage"
+      XMAGE_DOCKER_AUTHENTICATION_ACTIVATED: "false"
+    volumes:
+      - {{ docker_appdata_path }}/xmage/db:/xmage/db
+      - {{ docker_appdata_path }}/xmage/saved:/xmage/saved
+    ports:
+      - "17171:17171"
+      - "17179:17179"
