@@ -54,20 +54,38 @@ repo, so they can't be rendered from a template — add them by hand once,
 in the admin UI at `http://192.168.1.3:81`:
 
 1. **`matrix.lab.<domain>`** → forward to `continuwuity:8008`
-   - Enable **Websockets Support** (Matrix sync uses long-polling/websockets)
-   - SSL tab: use the existing `*.lab.<domain>` wildcard cert (same one
-     `vaultwarden`/`healthchecks`/`jellyfin` use), force SSL
+   - Enable **Websockets Support** — Matrix sync relies on long-lived
+     connections; without this it fails intermittently and confusingly
+   - SSL tab: a `*.lab.<domain>` wildcard cert, force SSL
 2. **`chat.lab.<domain>`** → forward to `element:80`
    - SSL tab: same `*.lab.<domain>` cert, force SSL
 
+The cert must be a **Let's Encrypt wildcard for `*.lab.<domain>` via the
+Cloudflare DNS-01 challenge** — HTTP-01 can't work here, because the hostname
+resolves to a private IP Let's Encrypt can't reach. If npm-internal doesn't
+already hold that cert, create it first: SSL Certificates → Add → Let's
+Encrypt → "Use a DNS Challenge" → Cloudflare → API token.
+
 ### DNS
 
-`*.lab.<domain>` must already resolve to neo's LAN IP (192.168.1.3). This
-is what makes the hostname reachable over WireGuard/LAN (where the resolver
-sees 192.168.1.3 and can route to it) while remaining unreachable from the
-public internet (an RFC1918 address isn't routable out there, so a public
-DNS record pointing at it is safe by construction — nothing new to set up
-here if `vaultwarden`/`healthchecks`/`jellyfin` already resolve correctly).
+`*.lab.<domain>` must resolve to neo's LAN IP (192.168.1.3). A public DNS
+record pointing at an RFC1918 address is safe by construction: reachable
+over WireGuard/LAN (the resolver returns 192.168.1.3 and you can route to
+it), dead from the public internet (that address isn't routable there).
+
+This is a **wildcard you must add explicitly** — it is NOT covered by the
+existing `*.<domain>` Cloudflare tunnel record, because DNS wildcards match
+only a single label: `*.<domain>` matches `foo.<domain>` but not
+`foo.lab.<domain>`. In Cloudflare (jjosh.org → DNS → Add record):
+
+    Type: A   Name: *.lab   IPv4: 192.168.1.3   Proxy: DNS only (grey)   TTL: Auto
+
+It will display "DNS only - reserved IP" (Cloudflare flagging the private
+IP) — expected, same as the existing `lab.<domain>` record. Do **not** proxy
+it (orange cloud): a proxied record on a private IP breaks and defeats the
+LAN-only design. Verify: `dig +short matrix.lab.<domain> @8.8.8.8` →
+`192.168.1.3`. One wildcard covers `matrix.lab`, `chat.lab`, and any future
+`.lab` service.
 
 ## Bootstrap sequence (first deploy)
 
@@ -76,16 +94,26 @@ here if `vaultwarden`/`healthchecks`/`jellyfin` already resolve correctly).
    `continuwuity/.env.j2`) and the registration token set via
    `secret_continuwuity_registration_token`.
 2. Add the two npm-internal proxy hosts above.
-3. Register two accounts against `https://matrix.lab.<domain>` using the
-   registration token:
-   - `josh` — Josh's personal account (matches `matrix_admin_user` in
-     `group_vars/neo/vars.yml`)
-   - `hermes` — the bot account baibot logs in as
-     (`user.mxid_localpart` in `baibot/appdata/baibot/config.yaml.j2`)
+3. Register two accounts. **continuwuity ignores `REGISTRATION_TOKEN` for the
+   very first account**: on first boot with no accounts it prints a one-time
+   *bootstrap* token to its logs (`docker logs continuwuity` → "using the
+   registration token ..."), and whoever registers first with it becomes the
+   server admin. So order matters:
+   - `josh` **first**, with the bootstrap token — run
+     `bootstrap-register-josh.sh` (this directory); it fetches the token from
+     the logs and prompts (with confirmation) for a password. This is the
+     admin account (matches `matrix_admin_user` in `group_vars/neo/vars.yml`).
+   - `hermes` **second**, with the now-active
+     `secret_continuwuity_registration_token` — the bot account baibot logs in
+     as (`user.mxid_localpart` in `baibot/appdata/baibot/config.yaml.j2`).
 4. Flip `CONTINUWUITY_ALLOW_REGISTRATION` to `false` in
    `continuwuity/.env.j2` and redeploy (`make neo-docker`). Leaving
    registration open past this point means anyone who can reach
    `matrix.lab.<domain>` over WireGuard/LAN can create accounts.
+
+_Status: bootstrapped 2026-07-21 — both accounts exist and registration is
+flipped to `false` in the template (deploy to apply). The steps above are the
+runbook for a from-scratch rebuild._
 
 ## Required secrets
 
@@ -101,6 +129,33 @@ values, never grep it for secrets):
 - `secret_baibot_groq_api_key` (from console.groq.com - used by the
   `whisper` static agent for speech-to-text)
 - `secret_domain` (shared across the repo, not Matrix-specific)
+
+## Troubleshooting: Hermes stops replying (continuwuity #779)
+
+**Symptom:** you send a message and Hermes gets stuck "typing" and never
+replies, or Hermes is silent in a freshly-created room.
+
+**Cause:** continuwuity bug
+[#779](https://forgejo.ellis.link/continuwuation/continuwuity/issues/779) — on
+`/sync` v3, a room a client just joined sometimes comes down without its state
+(power levels, etc.), because a `/sync` landing mid-join hits broken DB
+invariants. baibot is the joining client, so it never gets the room's power
+levels: in an **encrypted** room it can't read history to build context ("Local
+cache doesn't contain all necessary data"); in a **plain** room its own send is
+rejected ("Event is not authorized"). Neither is a config error on our side.
+
+**On-demand workaround:** run `./resync-baibot.sh` (this directory). It restarts
+baibot; on the fresh sync, already-joined rooms come down with full state and
+replies work again. For a **new** room: invite `@hermes`, wait for "Hermes
+joined", *then* run the script, *then* send your first message. `--logs` appends
+recent baibot logs for diagnosis.
+
+**Permanent fix:** #779 is fixed by continuwuity commit `eff454218c`
+(2026-07-17), which is **not** in any tagged release as of the pinned `v26.6.2`
+(2026-07-12). When a release past that ships, Renovate will bump the
+`continuwuity` image in `docker-compose.yml.j2` and this workaround becomes
+unnecessary. To fix sooner, move the image tag to `main` (bleeding edge,
+unpinned — accept the reproducibility tradeoff) and redeploy.
 
 ## Voice messages
 

@@ -1,0 +1,45 @@
+# Synapse homeserver config. Rendered by ansible (secrets from vault).
+# Single-user, LAN-only, federation OFF, SQLite (no postgres) — tuned lean.
+server_name: "matrix.lab.{{ secret_domain }}"
+pid_file: /data/homeserver.pid
+public_baseurl: "https://matrix.lab.{{ secret_domain }}/"
+
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ['0.0.0.0']
+    resources:
+      - names: [client]
+        compress: false
+
+database:
+  name: sqlite3
+  args:
+    database: /data/homeserver.db
+
+signing_key_path: "/data/signing.key"
+macaroon_secret_key: "{{ secret_synapse_macaroon_secret_key }}"
+form_secret: "{{ secret_synapse_form_secret }}"
+registration_shared_secret: "{{ secret_synapse_registration_shared_secret }}"
+
+enable_registration: false
+report_stats: false
+
+# Federation OFF (whitelist nothing) — this server talks to no one but us.
+federation_domain_whitelist: []
+allow_public_rooms_over_federation: false
+trusted_key_servers: []
+suppress_key_server_warning: true
+
+# Trim memory/CPU for a single user.
+presence:
+  enabled: false
+url_preview_enabled: false
+caches:
+  global_factor: 0.5
+  event_cache_size: "5K"
+
+media_store_path: /data/media_store
+log_config: "/data/log.config"

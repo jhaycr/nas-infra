@@ -9,12 +9,8 @@ gateway (e.g. gluetun) are listed under the gateway service, not the proxied ser
 
 | Host | Stack | Service | Host Port | Container Port/Proto |
 |------|-------|---------|-----------|----------------------|
-| 192.168.1.3 | games | forge | `3010` | `3000` |
-| 192.168.1.3 | games | forge | `36743` | `36743` |
 | 192.168.1.3 | games | minecraft-proxy | `25565` | `25565` |
 | 192.168.1.3 | games | minecraft-proxy | `19132` | `19132/udp` |
-| 192.168.1.3 | games | xmage | `17171` | `17171` |
-| 192.168.1.3 | games | xmage | `17179` | `17179` |
 | 192.168.1.3 | infra | alloy | `12345` | `12345` |
 | 192.168.1.3 | infra | alloy | `4317` | `4317` |
 | 192.168.1.3 | infra | alloy | `4318` | `4318` |
@@ -32,7 +28,6 @@ gateway (e.g. gluetun) are listed under the gateway service, not the proxied ser
 | 192.168.1.3 | media-server | calibre-web-automated-book-downloader | `8084` | `8084` |
 | 192.168.1.3 | media-server | calibre-web-automated-kids | `8882` | `8083` |
 | 192.168.1.3 | media-server | chaptarr | `8789` | `8789` |
-| 192.168.1.3 | media-server | continuwuity | `8014` | `8008` |
 | 192.168.1.3 | media-server | deemix | `6595` | `6595` |
 | 192.168.1.3 | media-server | dockerproxy | `127.0.0.1:2375` | `2375` |
 | 192.168.1.3 | media-server | dozzle | `8081` | `8080` |
@@ -70,6 +65,7 @@ gateway (e.g. gluetun) are listed under the gateway service, not the proxied ser
 | 192.168.1.3 | media-server | sonarr | `8989` | `8989` |
 | 192.168.1.3 | media-server | sonarr-anime | `9989` | `8989` |
 | 192.168.1.3 | media-server | speedtest-tracker | `8085` | `80` |
+| 192.168.1.3 | media-server | synapse | `8014` | `8008` |
 | 192.168.1.3 | media-server | tarot | `8013` | `8000` |
 | 192.168.1.3 | media-server | tautulli | `8181` | `8181` |
 | 192.168.1.3 | media-server | tunarr | `8265` | `8000` |
