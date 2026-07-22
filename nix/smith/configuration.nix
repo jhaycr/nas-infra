@@ -140,7 +140,7 @@
     # once (HERMES_WRITE_SAFE_ROOT default change, 2026-07-17). Bump the
     # digest deliberately and run the hermes-agent skill's canary.sh after.
     # renovate: datasource=docker depName=nousresearch/hermes-agent
-    image = "nousresearch/hermes-agent:latest@sha256:24af4359a7c544209323cc9a427fd0b34a6d7a78a8480bfbdfe565fc05ba89db";
+    image = "nousresearch/hermes-agent:latest@sha256:d820f7866948cef029514f2859dfdab8162684863ee86b8a0d58448d480df182";
     cmd = [ "gateway" "run" ];
     environmentFiles = [
       "/etc/hermes/hermes-josh.env"
