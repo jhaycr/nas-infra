@@ -9,7 +9,13 @@ set -euo pipefail
 REPO="${1:-$HOME/Code/tarot}"
 cd "$(dirname "$0")/.."
 
-docker --context default build -t ghcr.io/jhaycr/tarot:dev "$REPO"
+# Stamp the dev image with the working-tree state so the in-app version line
+# tells you exactly which local build is live on neo (e.g. dev-201ba30-dirty).
+DEV_VERSION="dev-$(git -C "$REPO" describe --always --dirty --exclude '*' 2>/dev/null || echo local)"
+echo "Building $DEV_VERSION"
+
+docker --context default build --build-arg TAROT_VERSION="$DEV_VERSION" \
+  -t ghcr.io/jhaycr/tarot:dev "$REPO"
 docker --context default save ghcr.io/jhaycr/tarot:dev | gzip > /tmp/tarot-dev.tar.gz
 ansible neo -m copy -a "src=/tmp/tarot-dev.tar.gz dest=/tmp/tarot-dev.tar.gz"
 ansible neo --become -m shell -a "gunzip -c /tmp/tarot-dev.tar.gz | docker load && rm /tmp/tarot-dev.tar.gz"
